@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gratuity Calculator for Central Government Employees</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles matching leave encashment calculator */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            background: #0d1525; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            color: #e0e0e0; 
+            line-height: 1.6;
+        }
+        body { 
+            min-height: 100vh; 
+            padding: 20px 19px; /* 19px ≈ 0.2 inches */
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .container {
+            width: 100vw; /* Full viewport width */
+            max-width: none; /* Remove max-width constraint */
+            margin: 0;
+            padding: 0 19px; /* Add padding equivalent to original body padding */
+        }
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            padding-left: 18px;
+            letter-spacing: 1px;
+            border-left: 4px solid #4d7cff;
+            text-align: left;
+            margin-left: 0;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            color: #a0a8c0;
+            text-align: left;
+            margin-left: 0;
+            margin-top: 10px;
+        }
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: #1a243d;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3450;
+        }
+        .section-title {
+            color: #e0e0e0;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4d7cff;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .output-section {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #d0d8e8;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #0d1525;
+            border: 1px solid #2a3450;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #e0e0e0;
+        }
+        input:focus, select:focus {
+            border-color: #4d7cff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(77, 124, 255, 0.3);
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 8px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 2px solid #2a3450;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #0d1525;
+            font-size: 0.95rem;
+        }
+        .radio-option:hover {
+            border-color: #4d7cff;
+            background-color: #1a243d;
+        }
+        .radio-option input {
+            margin: 0;
+            width: 16px;
+            height: 16px;
+        }
+        .radio-option input:checked + label {
+            color: #4d7cff;
+            font-weight: 600;
+        }
+        .radio-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button {
+            background: #4d7cff;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(77, 124, 255, 0.3);
+            background: #5d8cff;
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-success {
+            background: #4CAF50;
+        }
+        .btn-success:hover {
+            background: #5dbf61;
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.3);
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #2a3450;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 600;
+            color: #d0d8e8;
+        }
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        .highlight {
+            background: #0d1525;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4d7cff;
+        }
+        .note {
+            font-size: 0.9rem;
+            color: #a0a8c0;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .alert i {
+            font-size: 1.3rem;
+            margin-top: 2px;
+        }
+        .alert-info {
+            background-color: #1a243d;
+            border-left: 4px solid #4d7cff;
+            color: #d0d8e8;
+        }
+        .alert-info i {
+            color: #4d7cff;
+        }
+        .alert-success {
+            background-color: #1a243d;
+            border-left: 4px solid #4CAF50;
+            color: #d0d8e8;
+        }
+        .alert-success i {
+            color: #4CAF50;
+        }
+        .alert-warning {
+            background-color: #1a243d;
+            border-left: 4px solid #FF9800;
+            color: #d0d8e8;
+        }
+        .alert-warning i {
+            color: #FF9800;
+        }
+        .alert-danger {
+            background-color: #1a243d;
+            border-left: 4px solid #f44336;
+            color: #d0d8e8;
+        }
+        .alert-danger i {
+            color: #f44336;
+        }
+        .calculation-steps {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px dashed #2a3450;
+        }
+        .step {
+            margin-bottom: 12px;
+            padding: 12px;
+            background-color: #0d1525;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 40px;
+        }
+        .step-number {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            background: #4d7cff;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        footer {
+            text-align: center;
+            color: #a0a8c0;
+            padding: 30px 0;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            background: #1a243d;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a3450;
+            margin-left: 19px; /* Match container padding */
+            margin-right: 19px; /* Match container padding */
+        }
+        .date-inputs {
+            display: flex;
+            gap: 12px;
+        }
+        .date-inputs > div {
+            flex: 1;
+        }
+        .hidden {
+            display: none;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: #0d1525;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid #2a3450;
+        }
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        .summary-card i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        .summary-card h3 {
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+        .service-card {
+            background: linear-gradient(135deg, #2c7bb6 0%, #1a4f7a 100%);
+            color: white;
+        }
+        .service-card i {
+            color: #ffd700;
+        }
+        .amount-card {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+        .amount-card i {
+            color: #ffd700;
+        }
+        .type-card {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            color: white;
+        }
+        .type-card i {
+            color: #ffd700;
+        }
+        .periods-card {
+            background: linear-gradient(135deg, #fd7e14 0%, #e06a0d 100%);
+            color: white;
+        }
+        .periods-card i {
+            color: #ffd700;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .results-header h2 {
+            margin: 0;
+        }
+        .export-btn-container {
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 0; /* Adjusted for full width */
+            }
+            .container {
+                padding: 0 10px; /* Adjusted for smaller screens */
+            }
+            .app-container {
+                gap: 15px;
+            }
+            .card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                text-align: center;
+                padding-left: 0;
+                border-left: none;
+                border-bottom: 3px solid #4d7cff;
+                padding-bottom: 10px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .subtitle {
+                text-align: center;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .date-inputs {
+                flex-direction: column;
+            }
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            footer {
+                margin-left: 10px; /* Match container padding on mobile */
+                margin-right: 10px; /* Match container padding on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Gratuity Calculator</h1>
+            <p class="subtitle">Designed by Anil Kumar VT | Calculated as per CCS (Pension) Rules, 2021</p>
+        </header>
+        <div class="app-container">
+            <div class="input-section">
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-user"></i> Employee Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="employeeName">Employee Name</label>
+                            <input type="text" id="employeeName" class="form-control" placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="designation">Designation</label>
+                            <input type="text" id="designation" class="form-control" placeholder="Enter designation">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-clock"></i> Service Details</h2>
+                    <div class="form-group">
+                        <label>Calculation Type</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="retirement" name="calculationType" value="retirement" checked>
+                                <label for="retirement">Retirement Gratuity</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="death" name="calculationType" value="death">
+                                <label for="death">Death Gratuity</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dateOfJoining">Date of Joining Service</label>
+                            <input type="date" id="dateOfJoining" class="form-control">
+                        </div>
+                        <div class="form-group" id="retirementDateGroup">
+                            <label for="dateOfRetirement">Date of Retirement</label>
+                            <input type="date" id="dateOfRetirement" class="form-control">
+                        </div>
+                        <div class="form-group hidden" id="deathDateGroup">
+                            <label for="dateOfDeath">Date of Death</label>
+                            <input type="date" id="dateOfDeath" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Emoluments Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="basicPay">Basic Pay at Retirement/Death (₹)</label>
+                            <input type="number" id="basicPay" class="form-control" min="0" placeholder="Enter basic pay">
+                        </div>
+                        <div class="form-group">
+                            <label for="daPercentage">Dearness Allowance Percentage (%)</label>
+                            <input type="number" id="daPercentage" class="form-control" min="0" max="100" step="0.01" placeholder="Enter DA percentage">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="averageEmoluments">Average Emoluments (₹)</label>
+                        <input type="number" id="averageEmoluments" class="form-control" min="0" placeholder="Enter average of last 10 months">
+                        <div class="note">Average of last 10 months' emoluments</div>
+                    </div>
+                    <button id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Gratuity</button>
+                </div>
+            </div>
+            <div class="output-section">
+                <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="results-header">
+                        <h2 class="section-title"><i class="fas fa-chart-bar"></i> Calculation Results</h2>
+                    </div>
+                    <div id="resultsContainer" style="flex: 1;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Welcome to the Gratuity Calculator</strong>
+                                <p>Please enter your details and click "Calculate Gratuity" to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="export-btn-container">
+                        <button id="exportPdfBtn" class="btn-success hidden"><i class="fas fa-file-pdf"></i> Export to PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p><strong>Disclaimer:</strong> This calculator provides estimates based on the Central Civil Services Pension Rules, 2021. Actual gratuity amounts may vary based on specific circumstances and official interpretations.</p>
+            <p>© 2025 Advanced Gratuity Calculator for Central Government Employees</p>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculateBtn');
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const retirementDateGroup = document.getElementById('retirementDateGroup');
+            const deathDateGroup = document.getElementById('deathDateGroup');
+            const calculationTypeRadios = document.querySelectorAll('input[name="calculationType"]');
+            // Toggle between retirement and death date inputs
+            calculationTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'retirement') {
+                        retirementDateGroup.classList.remove('hidden');
+                        deathDateGroup.classList.add('hidden');
+                    } else {
+                        retirementDateGroup.classList.add('hidden');
+                        deathDateGroup.classList.remove('hidden');
+                    }
+                });
+            });
+            calculateBtn.addEventListener('click', calculateGratuity);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+
+            function calculateGratuity() {
+                // Get employee details
+                const employeeName = document.getElementById('employeeName').value;
+                const designation = document.getElementById('designation').value;
+                // Get calculation type
+                const calculationType = document.querySelector('input[name="calculationType"]:checked').value;
+                // Get dates
+                const dateOfJoining = new Date(document.getElementById('dateOfJoining').value);
+                let endDate;
+                if (calculationType === 'retirement') {
+                    endDate = new Date(document.getElementById('dateOfRetirement').value);
+                } else {
+                    endDate = new Date(document.getElementById('dateOfDeath').value);
+                }
+                // Get emoluments details
+                const basicPay = parseFloat(document.getElementById('basicPay').value) || 0;
+                const daPercentage = parseFloat(document.getElementById('daPercentage').value) || 0;
+                const averageEmoluments = parseFloat(document.getElementById('averageEmoluments').value) || 0;
+                // Validate inputs
+                if (!employeeName || !designation) {
+                    showError("Please enter employee name and designation.");
+                    return;
+                }
+                if (isNaN(dateOfJoining.getTime())) {
+                    showError("Please enter a valid date of joining.");
+                    return;
+                }
+                if (isNaN(endDate.getTime())) {
+                    showError(`Please enter a valid date of ${calculationType === 'retirement' ? 'retirement' : 'death'}.`);
+                    return;
+                }
+                if (basicPay <= 0 || daPercentage < 0) {
+                    showError("Please enter valid basic pay and DA percentage values.");
+                    return;
+                }
+                if (averageEmoluments <= 0) {
+                    showError("Please enter a valid average emoluments value.");
+                    return;
+                }
+                // Calculate service period
+                const servicePeriod = calculateServicePeriod(dateOfJoining, endDate);
+                let years = servicePeriod.years;
+                let months = servicePeriod.months;
+                const totalMonths = years * 12 + months;
+                // Apply maximum service limit of 33 years for gratuity calculation
+                let serviceLimited = false;
+                if (years > 33 || (years === 33 && months > 0)) {
+                    serviceLimited = true;
+                    years = 33;
+                    months = 0;
+                }
+                // Calculate last drawn emoluments
+                const daAmount = basicPay * (daPercentage / 100);
+                const lastDrawnEmoluments = basicPay + daAmount;
+                // Calculate emoluments (higher of last drawn or average)
+                const emoluments = Math.max(lastDrawnEmoluments, averageEmoluments);
+                // Calculate qualifying service in six-monthly periods
+                const totalPeriods = calculateSixMonthlyPeriods(years, months);
+                // Perform calculation based on calculation type
+                let gratuityAmount = 0;
+                const maxMultiplier = 16.5; // Maximum at 33 years/66 periods
+                const maxCeiling = 2500000; // 25 Lakhs
+                let gratuityType = '';
+                let calculationSteps = [];
+                let eligibilityError = false;
+                if (calculationType === 'retirement') {
+                    // Check eligibility for Retirement Gratuity (minimum 5 years service)
+                    if (totalMonths < 60) {
+                        showError("Retirement Gratuity requires minimum 5 years of qualifying service. For service less than 5 years, only Death Gratuity is payable.");
+                        eligibilityError = true;
+                        return;
+                    }
+                    gratuityType = 'Retirement Gratuity (RG)';
+                    calculationSteps.push("Eligibility: 5+ years of qualifying service confirmed");
+                    calculationSteps.push(`Formula: RG = Emoluments × 1/4 × Total Six-Monthly Periods (P)`);
+                    calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 1/4 × ${totalPeriods}`);
+                    gratuityAmount = emoluments * (1/4) * totalPeriods;
+                    // Apply maximum multiplier (16.5 times emoluments)
+                    const maxByMultiplier = emoluments * maxMultiplier;
+                    if (gratuityAmount > maxByMultiplier) {
+                        calculationSteps.push(`Maximum multiplier applied: Rs.${emoluments.toLocaleString()} × ${maxMultiplier} = Rs.${maxByMultiplier.toLocaleString()}`);
+                        gratuityAmount = maxByMultiplier;
+                    }
+                    // Apply monetary ceiling for RG
+                    if (gratuityAmount > maxCeiling) {
+                        calculationSteps.push(`Monetary ceiling applied: Rs.${gratuityAmount.toLocaleString()} limited to Rs.${maxCeiling.toLocaleString()}`);
+                        gratuityAmount = maxCeiling;
+                    }
+                } else {
+                    // Death Gratuity - No minimum service requirement
+                    gratuityType = 'Death Gratuity (DG)';
+                    // Apply rounding rule for Death Gratuity: 9+ months rounded up to next year
+                    let roundedYears = years;
+                    let roundedMonths = months;
+                    let roundingApplied = false;
+                    if (months >= 9) {
+                        roundedYears = years + 1;
+                        roundedMonths = 0;
+                        roundingApplied = true;
+                        calculationSteps.push(`Service rounding applied: ${years} years ${months} months → ${roundedYears} years (9+ months rounded up)`);
+                    }
+                    // Use rounded years for Death Gratuity calculation
+                    const roundedTotalMonths = roundedYears * 12 + roundedMonths;
+                    if (roundedTotalMonths < 12) {
+                        // Less than 1 year
+                        calculationSteps.push("Service Duration: Less than 1 year");
+                        calculationSteps.push(`Formula: DG = Emoluments × 2`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 2`);
+                        gratuityAmount = emoluments * 2;
+                    } else if (roundedTotalMonths >= 12 && roundedTotalMonths < 60) {
+                        // 1 year or more but less than 5 years
+                        calculationSteps.push("Service Duration: 1 year or more but less than 5 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 6`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 6`);
+                        gratuityAmount = emoluments * 6;
+                    } else if (roundedTotalMonths >= 60 && roundedTotalMonths < 132) {
+                        // 5 years or more but less than 11 years
+                        calculationSteps.push("Service Duration: 5 years or more but less than 11 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 12`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 12`);
+                        gratuityAmount = emoluments * 12;
+                    } else if (roundedTotalMonths >= 132 && roundedTotalMonths < 240) {
+                        // 11 years or more but less than 20 years
+                        calculationSteps.push("Service Duration: 11 years or more but less than 20 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 20`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 20`);
+                        gratuityAmount = emoluments * 20;
+                    } else {
+                        // 20 years or more
+                        calculationSteps.push("Service Duration: 20 years or more");
+                        calculationSteps.push(`Formula: DG = Emoluments × 1/2 × Total Six-Monthly Periods (P)`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 1/2 × ${totalPeriods}`);
+                        gratuityAmount = emoluments * (1/2) * totalPeriods;
+                        // Apply maximum multiplier for 20+ years slab (33 times emoluments)
+                        const maxByMultiplierDG = emoluments * 33;
+                        if (gratuityAmount > maxByMultiplierDG) {
+                            calculationSteps.push(`Maximum multiplier applied: Rs.${emoluments.toLocaleString()} × 33 = Rs.${maxByMultiplierDG.toLocaleString()}`);
+                            gratuityAmount = maxByMultiplierDG;
+                        }
+                    }
+                    // Apply monetary ceiling for DG
+                    if (gratuityAmount > maxCeiling) {
+                        calculationSteps.push(`Monetary ceiling applied: Rs.${gratuityAmount.toLocaleString()} limited to Rs.${maxCeiling.toLocaleString()}`);
+                        gratuityAmount = maxCeiling;
+                    }
+                }
+                if (eligibilityError) return;
+                // Round up to the next higher rupee if there's a fraction
+                if (gratuityAmount % 1 !== 0) {
+                    const originalAmount = gratuityAmount;
+                    gratuityAmount = Math.ceil(gratuityAmount);
+                    calculationSteps.push(`Rounded up to next higher rupee: Rs.${originalAmount.toFixed(2)} → Rs.${gratuityAmount.toLocaleString()}`);
+                }
+                // Store data for PDF export
+                window.calculationData = {
+                    employeeName,
+                    designation,
+                    gratuityType,
+                    basicPay,
+                    daPercentage,
+                    daAmount,
+                    lastDrawnEmoluments,
+                    averageEmoluments,
+                    emoluments,
+                    dateOfJoining: formatDate(dateOfJoining),
+                    endDate: formatDate(endDate),
+                    endDateType: calculationType === 'retirement' ? 'Retirement' : 'Death',
+                    years,
+                    months,
+                    totalMonths,
+                    totalPeriods,
+                    gratuityAmount,
+                    calculationSteps,
+                    serviceLimited,
+                    maxMultiplier,
+                    maxCeiling,
+                    roundingApplied: calculationType === 'death' && months >= 9
+                };
+                // Display results
+                displayResults();
+                exportPdfBtn.classList.remove('hidden');
+            }
+            function calculateServicePeriod(startDate, endDate) {
+                let years = endDate.getFullYear() - startDate.getFullYear();
+                let months = endDate.getMonth() - startDate.getMonth();
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                // Adjust for day of month
+                if (endDate.getDate() < startDate.getDate()) {
+                    months--;
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                }
+                return { years, months };
+            }
+            // Function to calculate six-monthly periods with proper rounding and maximum limit
+            function calculateSixMonthlyPeriods(years, months) {
+                // Maximum service for gratuity is 33 years (66 periods)
+                const maxPeriods = 66;
+                let totalPeriods = years * 2; // Each year gives 2 six-monthly periods
+                // Handle the remaining months
+                if (months >= 6) {
+                    // If 6 or more months, we have at least one complete six-month period
+                    totalPeriods += 1;
+                    months -= 6;
+                }
+                // For remaining months (0-5 months), apply rounding rules
+                if (months >= 3 && months <= 5) {
+                    // 3-5 months: round up by adding one more period
+                    totalPeriods += 1;
+                }
+                // 0-2 months: disregard (no additional period)
+                // Apply maximum limit of 66 periods
+                return Math.min(totalPeriods, maxPeriods);
+            }
+            function formatDate(date) {
+                return date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+            function displayResults() {
+                const data = window.calculationData;
+                // Create summary cards
+                let summaryCards = `
+                    <div class="summary-cards">
+                        <div class="summary-card amount-card">
+                            <i class="fas fa-rupee-sign"></i>
+                            <h3>Gratuity Amount</h3>
+                            <p>Rs.${data.gratuityAmount.toLocaleString()}</p>
+                        </div>
+                        <div class="summary-card service-card">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h3>Service Period</h3>
+                            <p>${data.years}Y ${data.months}M</p>
+                        </div>
+                        <div class="summary-card type-card">
+                            <i class="fas fa-tag"></i>
+                            <h3>Gratuity Type</h3>
+                            <p>${data.gratuityType.split(' ')[0]}</p>
+                        </div>
+                        <div class="summary-card periods-card">
+                            <i class="fas fa-sync-alt"></i>
+                            <h3>Six-Monthly Periods</h3>
+                            <p>${data.totalPeriods}</p>
+                        </div>
+                    </div>
+                `;
+                // Create detailed results
+                let resultsHTML = `
+                    ${summaryCards}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Gratuity Calculation Complete</strong>
+                            <p>Your gratuity has been calculated successfully based on the provided details.</p>
+                        </div>
+                    </div>
+                    <div class="result-item highlight">
+                        <div class="result-label">Final Gratuity Amount</div>
+                        <div class="result-value">Rs.${data.gratuityAmount.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Employee Name</div>
+                        <div class="result-value">${data.employeeName}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Designation</div>
+                        <div class="result-value">${data.designation}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Gratuity Type</div>
+                        <div class="result-value">${data.gratuityType}</div>
+                    </div>
+                `;
+                // Add service rounding notice if applicable
+                if (data.roundingApplied) {
+                    resultsHTML += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Service Rounding Applied:</strong> For Death Gratuity, service of ${data.years} years ${data.months} months has been rounded up to ${data.years + 1} years (9+ months rounded up to next year).
+                            </div>
+                        </div>
+                    `;
+                }
+                // Add service limitation notice if applicable
+                if (data.serviceLimited) {
+                    resultsHTML += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Note:</strong> Service limited to maximum 33 years for gratuity calculation as per rules.
+                            </div>
+                        </div>
+                    `;
+                }
+                resultsHTML += `
+                    <div class="result-item">
+                        <div class="result-label">Date of Joining</div>
+                        <div class="result-value">${data.dateOfJoining}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Date of ${data.endDateType}</div>
+                        <div class="result-value">${data.endDate}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Qualifying Service</div>
+                        <div class="result-value">${data.years} Years ${data.months} Months (${data.totalMonths} months)</div>
+                        ${data.serviceLimited ? '<div class="note">Limited to maximum 33 years for gratuity calculation</div>' : ''}
+                        ${data.roundingApplied ? `<div class="note">Rounded up to ${data.years + 1} years for Death Gratuity calculation (9+ months rounded up)</div>` : ''}
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Total Completed Six-Monthly Periods (P)</div>
+                        <div class="result-value">${data.totalPeriods}</div>
+                        <div class="note">${data.totalPeriods === 66 ? 'Maximum limit of 66 periods reached' : `Calculated as: ${data.years} years × 2 = ${data.years * 2} periods + ${getMonthsExplanation(data.months)}`}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Basic Pay</div>
+                        <div class="result-value">Rs.${data.basicPay.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Dearness Allowance (${data.daPercentage}%)</div>
+                        <div class="result-value">Rs.${data.daAmount.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Last Drawn Emoluments</div>
+                        <div class="result-value">Rs.${data.lastDrawnEmoluments.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Average Emoluments</div>
+                        <div class="result-value">Rs.${data.averageEmoluments.toLocaleString()}</div>
+                    </div>
+                    <div class="result-item highlight">
+                        <div class="result-label">Emoluments for Gratuity Calculation</div>
+                        <div class="result-value">Rs.${data.emoluments.toLocaleString()}</div>
+                        <div class="note">Higher of last drawn emoluments (Rs.${data.lastDrawnEmoluments.toLocaleString()}) or average emoluments (Rs.${data.averageEmoluments.toLocaleString()})</div>
+                    </div>
+                `;
+                // Add calculation steps
+                if (data.calculationSteps && data.calculationSteps.length > 0) {
+                    resultsHTML += `
+                        <div class="calculation-steps">
+                            <h3 class="section-title"><i class="fas fa-calculator"></i> Calculation Steps</h3>
+                            ${data.calculationSteps.map((step, index) => `
+                                <div class="step">
+                                    <div class="step-number">${index + 1}</div>
+                                    <div>${step}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                // Add important notes
+                resultsHTML += `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Important Rules:</strong>
+                            <ul style="margin-top: 8px; margin-left: 20px;">
+                                <li>Retirement Gratuity requires minimum 5 years of qualifying service</li>
+                                <li>Death Gratuity has no minimum service requirement</li>
+                                <li>For Death Gratuity: 9+ months of service rounded up to next year</li>
+                                <li>Maximum gratuity amount: Rs.25,00,000</li>
+                                <li>Fractions of rupee are rounded up to next higher rupee</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.innerHTML = resultsHTML;
+            }
+            function getMonthsExplanation(months) {
+                if (months === 0) return "0 months = 0 additional periods";
+                if (months < 3) return `${months} months = 0 additional periods (less than 3 months disregarded)`;
+                if (months >= 3 && months < 6) return `${months} months = 1 additional period (3-5 months rounded up)`;
+                if (months >= 6) return `${months} months = 1 additional period (6+ months = 1 period)`;
+                return "";
+            }
+            function showError(message) {
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Error</strong>
+                            <p>${message}</p>
+                        </div>
+                    </div>
+                `;
+                exportPdfBtn.classList.add('hidden');
+            }
+            function exportToPdf() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const data = window.calculationData;
+                // Margins
+                const leftMargin = 20;
+                let y = 20;
+                // === Header ===
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(20);
+                doc.setTextColor(40, 60, 120);
+                doc.text("Gratuity Calculation Report", leftMargin, y);
+                y += 8;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Calculated as per CCS (Pension) Rules, 2021", leftMargin, y);
+                y += 10;
+                // Helper: section title
+                const sectionTitle = (text) => {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(13);
+                    doc.setTextColor(50, 50, 50);
+                    doc.text(text, leftMargin, y);
+                    y += 8;
+                };
+                // Helper: key-value row
+                const row = (label, value) => {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(11);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text(label, leftMargin, y);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(value, leftMargin + 65, y);
+                    y += 7;
+                };
+                // === Employee Details ===
+                sectionTitle("1. Employee Details");
+                row("Name:", data.employeeName);
+                row("Designation:", data.designation);
+                row("Gratuity Type:", data.gratuityType);
+                row("Date of Joining:", data.dateOfJoining);
+                row(`Date of ${data.endDateType}:`, data.endDate);
+                row("Qualifying Service:", `${data.years} Years ${data.months} Months`);
+                if (data.roundingApplied) {
+                    row("Rounded Service (DG):", `${data.years + 1} Years`);
+                }
+                y += 5;
+                // === Emoluments ===
+                sectionTitle("2. Emoluments Details");
+                row("Basic Pay:", `Rs.${data.basicPay.toLocaleString()}`);
+                row("DA (%):", `${data.daPercentage}%`);
+                row("DA Amount:", `Rs.${data.daAmount.toLocaleString()}`);
+                row("Last Drawn Emoluments:", `Rs.${data.lastDrawnEmoluments.toLocaleString()}`);
+                row("Average Emoluments:", `Rs.${data.averageEmoluments.toLocaleString()}`);
+                row("Emoluments for Calculation:", `Rs.${data.emoluments.toLocaleString()}`);
+                y += 5;
+                // === Gratuity Calculation ===
+                sectionTitle("3. Gratuity Calculation");
+                row("Six-Monthly Periods (P):", `${data.totalPeriods}`);
+                if (data.serviceLimited) {
+                    row("Note:", "Service limited to 33 years for calculation");
+                }
+                y += 5;
+                // Gratuity Amount (highlighted)
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.setTextColor(0, 100, 0);
+                doc.text(`Final Gratuity Amount: Rs.${data.gratuityAmount.toLocaleString()}`, leftMargin, y);
+                y += 12;
+                // === Calculation Steps (if any) ===
+                if (data.calculationSteps && data.calculationSteps.length > 0) {
+                    sectionTitle("4. Calculation Steps");
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    data.calculationSteps.forEach(step => {
+                        // If it barely fits, keep it on page 1 by reducing spacing
+                        if (y > 260) {
+                            // Only add page if absolutely necessary (unlikely now)
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`• ${step}`, leftMargin + 5, y);
+                        y += 6;
+                    });
+                    y += 6;
+                }
+                // === Single footer on page 1 only ===
+                const footerText = "Generated by Advanced Gratuity Calculator | © 2025";
+                doc.setFontSize(9);
+                doc.setTextColor(150, 150, 150);
+                doc.text(footerText, leftMargin, 285);
+                // Save
+                doc.save(`Gratuity_Calculation_${data.employeeName.replace(/\s+/g, '_')}.pdf`);
+            }
+        });
+    </script>
+</body>
+</html>

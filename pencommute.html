@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pension Commutation Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Initialize Tailwind with custom configuration if needed
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#e3f2fd',
+                            100: '#bbdefb',
+                            200: '#90caf9',
+                            300: '#64b5f6',
+                            400: '#42a5f5',
+                            500: '#2196f3',
+                            600: '#1e88e5',
+                            700: '#1976d2',
+                            800: '#1565c0',
+                            900: '#0d47a1',
+                        },
+                        dark: {
+                            900: '#0a192f',
+                            800: '#0d1b2a',
+                            700: '#1b263b',
+                            600: '#2d3748',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #0d1b2a 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 30px 20px;
+            background: rgba(13, 27, 42, 0.8);
+            border-bottom: 2px solid #1e88e5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .main-header h1 {
+            color: #64b5f6;
+            margin-bottom: 8px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 15px rgba(100, 181, 246, 0.7);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #90caf9;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 25px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 350px;
+            padding: 25px;
+            background-color: rgba(27, 38, 59, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .input-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #64b5f6;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(20, 30, 48, 0.9);
+            border: 2px solid rgba(100, 150, 255, 0.4);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2196f3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+
+        .input-group input::placeholder {
+            color: #90a4ae;
+        }
+
+        .calculate-btn, .export-btn {
+            width: 100%;
+            padding: 15px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            display: none;
+        }
+
+        .calculate-btn:hover, .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+        }
+
+        .calculate-btn:active, .export-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 20px;
+            background: rgba(27, 38, 59, 0.9);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+
+        .result h2 {
+            color: #64b5f6;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            background: rgba(20, 30, 48, 0.9);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card h3 {
+            font-size: 0.9rem;
+            color: #90caf9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .lump-sum {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(46, 125, 50, 0.15));
+            padding: 20px;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(76, 175, 80, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .final-pension {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(245, 124, 0, 0.15));
+            padding: 20px;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(255, 193, 7, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .steps-section h3 {
+            color: #64b5f6;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.4rem;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-item {
+            background: rgba(20, 30, 48, 0.9);
+            padding: 14px;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid #64b5f6;
+            text-align: left;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .disclaimer {
+            font-size: 0.85rem;
+            color: #90a4ae;
+            margin-top: 2rem;
+            line-height: 1.5;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(100, 150, 255, 0.1);
+        }
+
+        /* PDF Specific Styles */
+        .pdf-template {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+            .input-section {
+                padding: 20px;
+            }
+            .main-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <h1>Pension Commutation Calculator</h1>
+        <p class="subtitle">Calculate your commuted pension value and monthly payable pension</p>
+    </div>
+
+    <div class="container">
+        <div class="input-section">
+            <div id="calculator-form">
+                <h2 class="text-xl font-semibold text-primary-300 mb-6 pb-2 border-b border-primary-500/30">Pensioner Details</h2>
+
+                <div class="input-group mb-6">
+                    <div>
+                        <label for="employeeName">Employee Name</label>
+                        <input type="text" id="employeeName" placeholder="Enter your full name">
+                    </div>
+                    <div>
+                        <label for="designation">Designation</label>
+                        <input type="text" id="designation" placeholder="Enter Designation">
+                    </div>
+                    <div>
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob">
+                    </div>
+                    <div>
+                        <label for="dor">Date of Retirement</label>
+                        <input type="date" id="dor">
+                    </div>
+                    <div>
+                        <label for="doa">Date of Application (Commutation)</label>
+                        <input type="date" id="doa">
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-semibold text-primary-300 mb-6 mt-6 pb-2 border-b border-primary-500/30">Financial Inputs</h2>
+
+                <div class="input-group mb-8">
+                    <div>
+                        <label for="basicPay">Last Drawn Basic Pay (₹)</label>
+                        <input type="number" id="basicPay" placeholder="e.g., 50000" min="0" step="100">
+                    </div>
+                    <div>
+                        <label for="daPercent">DA Percentage (%)</label>
+                        <input type="number" id="daPercent" placeholder="e.g., 46" min="0" max="100" step="0.1">
+                    </div>
+                    <div>
+                        <label for="commutePercent">Commutation Percentage (Max 40%)</label>
+                        <input type="number" id="commutePercent" placeholder="e.g., 40" min="0" max="40" step="0.1">
+                    </div>
+                </div>
+
+                <button onclick="calculateCommutation()" class="calculate-btn">
+                    Calculate Commutation
+                </button>
+                <button onclick="exportToPDF()" class="export-btn" id="export-btn">
+                    Export Report to PDF
+                </button>
+                <p id="error-message" class="text-red-400 mt-3 text-center font-medium hidden"></p>
+            </div>
+
+            <div class="disclaimer">
+                <strong>Disclaimer:</strong> Monthly Basic Pension is estimated as 50% of the Last Drawn Basic Pay. Dearness Relief (DR) is calculated on the full Basic Pension amount before commutation. This calculator provides estimates based on standard government rules. Actual calculations may vary depending on specific pension regulations.
+            </div>
+        </div>
+
+        <div id="results" class="input-section">
+            <h2 class="text-xl font-semibold text-primary-300 mb-6 pb-2 border-b border-primary-500/30">Calculation Results</h2>
+
+            <p class="text-center mb-6 font-semibold text-lg text-white" id="result-name-designation"></p>
+
+            <div class="result-grid">
+                <div class="result-card">
+                    <h3>Age Next Birthday</h3>
+                    <div class="result-value" id="result-age">—</div>
+                </div>
+                <div class="result-card">
+                    <h3>Commutation Factor</h3>
+                    <div class="result-value" id="result-factor">—</div>
+                </div>
+                <div class="result-card">
+                    <h3>Total Basic Pension (Monthly)</h3>
+                    <div class="result-value" id="result-total-pension">—</div>
+                </div>
+                <div class="result-card">
+                    <h3>Dearness Relief (Monthly)</h3>
+                    <div class="result-value" id="result-dr">—</div>
+                </div>
+            </div>
+
+            <div class="lump-sum">
+                <h3 class="text-green-400 font-semibold">Lump Sum Commutation Value (₹)</h3>
+                <div class="result-value text-green-300 text-2xl" id="result-lump-sum">—</div>
+            </div>
+
+            <div class="final-pension">
+                <h3 class="text-yellow-400 font-semibold">Net Monthly Pension Payable (₹)</h3>
+                <div class="result-value text-yellow-300 text-2xl" id="result-final-payable-pension">—</div>
+            </div>
+
+            <div class="result-card" style="margin-top: 15px;">
+                <h3 class="text-yellow-400">Residual Basic Pension (Monthly, Before DR)</h3>
+                <div class="result-value" id="result-residual-basic-pension">—</div>
+            </div>
+
+            <div class="steps-section">
+                <h3>Detailed Calculation Steps</h3>
+                <div id="calculation-steps">
+                    <p class="text-gray-400">Enter details and click 'Calculate' to see the steps.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CORRECTED COMMUTATION TABLE
+        const COMMUTATION_TABLE = {
+            20: 9.188, 21: 9.187, 22: 9.186, 23: 9.185, 24: 9.184, 25: 9.183, 26: 9.182, 27: 9.180, 28: 9.178, 29: 9.176,
+            30: 9.173, 31: 9.169, 32: 9.164, 33: 9.159, 34: 9.152, 35: 9.145, 36: 9.136, 37: 9.126, 38: 9.116, 39: 9.103,
+            40: 9.090, 41: 9.075, 42: 9.059, 43: 9.040, 44: 9.019, 45: 8.996, 46: 8.971, 47: 8.943, 48: 8.913, 49: 8.881,
+            50: 8.846, 51: 8.808, 52: 8.768, 53: 8.724, 54: 8.678, 55: 8.627, 56: 8.572, 57: 8.512, 58: 8.446, 59: 8.371,
+            60: 8.287, 61: 8.194, 62: 8.093, 63: 7.982, 64: 7.862, 65: 7.731, 66: 7.591, 67: 7.431, 68: 7.262, 69: 7.083,
+            70: 6.897, 71: 6.703, 72: 6.502, 73: 6.296, 74: 6.085, 75: 5.872, 76: 5.657, 77: 5.443, 78: 5.229, 79: 5.018,
+            80: 4.812, 81: 4.611
+        };
+
+        const errorMessageElement = document.getElementById('error-message');
+        const exportBtn = document.getElementById('export-btn');
+
+        // Custom formatter for Rs. symbol
+        function formatCurrency(amount) {
+            return 'Rs. ' + Number(amount).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function calculateAgeNextBirthday(dobString, doaString) {
+            const dob = new Date(dobString);
+            const doa = new Date(doaString);
+            if (isNaN(dob) || isNaN(doa)) return null;
+            let ageAtDoa = doa.getFullYear() - dob.getFullYear();
+            const monthDiff = doa.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && doa.getDate() < dob.getDate())) {
+                ageAtDoa--;
+            }
+            let nextBirthdayYear = dob.getFullYear() + ageAtDoa + 1;
+            let nextBirthday = new Date(nextBirthdayYear, dob.getMonth(), dob.getDate());
+            if (nextBirthday <= doa) nextBirthdayYear++;
+            return nextBirthdayYear - dob.getFullYear();
+        }
+        
+        function calculateAgeAtDate(dobString, dateString) {
+            const dob = new Date(dobString);
+            const date = new Date(dateString);
+            if (isNaN(dob) || isNaN(date)) return null;
+
+            let age = date.getFullYear() - dob.getFullYear();
+            const monthDiff = date.getMonth() - dob.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && date.getDate() < dob.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function displayError(message) {
+            errorMessageElement.textContent = message;
+            errorMessageElement.classList.remove('hidden');
+            exportBtn.style.display = 'none';
+        }
+
+        function hideError() {
+            errorMessageElement.classList.add('hidden');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '—';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function calculateCommutation() {
+            hideError();
+            const name = document.getElementById('employeeName').value.trim();
+            const designation = document.getElementById('designation').value.trim();
+            const dobString = document.getElementById('dob').value;
+            const dorString = document.getElementById('dor').value;
+            const doaString = document.getElementById('doa').value;
+            const basicPay = parseFloat(document.getElementById('basicPay').value);
+            const daPercent = parseFloat(document.getElementById('daPercent').value);
+            const commutePercent = parseFloat(document.getElementById('commutePercent').value);
+
+            if (!name || !designation || !dobString || !dorString || !doaString || isNaN(basicPay) || isNaN(daPercent) || isNaN(commutePercent)) {
+                return displayError("Please fill in all required fields.");
+            }
+            if (commutePercent > 40 || commutePercent < 0) {
+                return displayError("Commutation percentage must be between 0% and 40%.");
+            }
+            if (basicPay <= 0 || daPercent < 0) {
+                return displayError("Basic Pay must be positive and DA percentage cannot be negative.");
+            }
+
+            const ageNextBirthday = calculateAgeNextBirthday(dobString, doaString);
+            if (ageNextBirthday === null) {
+                return displayError("Invalid date inputs provided.");
+            }
+            if (ageNextBirthday < 20 || ageNextBirthday > 81) {
+                return displayError(`Age Next Birthday (${ageNextBirthday}) is outside valid range (20–81).`);
+            }
+
+            const ageAtApplication = calculateAgeAtDate(dobString, doaString);
+            const commutationFactor = COMMUTATION_TABLE[ageNextBirthday]; 
+            const daRate = daPercent / 100;
+            const commuteRate = commutePercent / 100;
+            const basicPensionMonthly = basicPay / 2;
+            const commutedPortionMonthly = basicPensionMonthly * commuteRate;
+            const lumpSumValue = commutedPortionMonthly * 12 * commutationFactor;
+            const residualBasicPensionMonthly = basicPensionMonthly - commutedPortionMonthly;
+            const dearnessReliefMonthly = basicPensionMonthly * daRate;
+            const finalMonthlyPayablePension = residualBasicPensionMonthly + dearnessReliefMonthly;
+
+            // Update Web UI Results
+            document.getElementById('result-name-designation').textContent = `${name}, ${designation}`;
+            document.getElementById('result-age').textContent = `${ageNextBirthday} years`;
+            document.getElementById('result-factor').textContent = commutationFactor.toFixed(3);
+            document.getElementById('result-total-pension').textContent = formatCurrency(basicPensionMonthly);
+            document.getElementById('result-dr').textContent = formatCurrency(dearnessReliefMonthly);
+            document.getElementById('result-lump-sum').textContent = formatCurrency(lumpSumValue);
+            document.getElementById('result-residual-basic-pension').textContent = formatCurrency(residualBasicPensionMonthly);
+            document.getElementById('result-final-payable-pension').textContent = formatCurrency(finalMonthlyPayablePension);
+
+            const stepsHtml = `
+                <div class="step-item"><strong>Step 1:</strong> Basic Pension (BP) = Last Drawn Basic Pay / 2 = ₹${basicPay.toLocaleString()} / 2 = ${formatCurrency(basicPensionMonthly)}</div>
+                <div class="step-item"><strong>Step 2:</strong> Commuted Portion (CP) = BP × Commutation % = ${formatCurrency(basicPensionMonthly)} × ${commutePercent}% = ${formatCurrency(commutedPortionMonthly)}<br>Commutation Factor (Age ${ageNextBirthday}) = ${commutationFactor}</div>
+                <div class="step-item"><strong>Step 3:</strong> Lump Sum Value (LSV) = CP × 12 × Factor = ${formatCurrency(commutedPortionMonthly)} × 12 × ${commutationFactor} = ${formatCurrency(lumpSumValue)}</div>
+                <div class="step-item"><strong>Step 4:</strong> Residual Basic Pension (RBP) = BP - CP = ${formatCurrency(basicPensionMonthly)} - ${formatCurrency(commutedPortionMonthly)} = ${formatCurrency(residualBasicPensionMonthly)}</div>
+                <div class="step-item"><strong>Step 5:</strong> Dearness Relief (DR) = BP × DA % = ${formatCurrency(basicPensionMonthly)} × ${daPercent}% = ${formatCurrency(dearnessReliefMonthly)}<br>Final Monthly Pension (FMP) = RBP + DR = ${formatCurrency(residualBasicPensionMonthly)} + ${formatCurrency(dearnessReliefMonthly)} = ${formatCurrency(finalMonthlyPayablePension)}</div>
+            `;
+            document.getElementById('calculation-steps').innerHTML = stepsHtml;
+
+            exportBtn.style.display = 'block';
+        }
+
+        function exportToPDF() {
+            // Get the jsPDF library from the global scope
+            const { jsPDF } = window.jspdf;
+            
+            // Create new PDF document
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Set margins
+            const marginLeft = 15;
+            const marginTop = 15;
+            const marginRight = 15;
+            const marginBottom = 15;
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const contentWidth = pageWidth - marginLeft - marginRight;
+
+            // Get data from the form and results
+            const name = document.getElementById('employeeName').value.trim() || 'N/A';
+            const designation = document.getElementById('designation').value.trim() || 'N/A';
+            const dob = document.getElementById('dob').value;
+            const dor = document.getElementById('dor').value;
+            const doa = document.getElementById('doa').value;
+            const basicPay = parseFloat(document.getElementById('basicPay').value) || 0;
+            const daPercent = parseFloat(document.getElementById('daPercent').value) || 0;
+            const commutePercent = parseFloat(document.getElementById('commutePercent').value) || 0;
+
+            // Get calculated results
+            const ageNextBirthday = document.getElementById('result-age').textContent.replace(' years', '');
+            const commutationFactor = document.getElementById('result-factor').textContent;
+            const basicPension = document.getElementById('result-total-pension').textContent;
+            const dearnessRelief = document.getElementById('result-dr').textContent;
+            const lumpSumValue = document.getElementById('result-lump-sum').textContent;
+            const residualPension = document.getElementById('result-residual-basic-pension').textContent;
+            const finalPension = document.getElementById('result-final-payable-pension').textContent;
+
+            // Add header with dark blue background
+            doc.setFillColor(13, 27, 42); // Dark blue background
+            doc.rect(0, 0, pageWidth, 25, 'F');
+            
+            doc.setTextColor(255, 255, 255); // White text
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('Pension Commutation Report', pageWidth/2, 12, null, null, 'center');
+
+            // Add generation date
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            const currentDate = new Date().toLocaleDateString();
+            doc.text(`Generated on: ${currentDate}`, pageWidth/2, 20, null, null, 'center');
+
+            // Reset text color for content
+            doc.setTextColor(0, 0, 0); // Black text
+
+            // Add employee details section
+            let yPos = 30;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(13, 27, 42); // Dark blue
+            doc.text('Employee Details', marginLeft, yPos);
+            yPos += 1;
+
+            // Draw line under section title
+            doc.setDrawColor(13, 27, 42);
+            doc.line(marginLeft, yPos, pageWidth - marginRight, yPos);
+            yPos += 5;
+
+            // Employee details content
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            // First row
+            doc.setFont(undefined, 'bold');
+            doc.text('Name:', marginLeft, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(name, marginLeft + 18, yPos);
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('Designation:', marginLeft + 80, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(designation, marginLeft + 105, yPos);
+            yPos += 5;
+
+            // Second row
+            doc.setFont(undefined, 'bold');
+            doc.text('DOB:', marginLeft, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(dob ? new Date(dob).toLocaleDateString() : 'N/A', marginLeft + 15, yPos);
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('DOR:', marginLeft + 80, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(dor ? new Date(dor).toLocaleDateString() : 'N/A', marginLeft + 95, yPos);
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('DOA:', marginLeft + 140, yPos);
+            doc.setFont(undefined, 'normal');
+            doc.text(doa ? new Date(doa).toLocaleDateString() : 'N/A', marginLeft + 155, yPos);
+            yPos += 8;
+
+            // Add calculation summary section
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(13, 27, 42);
+            doc.text('Calculation Summary', marginLeft, yPos);
+            yPos += 1;
+
+            // Draw line under section title
+            doc.setDrawColor(13, 27, 42);
+            doc.line(marginLeft, yPos, pageWidth - marginRight, yPos);
+            yPos += 5;
+
+            // Summary table
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+
+            // Table headers
+            doc.setFillColor(235, 245, 255);
+            doc.rect(marginLeft, yPos, contentWidth, 6, 'F');
+            doc.setTextColor(13, 27, 42);
+            doc.setFont(undefined, 'bold');
+            doc.text('Parameter', marginLeft + 3, yPos + 4);
+            doc.text('Value', pageWidth - marginRight - 35, yPos + 4);
+
+            // Table rows
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'normal');
+            
+            yPos += 7;
+            doc.text('Age Next Birthday', marginLeft + 3, yPos);
+            doc.text(`${ageNextBirthday} years`, pageWidth - marginRight - 35, yPos);
+            
+            yPos += 5;
+            doc.text('Commutation Factor', marginLeft + 3, yPos);
+            doc.text(commutationFactor, pageWidth - marginRight - 35, yPos);
+            
+            yPos += 5;
+            doc.text('Basic Pension (Monthly)', marginLeft + 3, yPos);
+            doc.text(basicPension, pageWidth - marginRight - 35, yPos);
+            
+            yPos += 5;
+            doc.text('Dearness Relief (Monthly)', marginLeft + 3, yPos);
+            doc.text(dearnessRelief, pageWidth - marginRight - 35, yPos);
+            
+            yPos += 5;
+            doc.text('Residual Basic Pension', marginLeft + 3, yPos);
+            doc.text(residualPension, pageWidth - marginRight - 35, yPos);
+
+            // Highlighted sections for lump sum and final pension
+            yPos += 7;
+            doc.setFillColor(232, 245, 233);
+            doc.rect(marginLeft, yPos - 2, contentWidth, 8, 'F');
+            doc.setTextColor(27, 94, 32);
+            doc.setFont(undefined, 'bold');
+            doc.text('Lump Sum Commutation Value', marginLeft + 3, yPos + 3);
+            doc.text(lumpSumValue, pageWidth - marginRight - 35, yPos + 3);
+
+            yPos += 10;
+            doc.setFillColor(255, 248, 225);
+            doc.rect(marginLeft, yPos - 2, contentWidth, 8, 'F');
+            doc.setTextColor(230, 81, 0);
+            doc.setFont(undefined, 'bold');
+            doc.text('Net Monthly Pension Payable', marginLeft + 3, yPos + 3);
+            doc.text(finalPension, pageWidth - marginRight - 35, yPos + 3);
+
+            // Add detailed calculation steps
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(13, 27, 42);
+            doc.text('Detailed Calculation Steps', marginLeft, yPos);
+            yPos += 1;
+
+            // Draw line under section title
+            doc.setDrawColor(13, 27, 42);
+            doc.line(marginLeft, yPos, pageWidth - marginRight, yPos);
+            yPos += 5;
+
+            // Reset text properties
+            doc.setFontSize(8);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+
+            const basicPensionMonthly = basicPay / 2;
+            const commutedPortion = basicPensionMonthly * (commutePercent / 100);
+            const lumpSum = commutedPortion * 12 * parseFloat(commutationFactor);
+            const residual = basicPensionMonthly - commutedPortion;
+            const dr = basicPensionMonthly * (daPercent / 100);
+            const finalPayable = residual + dr;
+
+            // Step 1
+            doc.setFont(undefined, 'bold');
+            doc.text('Step 1: Basic Pension = Basic Pay / 2', marginLeft, yPos);
+            yPos += 4;
+            doc.setFont(undefined, 'normal');
+            doc.text(`= Rs. ${basicPay.toLocaleString()} / 2 = ${formatCurrency(basicPensionMonthly)}`, marginLeft + 5, yPos);
+
+            // Step 2
+            yPos += 6;
+            doc.setFont(undefined, 'bold');
+            doc.text('Step 2: Commutation Calculation', marginLeft, yPos);
+            yPos += 4;
+            doc.setFont(undefined, 'normal');
+            doc.text(`Commuted Portion = ${formatCurrency(basicPensionMonthly)} × ${commutePercent}% = ${formatCurrency(commutedPortion)}`, marginLeft + 5, yPos);
+            yPos += 4;
+            doc.text(`Factor (Age ${ageNextBirthday}) = ${commutationFactor}`, marginLeft + 5, yPos);
+
+            // Step 3
+            yPos += 6;
+            doc.setFont(undefined, 'bold');
+            doc.text('Step 3: Lump Sum Value', marginLeft, yPos);
+            yPos += 4;
+            doc.setFont(undefined, 'normal');
+            doc.text(`= ${formatCurrency(commutedPortion)} × 12 × ${commutationFactor} = ${formatCurrency(lumpSum)}`, marginLeft + 5, yPos);
+
+            // Step 4
+            yPos += 6;
+            doc.setFont(undefined, 'bold');
+            doc.text('Step 4: Residual Pension', marginLeft, yPos);
+            yPos += 4;
+            doc.setFont(undefined, 'normal');
+            doc.text(`= ${formatCurrency(basicPensionMonthly)} - ${formatCurrency(commutedPortion)} = ${formatCurrency(residual)}`, marginLeft + 5, yPos);
+
+            // Step 5
+            yPos += 6;
+            doc.setFont(undefined, 'bold');
+            doc.text('Step 5: Final Pension Calculation', marginLeft, yPos);
+            yPos += 4;
+            doc.setFont(undefined, 'normal');
+            doc.text(`DR = ${formatCurrency(basicPensionMonthly)} × ${daPercent}% = ${formatCurrency(dr)}`, marginLeft + 5, yPos);
+            yPos += 4;
+            doc.text(`Final Pension = ${formatCurrency(residual)} + ${formatCurrency(dr)} = ${formatCurrency(finalPayable)}`, marginLeft + 5, yPos);
+
+            // Add footer
+            yPos = pageHeight - 10;
+            doc.setFontSize(7);
+            doc.setTextColor(100, 100, 100);
+            doc.text('This report was generated using the Pension Commutation Calculator.', pageWidth/2, yPos - 3, null, null, 'center');
+            doc.text('Calculations are estimates based on inputs provided and standard commutation rules.', pageWidth/2, yPos, null, null, 'center');
+
+            // Save the PDF
+            const filename = `Pension_Commutation_Report_${name.replace(/\s+/g, '_') || 'User'}.pdf`;
+            doc.save(filename);
+        }
+    </script>
+</body>
+</html>

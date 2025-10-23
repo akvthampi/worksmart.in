@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfficeSuite Pro - Ultimate Productivity Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 100;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            margin-left: -280px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #3d566e;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h1 i {
+            color: #3498db;
+        }
+
+        .tools-list {
+            padding: 15px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tool-category {
+            margin-bottom: 20px;
+        }
+
+        .category-title {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #bdc3c7;
+            letter-spacing: 1px;
+        }
+
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .tool-item:hover {
+            background: #34495e;
+        }
+
+        .tool-item.active {
+            background: #3498db;
+            border-left: 3px solid #fff;
+        }
+
+        .tool-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .tool-name {
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #ffffff;
+            position: relative;
+            transition: width 0.3s ease;
+        }
+
+        .main-content.expanded {
+            width: 100vw;
+        }
+
+        .content-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+        }
+
+        .menu-trigger {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-trigger:hover {
+            background: #e9ecef;
+        }
+
+        .content-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background: #3498db;
+        }
+
+        .content-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .tool-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: #ffffff;
+        }
+
+        .welcome-screen i {
+            font-size: 4rem;
+            color: #3498db;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-screen h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-screen p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .menu-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+            font-size: 1rem;
+        }
+
+        .menu-icon {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 6px;
+            background: #ffffff;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        .menu-line {
+            width: 20px;
+            height: 2px;
+            background: #2c3e50;
+            border-radius: 1px;
+        }
+
+        footer {
+            padding: 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .heart {
+            color: #e74c3c;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            5% { transform: scale(1.1); }
+            10% { transform: scale(1); }
+            15% { transform: scale(1.1); }
+            20% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #7f8c8d;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 260px;
+                margin-left: -260px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-briefcase"></i> OfficeSuite Pro</h1>
+            </div>
+            
+            <div class="tools-list">
+                <!-- Communication Tools -->
+                <div class="tool-category">
+                    <div class="category-title">Communication</div>
+                    <div class="tool-item" data-file="imms.html">
+                        <div class="tool-icon" style="background: #3498db;">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <div class="tool-name">Incoming Mail Management</div>
+                    </div>
+                    <div class="tool-item" data-file="omms.html">
+                        <div class="tool-icon" style="background: #2ecc71;">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="tool-name">Outgoing Mail Management</div>
+                    </div>
+                </div>
+
+                <!-- Management Tools -->
+                <div class="tool-category">
+                    <div class="category-title">Management</div>
+                    <div class="tool-item" data-file="dpms.html">
+                        <div class="tool-icon" style="background: #f39c12;">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <div class="tool-name">Disciplinary Proceedings</div>
+                    </div>
+                    <div class="tool-item" data-file="chart.html">
+                        <div class="tool-icon" style="background: #9b59b6;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="tool-name">Chart Preparation</div>
+                    </div>
+                    <div class="tool-item" data-file="fmru.html">
+                        <div class="tool-icon" style="background: #1abc9c;">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="tool-name">File Movement Records</div>
+                    </div>
+                    <div class="tool-item" data-file="empleavemgr.html">
+                        <div class="tool-icon" style="background: #3498db;">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="tool-name">Employee Leave Tracker</div>
+                    </div>
+                    <div class="tool-item" data-file="supleavemgr.html">
+                        <div class="tool-icon" style="background: #8e44ad;">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="tool-name">Supervisor Leave Dashboard</div>
+                    </div>
+                </div>
+
+                <!-- Productivity Tools -->
+                <div class="tool-category">
+                    <div class="category-title">Productivity</div>
+                    <div class="tool-item" data-file="taskmgr.html">
+                        <div class="tool-icon" style="background: #e74c3c;">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="tool-name">Task Manager</div>
+                    </div>
+                    <div class="tool-item" data-file="firu.html">
+                        <div class="tool-icon" style="background: #e91e63;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="tool-name">Digital File Index</div>
+                    </div>
+                    <div class="tool-item" data-file="quicknotes.html">
+                        <div class="tool-icon" style="background: #03a9f4;">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <div class="tool-name">Sticky Notes</div>
+                    </div>
+                    <div class="tool-item" data-file="taic.html">
+                        <div class="tool-icon" style="background: #f44336;">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="tool-name">Target Achievement</div>
+                    </div>
+                </div>
+
+                <!-- Finance Tools -->
+                <div class="tool-category">
+                    <div class="category-title">Finance</div>
+                    <div class="tool-item" data-file="dabook.html">
+                        <div class="tool-icon" style="background: #009688;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="tool-name">Digital Account Book</div>
+                    </div>
+                    <div class="tool-item" data-file="dcbook.html">
+                        <div class="tool-icon" style="background: #ff9800;">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="tool-name">Digital Cash Book</div>
+                    </div>
+                    <div class="tool-item" data-file="payfixation.html">
+                        <div class="tool-icon" style="background: #673ab7;">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="tool-name">Pay Fixation Comparator</div>
+                    </div>
+                    <div class="tool-item" data-file="daratetracker.html">
+                        <div class="tool-icon" style="background: #9c27b0;">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="tool-name">DA Rate Tracker</div>
+                    </div>
+                    <div class="tool-item" data-file="advanceincalc.html">
+                        <div class="tool-icon" style="background: #4caf50;">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="tool-name">Advance Increment</div>
+                    </div>
+                    <div class="tool-item" data-file="sixthtoseventh.html">
+                        <div class="tool-icon" style="background: #795548;">
+                            <i class="fas fa-business-time"></i>
+                        </div>
+                        <div class="tool-name">6th to 7th Pay Commission</div>
+                    </div>
+                    <div class="tool-item" data-file="eightcpcprojection.html">
+                        <div class="tool-icon" style="background: #3f51b5;">
+                            <i class="fas fa-chart-area"></i>
+                        </div>
+                        <div class="tool-name">8th CPC Projection</div>
+                    </div>
+                    <div class="tool-item" data-file="ppfcalc.html">
+                        <div class="tool-icon" style="background: #c2185b;">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="tool-name">PPF Investment Calculator</div>
+                    </div>
+                    <div class="tool-item" data-file="gratuity.html">
+                        <div class="tool-icon" style="background: #5c6bc0;">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="tool-name">Gratuity Calculator</div>
+                    </div>
+                    <div class="tool-item" data-file="pencommute.html">
+                        <div class="tool-icon" style="background: #00bcd4;">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="tool-name">Pension Commutation Calculator</div>
+                    </div>
+                    <div class="tool-item" data-file="leavencash.html">
+                        <div class="tool-icon" style="background: #f44336;">
+                            <i class="fas fa-umbrella-beach"></i>
+                        </div>
+                        <div class="tool-name">Leave Encashment Calculator</div>
+                    </div>
+                </div>
+
+                <!-- Appreciation -->
+                <div class="tool-category">
+                    <div class="category-title">Appreciation</div>
+                    <div class="tool-item" data-file="thankyou">
+                        <div class="tool-icon" style="background: #e91e63;">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="tool-name">Thank You!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <div class="content-header">
+                <div class="menu-trigger" id="menuTrigger">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="content-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="content-title">Welcome to OfficeSuite Pro</div>
+            </div>
+            
+            <div class="welcome-screen" id="welcomeScreen">
+                <i class="fas fa-hand-pointer"></i>
+                <h2>Select a Tool to Begin</h2>
+                <p>Click on the <span class="menu-icon"><span class="menu-line"></span><span class="menu-line"></span><span class="menu-line"></span></span> to open sidebar and select a tool. Each tool is designed to help you streamline office tasks and boost productivity.</p>
+            </div>
+            
+            <iframe class="tool-frame" id="toolFrame"></iframe>
+            
+            <footer>
+                <p>Made with <i class="fas fa-heart heart"></i> by Anil Kumar VT</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const menuTrigger = document.getElementById('menuTrigger');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const toolFrame = document.getElementById('toolFrame');
+        const contentTitle = document.querySelector('.content-title');
+        const contentIcon = document.querySelector('.content-icon i');
+        
+        // Initially hide sidebar
+        sidebar.classList.add('hidden');
+        mainContent.classList.add('expanded');
+        
+        // Show sidebar when menu trigger is clicked
+        menuTrigger.addEventListener('click', function() {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('expanded');
+        });
+        
+        // Hide sidebar when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!sidebar.contains(e.target) && !menuTrigger.contains(e.target) && 
+                !sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('expanded');
+            }
+        });
+        
+        // Tool selection functionality
+        const toolItems = document.querySelectorAll('.tool-item');
+        
+        toolItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                toolItems.forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                const toolFile = this.getAttribute('data-file');
+                const toolName = this.querySelector('.tool-name').textContent;
+                const toolIconClass = this.querySelector('.tool-icon i').className;
+                const toolIconBg = this.querySelector('.tool-icon').style.background;
+                
+                // Update header
+                contentTitle.textContent = toolName;
+                contentIcon.className = toolIconClass;
+                contentIcon.parentElement.style.background = toolIconBg;
+                
+                // Hide sidebar and expand main content
+                sidebar.classList.add('hidden');
+                mainContent.classList.add('expanded');
+                
+                // Hide welcome screen and show iframe
+                welcomeScreen.style.display = 'none';
+                toolFrame.style.display = 'block';
+                
+                // Load tool content
+                if (toolFile === 'thankyou') {
+                    toolFrame.style.display = 'none';
+                    welcomeScreen.style.display = 'flex';
+                    welcomeScreen.innerHTML = `
+                        <i class="fas fa-heart" style="font-size: 4rem; color: #e74c3c; margin-bottom: 1.5rem;"></i>
+                        <h2>Thank You!</h2>
+                        <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; line-height: 1.6;">
+                            We appreciate your trust in our tools. Stay productive and have an amazing day!
+                        </p>
+                    `;
+                } else {
+                    toolFrame.src = toolFile;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

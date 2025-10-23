@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Achievement Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .dashboard-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            position: relative;
+            flex-grow: 1;
+            min-height: 0;
+        }
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+        }
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        #dataTable input, #dataTable select {
+            padding: 0.3rem;
+            border-radius: 0.25rem;
+            border: 1px solid #d1d5db;
+            width: 100%;
+            font-size: 0.8rem;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .chart-title-input {
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1f2937;
+            background: transparent;
+            padding: 0.2rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+            flex-grow: 1;
+        }
+        .chart-title-input:focus {
+            outline: none;
+            background-color: #f9fafb;
+        }
+        .chart-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-shrink: 0;
+        }
+        .chart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .chart-modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            max-width: 95%;
+            max-height: 95%;
+            position: relative;
+            width: 90vw;
+        }
+        .close-modal {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: #6b7280;
+            z-index: 1001;
+        }
+        .close-modal:hover {
+            color: #374151;
+        }
+        .modal-chart-container {
+            height: 80vh;
+            width: 100%;
+            position: relative;
+        }
+        .main-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem;
+        }
+        .header-section {
+            padding: 0.5rem 0;
+            margin-bottom: 0.5rem;
+        }
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            gap: 0.5rem;
+            min-height: 0;
+        }
+        .data-panel {
+            flex: 0 0 28%;
+            display: flex;
+            flex-direction: column;
+        }
+        .charts-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 0.75rem;
+            padding: 0.25rem;
+        }
+        .chart-item {
+            min-height: 280px;
+        }
+        .data-table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 0.75rem;
+        }
+        .progress-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .achievement-rate {
+            font-weight: bold;
+            color: #059669;
+        }
+        .division-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        /* Fix for data table layout */
+        .data-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .data-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 0.5rem;
+        }
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header class="header-section text-center">
+            <h1 class="text-2xl font-extrabold text-gray-900 mb-1">Target Achievement Tracker</h1>
+            <p class="text-sm text-gray-600 max-w-2xl mx-auto">Track and visualize target achievements across different divisions with semi-circular progress charts.</p>
+        </header>
+
+        <div class="content-area">
+            <!-- Data Input Panel -->
+            <section class="data-panel rounded-xl bg-white shadow flex flex-col">
+                <div class="p-3 border-b">
+                    <h2 class="font-bold text-gray-800">Data Input</h2>
+                    <p class="text-gray-500 text-xs">Enter details, targets, and achievements.</p>
+                </div>
+                <div class="p-3 flex-grow flex flex-col">
+                    <div class="data-table-container">
+                        <div class="data-row font-bold text-gray-700 text-xs mb-2">
+                            <div>Division</div>
+                            <div>Color</div>
+                            <div>Target</div>
+                            <div>Achieved</div>
+                        </div>
+                        <div id="dataTable" class="space-y-1">
+                            <!-- Initial data rows will be injected here by JS -->
+                        </div>
+                    </div>
+                    <div class="data-actions">
+                        <div class="flex gap-2">
+                            <button id="uploadDataBtn" class="btn btn-secondary">Upload Data</button>
+                            <button id="downloadDataBtn" class="btn btn-secondary">Download Data</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="addRowBtn" class="btn btn-secondary">Add Row</button>
+                            <button id="generateChartsBtn" class="btn btn-primary">Generate Charts</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" accept=".json">
+                </div>
+            </section>
+
+            <!-- Charts Display Panel -->
+            <section class="charts-panel">
+                <div class="charts-grid" id="chartsGrid">
+                    <!-- Charts will be generated here -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal for expanded chart view -->
+    <div id="chartModal" class="chart-modal">
+        <div class="chart-modal-content">
+            <button class="close-modal">&times;</button>
+            <h3 id="modalTitle" class="text-lg font-bold mb-2"></h3>
+            <div class="modal-chart-container">
+                <canvas id="modalChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define division colors
+        const divisionColors = [
+            '#3b82f6', '#ef4444', '#10b981', '#f59e0b', 
+            '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16',
+            '#f97316', '#6366f1', '#14b8a6', '#f43f5e'
+        ];
+
+        // Get the DOM elements
+        const dataTable = document.getElementById('dataTable');
+        const chartsGrid = document.getElementById('chartsGrid');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const generateChartsBtn = document.getElementById('generateChartsBtn');
+        const chartModal = document.getElementById('chartModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const uploadDataBtn = document.getElementById('uploadDataBtn');
+        const downloadDataBtn = document.getElementById('downloadDataBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        // Chart instances
+        let divisionCharts = [];
+        let modalChart = null;
+
+        // Function to create a new input row
+        function createDataRow(division = '', target = '', achieved = '', colorIndex = 0) {
+            const row = document.createElement('div');
+            row.className = 'data-row';
+            row.innerHTML = `
+                <input type="text" value="${division}" placeholder="Division Name" class="division-input p-1 rounded border-gray-300 text-xs">
+                <select class="color-select p-1 rounded border-gray-300 text-xs">
+                    ${divisionColors.map((color, index) => 
+                        `<option value="${index}" ${index === colorIndex ? 'selected' : ''} style="background-color: ${color}; color: white;">Color ${index+1}</option>`
+                    ).join('')}
+                </select>
+                <input type="number" value="${target}" placeholder="Target" class="target-input p-1 rounded border-gray-300 text-xs">
+                <input type="number" value="${achieved}" placeholder="Achieved" class="achieved-input p-1 rounded border-gray-300 text-xs">
+            `;
+            dataTable.appendChild(row);
+        }
+
+        // Function to initialize the data
+        function initializeData() {
+            // Sample initial data
+            const initialData = [
+                { division: 'Sales', target: 1000, achieved: 750, colorIndex: 0 },
+                { division: 'Marketing', target: 800, achieved: 650, colorIndex: 1 },
+                { division: 'Operations', target: 1200, achieved: 900, colorIndex: 2 },
+                { division: 'R&D', target: 600, achieved: 550, colorIndex: 3 }
+            ];
+
+            // Populate the form with initial data
+            for (const data of initialData) {
+                createDataRow(data.division, data.target, data.achieved, data.colorIndex);
+            }
+
+            // Generate initial charts
+            generateCharts();
+        }
+
+        // Function to get data from input fields
+        function getDataFromInputs() {
+            const divisionInputs = document.querySelectorAll('.division-input');
+            const colorSelects = document.querySelectorAll('.color-select');
+            const targetInputs = document.querySelectorAll('.target-input');
+            const achievedInputs = document.querySelectorAll('.achieved-input');
+            
+            const data = [];
+
+            for (let i = 0; i < divisionInputs.length; i++) {
+                const division = divisionInputs[i].value.trim();
+                const colorIndex = parseInt(colorSelects[i].value);
+                const target = parseFloat(targetInputs[i].value);
+                const achieved = parseFloat(achievedInputs[i].value);
+                
+                if (division && !isNaN(target) && !isNaN(achieved)) {
+                    data.push({
+                        division,
+                        colorIndex,
+                        target,
+                        achieved,
+                        percentage: Math.min(100, (achieved / target) * 100)
+                    });
+                }
+            }
+            return data;
+        }
+
+        // Function to generate semicircular charts for each division
+        function generateCharts() {
+            // Clear existing charts
+            chartsGrid.innerHTML = '';
+            divisionCharts = [];
+
+            // Get data from inputs
+            const data = getDataFromInputs();
+
+            // Create a chart for each division
+            data.forEach((item, index) => {
+                // Create chart container
+                const chartItem = document.createElement('div');
+                chartItem.className = 'chart-item dashboard-card';
+                chartItem.innerHTML = `
+                    <div class="chart-header">
+                        <input type="text" class="chart-title-input" value="${item.division}" data-index="${index}">
+                        <div class="chart-actions">
+                            <button class="btn btn-secondary btn-sm expand-chart" data-index="${index}">Expand</button>
+                            <button class="btn btn-primary btn-sm download-chart" data-index="${index}">Download</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-${index}"></canvas>
+                    </div>
+                    <div class="progress-display">
+                        <span>Target: ${item.target.toLocaleString()}</span>
+                        <span>Achieved: ${item.achieved.toLocaleString()}</span>
+                        <span class="achievement-rate">${item.percentage.toFixed(1)}%</span>
+                    </div>
+                `;
+                
+                chartsGrid.appendChild(chartItem);
+
+                // Create the semicircular chart
+                const canvas = document.getElementById(`chart-${index}`);
+                const ctx = canvas.getContext('2d');
+                
+                // Calculate remaining target
+                const remaining = Math.max(0, item.target - item.achieved);
+                
+                const chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Achieved', 'Remaining'],
+                        datasets: [{
+                            data: [item.achieved, remaining],
+                            backgroundColor: [
+                                divisionColors[item.colorIndex],
+                                '#e5e7eb'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        circumference: 180,
+                        rotation: -90,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${label}: ${value.toLocaleString()} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Store chart reference
+                divisionCharts[index] = {
+                    chart: chart,
+                    data: item
+                };
+            });
+
+            // Update event listeners for the new charts
+            updateChartEventListeners();
+        }
+
+        // Function to expand chart in modal
+        function expandChart(chartIndex) {
+            const chartData = divisionCharts[chartIndex];
+            if (chartData) {
+                // Get the title for the modal
+                const titleInput = document.querySelector(`.chart-title-input[data-index="${chartIndex}"]`);
+                modalTitle.textContent = titleInput.value;
+                
+                // Clear the modal canvas first
+                const modalChartContainer = document.querySelector('.modal-chart-container');
+                const oldCanvas = document.getElementById('modalChart');
+                if (oldCanvas) {
+                    oldCanvas.remove();
+                }
+                
+                // Create a new canvas element
+                const newCanvas = document.createElement('canvas');
+                newCanvas.id = 'modalChart';
+                modalChartContainer.appendChild(newCanvas);
+                
+                // Destroy existing modal chart if it exists
+                if (modalChart) {
+                    modalChart.destroy();
+                }
+                
+                // Create a new chart in the modal with the same data
+                modalChart = new Chart(newCanvas, {
+                    type: 'doughnut',
+                    data: JSON.parse(JSON.stringify(chartData.chart.data)),
+                    options: {
+                        ...chartData.chart.options,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            ...chartData.chart.options.plugins,
+                            title: {
+                                display: true,
+                                text: titleInput.value,
+                                font: { size: 20, weight: 'bold' }
+                            },
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    font: { size: 14 }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Show the modal
+                chartModal.style.display = 'flex';
+            }
+        }
+
+        // Function to download chart as image
+        function downloadChart(chartIndex) {
+            const chartData = divisionCharts[chartIndex];
+            if (chartData) {
+                const titleInput = document.querySelector(`.chart-title-input[data-index="${chartIndex}"]`);
+                const title = titleInput.value;
+                
+                // Create a temporary canvas for the chart with title
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Set the dimensions for the temporary canvas
+                const width = chartData.chart.canvas.width;
+                const height = chartData.chart.canvas.height + 60;
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                
+                // Fill with white background
+                tempCtx.fillStyle = 'white';
+                tempCtx.fillRect(0, 0, width, height);
+                
+                // Add the title
+                tempCtx.fillStyle = '#1f2937';
+                tempCtx.font = 'bold 18px Inter';
+                tempCtx.textAlign = 'center';
+                tempCtx.fillText(title, width / 2, 30);
+                
+                // Add division info
+                tempCtx.fillStyle = '#6b7280';
+                tempCtx.font = '14px Inter';
+                tempCtx.fillText(
+                    `Target: ${chartData.data.target.toLocaleString()} | Achieved: ${chartData.data.achieved.toLocaleString()} (${chartData.data.percentage.toFixed(1)}%)`, 
+                    width / 2, 
+                    55
+                );
+                
+                // Draw the chart below the title
+                tempCtx.drawImage(chartData.chart.canvas, 0, 70);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `${title.replace(/\s+/g, '_')}.png`;
+                link.href = tempCanvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Function to download chart data as JSON
+        function downloadChartData() {
+            const data = getDataFromInputs();
+            
+            const exportData = {
+                divisions: data
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.download = 'target_achievement_data.json';
+            link.href = URL.createObjectURL(dataBlob);
+            link.click();
+        }
+
+        // Function to upload chart data from JSON file
+        function uploadChartData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Clear existing rows
+                    dataTable.innerHTML = '';
+                    
+                    // Create new rows from uploaded data
+                    if (data.divisions && Array.isArray(data.divisions)) {
+                        for (const division of data.divisions) {
+                            createDataRow(
+                                division.division, 
+                                division.target, 
+                                division.achieved, 
+                                division.colorIndex
+                            );
+                        }
+                    }
+                    
+                    // Update charts with new data
+                    generateCharts();
+                    
+                    // Reset file input
+                    fileInput.value = '';
+                } catch (error) {
+                    alert('Error parsing JSON file. Please ensure it is a valid target achievement data file.');
+                    console.error('Error parsing JSON:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Function to update event listeners for charts
+        function updateChartEventListeners() {
+            // Remove existing event listeners
+            document.querySelectorAll('.expand-chart').forEach(button => {
+                button.replaceWith(button.cloneNode(true));
+            });
+            document.querySelectorAll('.download-chart').forEach(button => {
+                button.replaceWith(button.cloneNode(true));
+            });
+            
+            // Add event listeners for expand buttons
+            document.querySelectorAll('.expand-chart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const chartIndex = parseInt(e.target.getAttribute('data-index'));
+                    expandChart(chartIndex);
+                });
+            });
+            
+            // Add event listeners for download buttons
+            document.querySelectorAll('.download-chart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const chartIndex = parseInt(e.target.getAttribute('data-index'));
+                    downloadChart(chartIndex);
+                });
+            });
+        }
+
+        // Function to set up event listeners
+        function setupEventListeners() {
+            // Event listeners for static buttons
+            addRowBtn.addEventListener('click', () => createDataRow());
+            generateChartsBtn.addEventListener('click', generateCharts);
+            
+            // Event listeners for data export/import
+            downloadDataBtn.addEventListener('click', downloadChartData);
+            uploadDataBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', uploadChartData);
+            
+            // Close modal when clicking the close button
+            closeModalBtn.addEventListener('click', () => {
+                chartModal.style.display = 'none';
+                if (modalChart) {
+                    modalChart.destroy();
+                    modalChart = null;
+                }
+            });
+            
+            // Close modal when clicking outside the content
+            chartModal.addEventListener('click', (e) => {
+                if (e.target === chartModal) {
+                    chartModal.style.display = 'none';
+                    if (modalChart) {
+                        modalChart.destroy();
+                        modalChart = null;
+                    }
+                }
+            });
+        }
+
+        // Initialize the app
+        function initializeApp() {
+            setupEventListeners();
+            initializeData();
+        }
+
+        // Start the app when the page loads
+        window.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

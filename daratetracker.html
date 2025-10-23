@@ -1,0 +1,1173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dearness Allowance Rate Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #0d1b2a 100%);
+            color: #e0e0e0;
+            line-height: 1.4;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(26, 59, 93, 0.8), rgba(44, 82, 130, 0.8));
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        h1 {
+            color: #64b5f6;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.7);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: #90caf9;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .controls-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: rgba(26, 59, 93, 0.8);
+            color: #90caf9;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            height: 36px;
+        }
+        
+        .export-btn:hover {
+            background: rgba(100, 181, 246, 0.3);
+            color: white;
+        }
+        
+        .avg-increase-tile {
+            background: rgba(26, 59, 93, 0.8);
+            color: #90caf9;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-weight: 600;
+            height: 36px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .avg-value {
+            color: #00ff55;
+            margin-left: 5px;
+        }
+        
+        .tabs-container {
+            margin-bottom: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: rgba(20, 30, 48, 0.8);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: rgba(26, 59, 93, 0.8);
+            color: #90caf9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border: none;
+            font-size: 0.95rem;
+        }
+        
+        .tab:hover, .tab:focus {
+            background-color: rgba(100, 181, 246, 0.3);
+            outline: none;
+        }
+        
+        .tab.active {
+            background-color: #64b5f6;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .chart-wrapper {
+            width: 100%;
+            background-color: rgba(20, 30, 48, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .chart-title {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: #64b5f6;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #90caf9;
+        }
+        
+        .tables-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .table-wrapper {
+            width: 100%;
+            background-color: rgba(20, 30, 48, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .table-title {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: #64b5f6;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 400px;
+        }
+        
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background-color: rgba(13, 27, 42, 0.9);
+            font-weight: 600;
+            color: #64b5f6;
+            position: sticky;
+            left: 0;
+        }
+        
+        tr:hover {
+            background-color: rgba(100, 150, 255, 0.1);
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+        
+        .highlight {
+            background-color: rgba(100, 181, 246, 0.2);
+            font-weight: 600;
+        }
+        
+        .current-rate {
+            background-color: #64b5f6;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .status-official {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .status-estimated {
+            color: #ff9800;
+            font-style: italic;
+        }
+        
+        .transition-note {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 10px 12px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: #90a4ae;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            header {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .controls-container {
+                margin-bottom: 20px;
+            }
+            
+            .export-btn {
+                padding: 10px 15px;
+                height: 40px;
+            }
+            
+            .avg-increase-tile {
+                padding: 10px 15px;
+                height: 40px;
+            }
+            
+            .tabs-container {
+                margin-bottom: 20px;
+            }
+            
+            .tab {
+                padding: 15px 20px;
+                font-size: 1.1rem;
+            }
+            
+            .charts-container {
+                flex-direction: row;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .chart-wrapper {
+                flex: 1;
+                min-width: 45%;
+                padding: 20px;
+            }
+            
+            .chart-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .tables-container {
+                flex-direction: row;
+                gap: 20px;
+            }
+            
+            .table-wrapper {
+                flex: 1;
+                min-width: 45%;
+                padding: 20px;
+            }
+            
+            .table-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+            
+            th, td {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+            
+            .transition-note {
+                padding: 10px 15px;
+                margin: 20px 0;
+            }
+            
+            footer {
+                margin-top: 30px;
+                padding: 20px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .chart-container {
+                height: 220px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                font-size: 0.85rem;
+            }
+            
+            .tab {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .controls-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dearness Allowance Rate Tracker</h1>
+            <p class="subtitle">Historical DA rates for Central Government Employees (2006 - 2025)</p>
+        </header>
+        
+        <!-- Controls -->
+        <div class="controls-container">
+            <div class="avg-increase-tile" id="avgIncreaseTile">
+                Avg bi-annual increase: <span class="avg-value" id="avgValue">0%</span>
+            </div>
+            <button class="export-btn" id="exportBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export to PDF
+            </button>
+        </div>
+        
+        <!-- Tabs for both mobile and desktop -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" data-tab="sixth">6th CPC (2006-2015)</button>
+                <button class="tab" data-tab="seventh">7th CPC (2016-2025)</button>
+            </div>
+        </div>
+        
+        <!-- Sixth CPC Content -->
+        <div class="tab-content active" id="sixth-content">
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h2 class="chart-title">6th CPC DA Rate Trend (2006-2015)</h2>
+                    <div class="chart-container">
+                        <div class="loading">Loading chart...</div>
+                        <canvas id="sixthCpcChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <h2 class="chart-title">6th CPC DA Increases (2006-2015)</h2>
+                    <div class="chart-container">
+                        <div class="loading">Loading chart...</div>
+                        <canvas id="sixthCpcIncreaseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tables-container">
+                <div class="table-wrapper">
+                    <h2 class="table-title">6th CPC DA Rates (2006-2015)</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Effective From</th>
+                                <th>Rate (%)</th>
+                                <th>Increase</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sixthCpcTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seventh CPC Content -->
+        <div class="tab-content" id="seventh-content">
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <h2 class="chart-title">7th CPC DA Rate Trend (2016-2025)</h2>
+                    <div class="chart-container">
+                        <div class="loading">Loading chart...</div>
+                        <canvas id="seventhCpcChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <h2 class="chart-title">7th CPC DA Increases (2016-2025)</h2>
+                    <div class="chart-container">
+                        <div class="loading">Loading chart...</div>
+                        <canvas id="seventhCpcIncreaseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="transition-note">
+                <p><strong>Important:</strong> The 7th Pay Commission was implemented on 1st January 2016, which revised basic pays and reset DA to 0%. The DA rates shown for 7th CPC are calculated on the revised pay structure.</p>
+            </div>
+            
+            <div class="tables-container">
+                <div class="table-wrapper">
+                    <h2 class="table-title">7th CPC DA Rates (2016-2025)</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Effective From</th>
+                                <th>Rate (%)</th>
+                                <th>Increase</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="seventhCpcTableBody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Data Source: Ministry of Finance, Government of India. | Last Official Update: July 1, 2025</p>
+            <p>Developed by : Anil Kumar V.T. | For reference purposes only. Please verify with official documents.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DA data for 6th CPC (2006-2015)
+        const sixthCpcData = [
+            { date: "2006-01-01", rate: 0, status: "Official", remarks: "Base Index" },
+            { date: "2006-07-01", rate: 2, status: "Official", remarks: "" },
+            { date: "2007-01-01", rate: 6, status: "Official", remarks: "" },
+            { date: "2007-07-01", rate: 9, status: "Official", remarks: "" },
+            { date: "2008-01-01", rate: 12, status: "Official", remarks: "" },
+            { date: "2008-07-01", rate: 16, status: "Official", remarks: "" },
+            { date: "2009-01-01", rate: 22, status: "Official", remarks: "" },
+            { date: "2009-07-01", rate: 27, status: "Official", remarks: "" },
+            { date: "2010-01-01", rate: 35, status: "Official", remarks: "" },
+            { date: "2010-07-01", rate: 45, status: "Official", remarks: "" },
+            { date: "2011-01-01", rate: 51, status: "Official", remarks: "" },
+            { date: "2011-07-01", rate: 58, status: "Official", remarks: "" },
+            { date: "2012-01-01", rate: 65, status: "Official", remarks: "" },
+            { date: "2012-07-01", rate: 72, status: "Official", remarks: "" },
+            { date: "2013-01-01", rate: 80, status: "Official", remarks: "" },
+            { date: "2013-07-01", rate: 90, status: "Official", remarks: "" },
+            { date: "2014-01-01", rate: 100, status: "Official", remarks: "" },
+            { date: "2014-07-01", rate: 107, status: "Official", remarks: "" },
+            { date: "2015-01-01", rate: 113, status: "Official", remarks: "" },
+            { date: "2015-07-01", rate: 119, status: "Official", remarks: "" },
+            { date: "2016-01-01", rate: 125, status: "Official", remarks: "Last under 6th CPC" }
+        ];
+
+        // DA data for 7th CPC (2016-2025) - Updated with actual official rates up to July 2025
+        const seventhCpcData = [
+            { date: "2016-01-01", rate: 0, status: "Official", remarks: "7th CPC implementation, DA reset" },
+            { date: "2016-07-01", rate: 2, status: "Official", remarks: "" },
+            { date: "2017-01-01", rate: 4, status: "Official", remarks: "" },
+            { date: "2017-07-01", rate: 5, status: "Official", remarks: "" },
+            { date: "2018-01-01", rate: 7, status: "Official", remarks: "" },
+            { date: "2018-07-01", rate: 9, status: "Official", remarks: "" },
+            { date: "2019-01-01", rate: 12, status: "Official", remarks: "" },
+            { date: "2019-07-01", rate: 17, status: "Official", remarks: "" },
+            { date: "2020-01-01", rate: 21, status: "Official", remarks: "Frozen at 17% due to Covid Pandemic" },
+            { date: "2020-07-01", rate: 24, status: "Official", remarks: "Frozen at 17% due to Covid Pandemic" },
+            { date: "2021-01-01", rate: 28, status: "Official", remarks: "Frozen at 17% due to Covid Pandemic" },
+            { date: "2021-07-01", rate: 31, status: "Official", remarks: "Restarted after freeze" },
+            { date: "2022-01-01", rate: 34, status: "Official", remarks: "" },
+            { date: "2022-07-01", rate: 38, status: "Official", remarks: "" },
+            { date: "2023-01-01", rate: 42, status: "Official", remarks: "" },
+            { date: "2023-07-01", rate: 46, status: "Official", remarks: "" },
+            { date: "2024-01-01", rate: 50, status: "Official", remarks: "" },
+            { date: "2024-07-01", rate: 53, status: "Official", remarks: "" },
+            { date: "2025-01-01", rate: 55, status: "Official", remarks: "Increased by 2%" },
+            { date: "2025-07-01", rate: 58, status: "Official", remarks: "Current Rate - Increased by 3%" }
+        ];
+
+        // Initialize the application
+        function initApp() {
+            renderTables();
+            renderCharts();
+            renderAverageIncrease();
+            setupTabs();
+            setupEventListeners();
+        }
+
+        // Setup tabs functionality
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and content
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                    
+                    // Update average increase
+                    renderAverageIncrease();
+                });
+                
+                // Add keyboard accessibility
+                tab.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        tab.click();
+                    }
+                });
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Export button
+            document.getElementById('exportBtn').addEventListener('click', exportToPDF);
+        }
+
+        // Render average increase at the top
+        function renderAverageIncrease() {
+            const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+            let data;
+            
+            if (activeTab === 'sixth') {
+                data = sixthCpcData;
+            } else {
+                data = seventhCpcData;
+            }
+            
+            // Filter official data only for calculations
+            const officialData = data.filter(item => item.status === 'Official');
+            
+            // Calculate average bi-annual increase
+            const increases = [];
+            for (let i = 1; i < officialData.length; i++) {
+                increases.push(officialData[i].rate - officialData[i-1].rate);
+            }
+            const avgIncrease = increases.length > 0 ? 
+                (increases.reduce((a, b) => a + b, 0) / increases.length).toFixed(1) : 0;
+            
+            // Update the tile
+            document.getElementById('avgValue').textContent = `${avgIncrease}%`;
+        }
+
+        // Render data tables
+        function renderTables() {
+            const sixthCpcTableBody = document.getElementById('sixthCpcTableBody');
+            const seventhCpcTableBody = document.getElementById('seventhCpcTableBody');
+            
+            // Render 6th CPC table
+            sixthCpcTableBody.innerHTML = '';
+            sixthCpcData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                // Format date
+                const date = new Date(item.date);
+                const formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                // Calculate increase
+                const increase = index > 0 ? 
+                    (item.rate - sixthCpcData[index-1].rate) : 0;
+                
+                // Highlight last rate under 6th CPC
+                if (item.remarks.includes("Last under 6th CPC")) {
+                    row.classList.add('highlight');
+                }
+                
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${item.rate}%</td>
+                    <td>${increase > 0 ? `+${increase}%` : '-'}</td>
+                    <td class="status-${item.status.toLowerCase()}">${item.status}</td>
+                    <td>${item.remarks}</td>
+                `;
+                
+                sixthCpcTableBody.appendChild(row);
+            });
+            
+            // Render 7th CPC table
+            seventhCpcTableBody.innerHTML = '';
+            seventhCpcData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                // Format date
+                const date = new Date(item.date);
+                const formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                // Calculate increase
+                const increase = index > 0 ? 
+                    (item.rate - seventhCpcData[index-1].rate) : 0;
+                
+                // Highlight current official rate
+                const isCurrentOfficial = item.status === 'Official' && 
+                    date <= new Date() && 
+                    (index === seventhCpcData.length - 1 || 
+                     new Date(seventhCpcData[index+1].date) > new Date());
+                
+                if (isCurrentOfficial) {
+                    row.classList.add('highlight');
+                }
+                
+                row.innerHTML = `
+                    <td>${formattedDate}</td>
+                    <td>${item.rate}% ${isCurrentOfficial ? '<span class="current-rate">Current</span>' : ''}</td>
+                    <td>${increase > 0 ? `+${increase}%` : '-'}</td>
+                    <td class="status-${item.status.toLowerCase()}">${item.status}</td>
+                    <td>${item.remarks}</td>
+                `;
+                
+                seventhCpcTableBody.appendChild(row);
+            });
+        }
+
+        // Render charts
+        function renderCharts() {
+            renderSixthCpcChart();
+            renderSeventhCpcChart();
+            renderIncreaseCharts();
+        }
+
+        // Render 6th CPC chart
+        function renderSixthCpcChart() {
+            const ctx = document.getElementById('sixthCpcChart').getContext('2d');
+            
+            // Prepare chart data
+            const labels = sixthCpcData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-IN', {
+                    month: 'short',
+                    year: 'numeric'
+                });
+            });
+            
+            const rates = sixthCpcData.map(item => item.rate);
+            
+            // Hide loading indicator
+            document.querySelector('#sixthCpcChart').closest('.chart-container').querySelector('.loading').style.display = 'none';
+            
+            // Create gradient for chart
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(100, 181, 246, 0.8)');
+            gradient.addColorStop(1, 'rgba(100, 181, 246, 0.1)');
+            
+            // Create chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'DA Rate (%)',
+                        data: rates,
+                        backgroundColor: gradient,
+                        borderColor: '#64b5f6',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#64b5f6',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                        trendline: {
+                            color: 'rgba(255,255,255,0.3)',
+                            lineStyle: 'dotted',
+                            width: 2
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'DA Rate (%)',
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: 'rgba(100, 150, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 6
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 8
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    }
+                }
+            });
+        }
+
+        // Render 7th CPC chart
+        function renderSeventhCpcChart() {
+            const ctx = document.getElementById('seventhCpcChart').getContext('2d');
+            
+            // Prepare chart data
+            const labels = seventhCpcData.map(item => {
+                const date = new Date(item.date);
+                return date.toLocaleDateString('en-IN', {
+                    month: 'short',
+                    year: 'numeric'
+                });
+            });
+            
+            const rates = seventhCpcData.map(item => item.rate);
+            
+            // Hide loading indicator
+            document.querySelector('#seventhCpcChart').closest('.chart-container').querySelector('.loading').style.display = 'none';
+            
+            // Create gradient for chart (#00ff55 color)
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 255, 85, 0.8)'); // #00ff55
+            gradient.addColorStop(1, 'rgba(0, 255, 85, 0.1)'); // #00ff55
+            
+            // Create chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'DA Rate (%)',
+                        data: rates,
+                        backgroundColor: gradient,
+                        borderColor: '#00ff55', // #00ff55
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00ff55', // #00ff55
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            display: false
+                        },
+                        trendline: {
+                            color: 'rgba(255,255,255,0.3)',
+                            lineStyle: 'dotted',
+                            width: 2
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'DA Rate (%)',
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: 'rgba(100, 150, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 6
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 8
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    }
+                }
+            });
+        }
+
+        // Render increase charts
+        function renderIncreaseCharts() {
+            renderSixthCpcIncreaseChart();
+            renderSeventhCpcIncreaseChart();
+        }
+
+        // Render 6th CPC increase chart
+        function renderSixthCpcIncreaseChart() {
+            const ctx = document.getElementById('sixthCpcIncreaseChart').getContext('2d');
+            
+            // Prepare chart data - calculate increases
+            const labels = [];
+            const increases = [];
+            
+            for (let i = 1; i < sixthCpcData.length; i++) {
+                const date = new Date(sixthCpcData[i].date);
+                labels.push(date.toLocaleDateString('en-IN', {
+                    month: 'short',
+                    year: 'numeric'
+                }));
+                
+                increases.push(sixthCpcData[i].rate - sixthCpcData[i-1].rate);
+            }
+            
+            // Hide loading indicator
+            document.querySelector('#sixthCpcIncreaseChart').closest('.chart-container').querySelector('.loading').style.display = 'none';
+            
+            // Create chart
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Increase (%)',
+                        data: increases,
+                        backgroundColor: 'rgba(100, 181, 246, 0.7)',
+                        borderColor: '#64b5f6',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Increase (%)',
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: 'rgba(100, 150, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 6
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 8
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    }
+                }
+            });
+        }
+
+        // Render 7th CPC increase chart
+        function renderSeventhCpcIncreaseChart() {
+            const ctx = document.getElementById('seventhCpcIncreaseChart').getContext('2d');
+            
+            // Prepare chart data - calculate increases
+            const labels = [];
+            const increases = [];
+            
+            for (let i = 1; i < seventhCpcData.length; i++) {
+                const date = new Date(seventhCpcData[i].date);
+                labels.push(date.toLocaleDateString('en-IN', {
+                    month: 'short',
+                    year: 'numeric'
+                }));
+                
+                increases.push(seventhCpcData[i].rate - seventhCpcData[i-1].rate);
+            }
+            
+            // Hide loading indicator
+            document.querySelector('#seventhCpcIncreaseChart').closest('.chart-container').querySelector('.loading').style.display = 'none';
+            
+            // Create chart (#00ff55 color)
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Increase (%)',
+                        data: increases,
+                        backgroundColor: 'rgba(0, 255, 85, 0.7)', // #00ff55
+                        borderColor: '#00ff55', // #00ff55
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Increase (%)',
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: 'rgba(100, 150, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 6
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#e0e0e0',
+                                maxTicksLimit: 8
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'nearest'
+                    }
+                }
+            });
+        }
+
+        // Export data to PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+            let data, title;
+            
+            if (activeTab === 'sixth') {
+                data = sixthCpcData;
+                title = '6th CPC DA Rates';
+            } else {
+                data = seventhCpcData;
+                title = '7th CPC DA Rates';
+            }
+            
+            // Create PDF
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(title, 105, 20, null, null, 'center');
+            
+            // Prepare table data
+            const tableData = data.map(item => {
+                const date = new Date(item.date);
+                const formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                return [
+                    formattedDate,
+                    item.rate + '%',
+                    item.status,
+                    item.remarks
+                ];
+            });
+            
+            // Add table
+            doc.autoTable({
+                head: [['Effective From', 'Rate (%)', 'Status', 'Remarks']],
+                body: tableData,
+                startY: 30,
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [100, 181, 246],
+                    textColor: [255, 255, 255]
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 240, 240]
+                }
+            });
+            
+            // Save the PDF
+            doc.save(`${title.replace(' ', '_')}_DA_Rates.pdf`);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Cash Book</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #333;
+            line-height: 1.4;
+            padding: 12px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c5364;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .description {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .database-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #2c5364, #203a43);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-receipt {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .btn-payment {
+            background: linear-gradient(to right, #F44336, #C62828);
+            color: white;
+        }
+        
+        .btn-print {
+            background: linear-gradient(to right, #9C27B0, #7B1FA2);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #ff5f6d, #ff3a4a);
+            color: white;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .summary-card {
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .summary-card.receipts {
+            background: linear-gradient(to right, #E8F5E9, #C8E6C9);
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .summary-card.payments {
+            background: linear-gradient(to right, #FFEBEE, #FFCDD2);
+            border-left: 4px solid #F44336;
+        }
+        
+        .summary-card.balance {
+            background: linear-gradient(to right, #E3F2FD, #BBDEFB);
+            border-left: 4px solid #2196F3;
+        }
+        
+        .summary-card h3 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #455A64;
+        }
+        
+        .summary-card .amount {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .summary-card.receipts .amount {
+            color: #2E7D32;
+        }
+        
+        .summary-card.payments .amount {
+            color: #C62828;
+        }
+        
+        .summary-card.balance .amount {
+            color: #1565C0;
+        }
+        
+        .form-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-title {
+            margin-bottom: 12px;
+            color: #495057;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85rem;
+        }
+        
+        input[type="date"],
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2c5364;
+            box-shadow: 0 0 0 2px rgba(44, 83, 100, 0.2);
+        }
+        
+        .cash-book-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        
+        .cash-book-side {
+            flex: 1;
+            min-width: 400px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .cash-book-header {
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .receipts-header {
+            background: linear-gradient(to right, #2E7D32, #1B5E20);
+        }
+        
+        .payments-header {
+            background: linear-gradient(to right, #C62828, #B71C1C);
+        }
+        
+        .cash-book-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.8rem;
+        }
+        
+        .cash-book-table th, 
+        .cash-book-table td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .cash-book-table th {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            font-size: 0.85rem;
+        }
+        
+        .cash-book-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .cash-book-table tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        .contra-entry {
+            background-color: #FFF9C4 !important;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 3px;
+        }
+        
+        .status-bar {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-left: 3px solid #2c5364;
+            font-size: 0.85rem;
+        }
+        
+        .status-message {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #203a43;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .file-label:hover {
+            background: #1a3038;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: white;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+        }
+        
+        .notification.error {
+            background: linear-gradient(to right, #F44336, #C62828);
+        }
+        
+        .search-container {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .icon {
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .contra-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .print-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        
+        .auto-save-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .cash-book-container {
+                flex-direction: column;
+            }
+            
+            .cash-book-side {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .database-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+            
+            .cash-book-table th, 
+            .cash-book-table td {
+                padding: 4px 6px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .print-controls {
+                flex-direction: column;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 2.5cm;
+            }
+            
+            body * {
+                visibility: hidden;
+                font-family: Tahoma, sans-serif !important;
+            }
+            
+            #printable-cashbook, #printable-cashbook * {
+                visibility: visible;
+                font-family: Tahoma, sans-serif !important;
+            }
+            
+            #printable-cashbook {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                font-size: 12px !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-header h2 {
+                font-size: 16px !important;
+                margin: 8px 0;
+                text-align: center;
+            }
+            
+            .print-header h3 {
+                font-size: 14px !important;
+                margin: 6px 0;
+                text-align: center;
+            }
+            
+            .print-period {
+                font-size: 12px !important;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+            
+            .print-table-container {
+                width: 100%;
+                display: flex;
+            }
+            
+            .print-receipts-side, .print-payments-side {
+                width: 50%;
+                border: 1px solid #ddd;
+                font-size: 12px !important;
+            }
+            
+            .print-receipts-side {
+                border-right: none;
+            }
+            
+            .print-side-header {
+                background-color: #f2f2f2;
+                font-weight: bold;
+                text-align: center;
+                padding: 6px;
+                border-bottom: 1px solid #ddd;
+                font-size: 12px !important;
+            }
+            
+            .print-side-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12px !important;
+            }
+            
+            .print-side-table th, .print-side-table td {
+                border: 1px solid #ddd;
+                padding: 4px;
+                text-align: left;
+                font-size: 12px !important;
+            }
+            
+            .print-side-table th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+                font-size: 12px !important;
+            }
+            
+            .print-summary {
+                margin-top: 15px;
+                padding: 10px;
+                border: 1px solid #ddd;
+                background-color: #f9f9f9;
+                font-size: 12px !important;
+                width: 50%;
+                margin-left: auto;
+            }
+            
+            .print-summary p {
+                margin: 4px 0;
+                font-size: 12px !important;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .print-summary-label {
+                font-weight: bold;
+                min-width: 60%;
+            }
+            
+            .print-opening-balance {
+                font-weight: bold;
+                margin-bottom: 5px;
+                font-size: 12px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Digital Cash Book</h1>
+            <p class="description">Track your cash transactions with printing functionality</p>
+        </header>
+        
+        <div class="database-actions no-print">
+            <input type="file" id="dbFile" accept=".json" class="file-input">
+            <label for="dbFile" class="file-label">
+                <span class="icon">📁</span>Load Cash Book
+            </label>
+            <button id="createDb" class="btn btn-primary">
+                <span class="icon">➕</span>New Cash Book
+            </button>
+            <button id="saveDb" class="btn btn-secondary">
+                <span class="icon">💾</span>Save Cash Book
+            </button>
+            <button id="exampleData" class="btn btn-secondary">
+                <span class="icon">🔍</span>Example Data
+            </button>
+            <button id="clearAll" class="btn btn-danger">
+                <span class="icon">🗑️</span>Clear All
+            </button>
+        </div>
+        
+        <div class="auto-save-toggle no-print">
+            <input type="checkbox" id="autoSave">
+            <label for="autoSave">Enable Auto-Save (saves to browser storage)</label>
+        </div>
+        
+        <div class="summary-cards no-print">
+            <div class="summary-card receipts">
+                <h3>Total Receipts</h3>
+                <div class="amount" id="totalReceipts">₹0.00</div>
+            </div>
+            <div class="summary-card payments">
+                <h3>Total Payments</h3>
+                <div class="amount" id="totalPayments">₹0.00</div>
+            </div>
+            <div class="summary-card balance">
+                <h3>Cash Balance</h3>
+                <div class="amount" id="closingBalance">₹0.00</div>
+            </div>
+        </div>
+        
+        <div class="print-controls no-print">
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate">
+            </div>
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="Enter company name">
+            </div>
+            <div class="form-group">
+                <button id="printBtn" class="btn btn-print">
+                    <span class="icon">🖨️</span>Print Cash Book
+                </button>
+            </div>
+        </div>
+        
+        <div class="form-container no-print">
+            <div class="form-title">
+                <span id="formTitle">Add Transaction</span>
+                <button type="button" id="cancelEdit" class="btn btn-secondary btn-sm hidden">
+                    <span class="icon">✖</span>Cancel
+                </button>
+            </div>
+            <form id="transactionForm">
+                <input type="hidden" id="editId" value="">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type *</label>
+                        <select id="type" required>
+                            <option value="Receipt">Receipt</option>
+                            <option value="Payment">Payment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (₹) *</label>
+                        <input type="number" id="amount" min="0.01" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <input type="text" id="description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category">
+                            <option value="">Select Category</option>
+                            <option value="Cash Sale">Cash Sale</option>
+                            <option value="Cash Purchase">Cash Purchase</option>
+                            <option value="Cash Expense">Cash Expense</option>
+                            <option value="Cash Receipt">Cash Receipt</option>
+                            <option value="Bank Deposit">Bank Deposit</option>
+                            <option value="Bank Withdrawal">Bank Withdrawal</option>
+                            <option value="Contra Entry">Contra Entry</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group contra-checkbox">
+                        <input type="checkbox" id="isContra">
+                        <label for="isContra">Contra Entry</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">💾</span>Save Transaction
+                </button>
+        </div>
+        
+        <div class="search-container no-print">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search transactions...">
+            <button id="clearSearch" class="btn btn-secondary">
+                <span class="icon">✖</span>Clear
+            </button>
+        </div>
+        
+        <div class="cash-book-container no-print">
+            <div class="cash-book-side">
+                <div class="cash-book-header receipts-header">Receipts</div>
+                <div class="transaction-table-container">
+                    <table class="cash-book-table" id="receiptTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px;">
+                                    No receipt transactions found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="cash-book-side">
+                <div class="cash-book-header payments-header">Payments</div>
+                <div class="transaction-table-container">
+                    <table class="cash-book-table" id="paymentTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount (₹)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px;">
+                                    No payment transactions found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar no-print">
+            <div class="status-message" id="statusMessage">No cash book loaded</div>
+            <div id="rowCount">0 transactions</div>
+            <div id="lastSaved">Last saved: Never</div>
+        </div>
+        
+        <!-- Printable cash book section (hidden by default) -->
+        <div id="printable-cashbook" style="display: none;">
+            <div class="print-header">
+                <h2 id="print-company-name">Company Name</h2>
+                <h3>Cash Book</h3>
+                <div class="print-period" id="print-period">For the period: </div>
+            </div>
+            
+            <div class="print-table-container">
+                <div class="print-receipts-side">
+                    <div class="print-side-header">Cash Inflow (Receipts)</div>
+                    <table class="print-side-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="print-receipts-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="print-payments-side">
+                    <div class="print-side-header">Cash Outflow (Payments)</div>
+                    <table class="print-side-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="print-payments-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="print-summary">
+                <p><span class="print-summary-label">Opening Balance:</span> <span id="print-opening-balance">₹0.00</span></p>
+                <p><span class="print-summary-label">Total Receipts during the Period:</span> <span id="print-total-receipts">₹0.00</span></p>
+                <p><span class="print-summary-label">Total Payments during the Period:</span> <span id="print-total-payments">₹0.00</span></p>
+                <p><span class="print-summary-label">Closing Balance:</span> <span id="print-closing-balance">₹0.00</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Confirm Action</h3>
+            <p id="modalMessage">Are you sure you want to perform this action?</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Global variables
+        let transactions = [];
+        let nextId = 1;
+        let autoSaveEnabled = false;
+        let lastSavedTimestamp = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as default
+            const today = new Date();
+            document.getElementById('date').valueAsDate = today;
+            
+            // Set default date range for printing (current month)
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            document.getElementById('startDate').valueAsDate = firstDay;
+            document.getElementById('endDate').valueAsDate = lastDay;
+            
+            // Event listeners
+            document.getElementById('createDb').addEventListener('click', createDatabase);
+            document.getElementById('saveDb').addEventListener('click', saveDatabase);
+            document.getElementById('dbFile').addEventListener('change', loadDatabase);
+            document.getElementById('exampleData').addEventListener('click', loadExampleData);
+            document.getElementById('transactionForm').addEventListener('submit', saveTransaction);
+            document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
+            document.getElementById('searchInput').addEventListener('input', filterTransactions);
+            document.getElementById('clearSearch').addEventListener('click', clearSearch);
+            document.getElementById('printBtn').addEventListener('click', printCashBook);
+            document.getElementById('clearAll').addEventListener('click', confirmClearAll);
+            document.getElementById('autoSave').addEventListener('change', toggleAutoSave);
+            document.getElementById('modalCancel').addEventListener('click', closeModal);
+            document.getElementById('modalConfirm').addEventListener('click', executeModalAction);
+            
+            // Update transaction type UI
+            document.getElementById('type').addEventListener('change', function() {
+                updateFormUI();
+            });
+            
+            // Check for saved data in localStorage
+            checkForSavedData();
+            
+            // Initial UI update
+            updateFormUI();
+        });
+        
+        // Check for saved data in localStorage
+        function checkForSavedData() {
+            const savedData = localStorage.getItem('cashbookData');
+            if (savedData) {
+                if (confirm('Saved data found in browser storage. Would you like to load it?')) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        transactions = data.transactions;
+                        nextId = data.nextId;
+                        lastSavedTimestamp = data.timestamp;
+                        
+                        updateUI();
+                        showNotification('Cash book loaded from browser storage.', 'success');
+                        updateLastSavedDisplay();
+                    } catch (error) {
+                        showNotification('Error loading from browser storage: ' + error.message, 'error');
+                    }
+                } else {
+                    // Create a new database if user doesn't want to load saved data
+                    createDatabase();
+                }
+            } else {
+                // Create a new database if no saved data
+                createDatabase();
+            }
+        }
+        
+        // Toggle auto-save feature
+        function toggleAutoSave() {
+            autoSaveEnabled = document.getElementById('autoSave').checked;
+            if (autoSaveEnabled) {
+                saveToLocalStorage();
+                showNotification('Auto-save enabled. Data will be saved to browser storage.', 'success');
+            } else {
+                showNotification('Auto-save disabled.', 'success');
+            }
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    transactions: transactions,
+                    nextId: nextId,
+                    timestamp: new Date().getTime()
+                };
+                
+                localStorage.setItem('cashbookData', JSON.stringify(data));
+                lastSavedTimestamp = data.timestamp;
+                updateLastSavedDisplay();
+            } catch (error) {
+                showNotification('Error saving to browser storage: ' + error.message, 'error');
+            }
+        }
+        
+        // Update last saved display
+        function updateLastSavedDisplay() {
+            const lastSavedElement = document.getElementById('lastSaved');
+            if (lastSavedTimestamp) {
+                const date = new Date(lastSavedTimestamp);
+                lastSavedElement.textContent = 'Last saved: ' + date.toLocaleString();
+            } else {
+                lastSavedElement.textContent = 'Last saved: Never';
+            }
+        }
+        
+        // Create a new database
+        function createDatabase() {
+            transactions = [];
+            nextId = 1;
+            document.getElementById('searchInput').value = '';
+            updateUI();
+            showNotification('New cash book created successfully.', 'success');
+            
+            if (autoSaveEnabled) {
+                saveToLocalStorage();
+            }
+        }
+        
+        // Save database to file
+        function saveDatabase() {
+            if (transactions.length === 0) {
+                showNotification('No transactions to save.', 'error');
+                return;
+            }
+            
+            try {
+                const data = {
+                    transactions: transactions,
+                    nextId: nextId,
+                    timestamp: new Date().getTime()
+                };
+                
+                const dataStr = JSON.stringify(data);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                // Create a download link and trigger it
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'cashbook_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                lastSavedTimestamp = data.timestamp;
+                updateLastSavedDisplay();
+                showNotification('Cash book saved successfully.', 'success');
+            } catch (error) {
+                showNotification('Error saving database: ' + error.message, 'error');
+            }
+        }
+        
+        // Load database from file
+        function loadDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    transactions = data.transactions;
+                    nextId = data.nextId;
+                    lastSavedTimestamp = data.timestamp || new Date().getTime();
+                    
+                    // Clear search input to show all transactions
+                    document.getElementById('searchInput').value = '';
+                    
+                    updateUI();
+                    updateLastSavedDisplay();
+                    showNotification('Cash book loaded successfully.', 'success');
+                    
+                    if (autoSaveEnabled) {
+                        saveToLocalStorage();
+                    }
+                } catch (error) {
+                    showNotification('Error loading database: ' + error.message, 'error');
+                }
+                
+                // Reset file input
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+        
+        // Load example data
+        function loadExampleData() {
+            createDatabase();
+            
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const lastWeek = new Date(today);
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            
+            const sampleTransactions = [
+                {id: nextId++, date: lastWeek.toISOString().slice(0,10), type: 'Receipt', description: 'Cash Sales', amount: 5000.00, category: 'Cash Sale', notes: 'Daily sales', isContra: false},
+                {id: nextId++, date: yesterday.toISOString().slice(0,10), type: 'Payment', description: 'Office Supplies', amount: 3500.00, category: 'Cash Expense', notes: 'Paper, pens, etc.', isContra: false},
+                {id: nextId++, date: yesterday.toISOString().slice(0,10), type: 'Payment', description: 'Bank Deposit', amount: 8000.00, category: 'Bank Deposit', notes: 'Cash deposit to bank account', isContra: true},
+                {id: nextId++, date: today.toISOString().slice(0,10), type: 'Receipt', description: 'Customer Payment', amount: 7500.00, category: 'Cash Receipt', notes: 'Payment from ABC Corp', isContra: false},
+                {id: nextId++, date: today.toISOString().slice(0,10), type: 'Payment', description: 'Utility Bills', amount: 4200.00, category: 'Cash Expense', notes: 'Electricity and water bills', isContra: false},
+                {id: nextId++, date: today.toISOString().slice(0,10), type: 'Receipt', description: 'Bank Withdrawal', amount: 5000.00, category: 'Bank Withdrawal', notes: 'Cash withdrawal from bank', isContra: true},
+            ];
+            
+            transactions = sampleTransactions;
+            updateUI();
+            showNotification('Example data loaded successfully.', 'success');
+            
+            if (autoSaveEnabled) {
+                saveToLocalStorage();
+            }
+        }
+        
+        // Save transaction to database
+        function saveTransaction(event) {
+            event.preventDefault();
+            
+            try {
+                const editId = document.getElementById('editId').value;
+                const date = document.getElementById('date').value;
+                const type = document.getElementById('type').value;
+                const description = document.getElementById('description').value;
+                const amount = parseFloat(document.getElementById('amount').value);
+                const category = document.getElementById('category').value;
+                const notes = document.getElementById('notes').value;
+                const isContra = document.getElementById('isContra').checked;
+                
+                if (editId) {
+                    // Update existing transaction
+                    const index = transactions.findIndex(t => t.id == editId);
+                    if (index !== -1) {
+                        transactions[index] = {
+                            id: parseInt(editId),
+                            date,
+                            type,
+                            description,
+                            amount,
+                            category,
+                            notes,
+                            isContra
+                        };
+                    }
+                    
+                    showNotification('Transaction updated successfully.', 'success');
+                } else {
+                    // Insert new transaction
+                    transactions.push({
+                        id: nextId++,
+                        date,
+                        type,
+                        description,
+                        amount,
+                        category,
+                        notes,
+                        isContra
+                    });
+                    
+                    showNotification('Transaction saved successfully.', 'success');
+                }
+                
+                // Reset form
+                document.getElementById('transactionForm').reset();
+                document.getElementById('editId').value = '';
+                document.getElementById('date').valueAsDate = new Date();
+                document.getElementById('cancelEdit').classList.add('hidden');
+                document.getElementById('formTitle').textContent = 'Add Transaction';
+                
+                updateUI();
+                
+                if (autoSaveEnabled) {
+                    saveToLocalStorage();
+                }
+            } catch (error) {
+                showNotification('Error saving transaction: ' + error.message, 'error');
+            }
+        }
+        
+        // Edit transaction
+        function editTransaction(id) {
+            try {
+                const transaction = transactions.find(t => t.id === id);
+                if (transaction) {
+                    document.getElementById('editId').value = transaction.id;
+                    document.getElementById('date').value = transaction.date;
+                    document.getElementById('type').value = transaction.type;
+                    document.getElementById('description').value = transaction.description;
+                    document.getElementById('amount').value = transaction.amount;
+                    document.getElementById('category').value = transaction.category || '';
+                    document.getElementById('notes').value = transaction.notes || '';
+                    document.getElementById('isContra').checked = transaction.isContra;
+                    
+                    document.getElementById('formTitle').textContent = 'Edit Transaction';
+                    document.getElementById('cancelEdit').classList.remove('hidden');
+                    
+                    updateFormUI();
+                }
+            } catch (error) {
+                showNotification('Error loading transaction: ' + error.message, 'error');
+            }
+        }
+        
+        // Delete transaction
+        function deleteTransaction(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) {
+                return;
+            }
+            
+            try {
+                transactions = transactions.filter(t => t.id !== id);
+                updateUI();
+                showNotification('Transaction deleted successfully.', 'success');
+                
+                if (autoSaveEnabled) {
+                    saveToLocalStorage();
+                }
+            } catch (error) {
+                showNotification('Error deleting transaction: ' + error.message, 'error');
+            }
+        }
+        
+        // Confirm clear all data
+        function confirmClearAll() {
+            if (transactions.length === 0) {
+                showNotification('No transactions to clear.', 'error');
+                return;
+            }
+            
+            showModal(
+                'Clear All Data',
+                'Are you sure you want to clear all transactions? This action cannot be undone.',
+                clearAllData
+            );
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            createDatabase();
+            if (autoSaveEnabled) {
+                localStorage.removeItem('cashbookData');
+                lastSavedTimestamp = null;
+                updateLastSavedDisplay();
+            }
+        }
+        
+        // Show confirmation modal
+        function showModal(title, message, confirmCallback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalConfirm').setAttribute('data-action', confirmCallback.name);
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+        
+        // Execute modal action
+        function executeModalAction() {
+            const actionName = this.getAttribute('data-action');
+            if (actionName === 'clearAllData') {
+                clearAllData();
+            }
+            closeModal();
+        }
+        
+        // Cancel edit
+        function cancelEdit() {
+            document.getElementById('transactionForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('date').valueAsDate = new Date();
+            document.getElementById('cancelEdit').classList.add('hidden');
+            document.getElementById('formTitle').textContent = 'Add Transaction';
+            
+            updateFormUI();
+        }
+        
+        // Filter transactions based on search input
+        function filterTransactions() {
+            updateUI();
+        }
+        
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            updateUI();
+        }
+        
+        // Update form UI based on transaction type
+        function updateFormUI() {
+            const type = document.getElementById('type').value;
+            
+            if (type === 'Receipt') {
+                document.querySelector('button[type="submit"]').className = 'btn btn-receipt';
+            } else {
+                document.querySelector('button[type="submit"]').className = 'btn btn-payment';
+            }
+        }
+        
+        // Print cash book
+        function printCashBook() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const companyName = document.getElementById('companyName').value || 'Company Name';
+            
+            if (!startDate || !endDate) {
+                showNotification('Please select start and end dates for the period.', 'error');
+                return;
+            }
+            
+            // Filter transactions by date range
+            const periodTransactions = transactions.filter(t => {
+                return t.date >= startDate && t.date <= endDate;
+            });
+            
+            // Get all transactions before the start date to calculate opening balance
+            const openingBalanceTransactions = transactions.filter(t => {
+                return t.date < startDate;
+            });
+            
+            // Calculate opening balance (balance before start date)
+            const openingReceipts = openingBalanceTransactions
+                .filter(t => t.type === 'Receipt')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const openingPayments = openingBalanceTransactions
+                .filter(t => t.type === 'Payment')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const openingBalance = openingReceipts - openingPayments;
+            
+            // Sort period transactions by date
+            periodTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Separate receipts and payments for the period
+            const receipts = periodTransactions.filter(t => t.type === 'Receipt');
+            const payments = periodTransactions.filter(t => t.type === 'Payment');
+            
+            // Calculate period totals
+            const periodReceipts = receipts.reduce((sum, t) => sum + t.amount, 0);
+            const periodPayments = payments.reduce((sum, t) => sum + t.amount, 0);
+            
+            // Calculate closing balance
+            const closingBalance = openingBalance + periodReceipts - periodPayments;
+            
+            // Update printable section
+            document.getElementById('print-company-name').textContent = companyName;
+            document.getElementById('print-period').textContent = `For the period: ${formatDateForPrint(startDate)} to ${formatDateForPrint(endDate)}`;
+            document.getElementById('print-opening-balance').textContent = `₹${openingBalance.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('print-total-receipts').textContent = `₹${periodReceipts.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('print-total-payments').textContent = `₹${periodPayments.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('print-closing-balance').textContent = `₹${closingBalance.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            
+            // Update receipts table
+            const receiptsBody = document.getElementById('print-receipts-body');
+            if (receipts.length > 0) {
+                receiptsBody.innerHTML = receipts.map(t => `
+                    <tr>
+                        <td>${formatDateForPrint(t.date)}</td>
+                        <td>${t.description}</td>
+                        <td>${t.category || ''}</td>
+                        <td>₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `).join('');
+            } else {
+                receiptsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 10px;">
+                            No receipt transactions
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Update payments table
+            const paymentsBody = document.getElementById('print-payments-body');
+            if (payments.length > 0) {
+                paymentsBody.innerHTML = payments.map(t => `
+                    <tr>
+                        <td>${formatDateForPrint(t.date)}</td>
+                        <td>${t.description}</td>
+                        <td>${t.category || ''}</td>
+                        <td>₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `).join('');
+            } else {
+                paymentsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 10px;">
+                            No payment transactions
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Show the printable section and print
+            const printableElement = document.getElementById('printable-cashbook');
+            printableElement.style.display = 'block';
+            
+            window.print();
+            
+            // Hide the printable section after printing
+            printableElement.style.display = 'none';
+        }
+        
+        // Format date for printing
+        function formatDateForPrint(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+        
+        // Update UI with data from database
+        function updateUI() {
+            // Get search term
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filter transactions if search term exists
+            let filteredTransactions = transactions;
+            if (searchTerm) {
+                filteredTransactions = transactions.filter(t => 
+                    t.description.toLowerCase().includes(searchTerm) ||
+                    (t.category && t.category.toLowerCase().includes(searchTerm)) ||
+                    (t.notes && t.notes.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Separate receipts and payments
+            const receipts = filteredTransactions.filter(t => t.type === 'Receipt');
+            const payments = filteredTransactions.filter(t => t.type === 'Payment');
+            
+            // Calculate totals
+            const totalReceipts = receipts.reduce((sum, t) => sum + t.amount, 0);
+            const totalPayments = payments.reduce((sum, t) => sum + t.amount, 0);
+            const closingBalance = totalReceipts - totalPayments;
+            
+            // Update summary cards
+            document.getElementById('totalReceipts').textContent = `₹${totalReceipts.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalPayments').textContent = `₹${totalPayments.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('closingBalance').textContent = `₹${closingBalance.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            
+            // Update receipts table
+            const receiptTableBody = document.getElementById('receiptTable').querySelector('tbody');
+            if (receipts.length > 0) {
+                receiptTableBody.innerHTML = receipts.map(t => `
+                    <tr class="${t.isContra ? 'contra-entry' : ''}">
+                        <td>${formatDate(t.date)}</td>
+                        <td>${t.description}</td>
+                        <td>${t.category || ''}</td>
+                        <td>₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="editTransaction(${t.id})">
+                                <span class="icon">✏️</span>Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="deleteTransaction(${t.id})">
+                                <span class="icon">🗑️</span>Delete
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                receiptTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">
+                            ${searchTerm ? 'No matching receipt transactions found.' : 'No receipt transactions found.'}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Update payments table
+            const paymentTableBody = document.getElementById('paymentTable').querySelector('tbody');
+            if (payments.length > 0) {
+                paymentTableBody.innerHTML = payments.map(t => `
+                    <tr class="${t.isContra ? 'contra-entry' : ''}">
+                        <td>${formatDate(t.date)}</td>
+                        <td>${t.description}</td>
+                        <td>${t.category || ''}</td>
+                        <td>₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="editTransaction(${t.id})">
+                                <span class="icon">✏️</span>Edit
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="deleteTransaction(${t.id})">
+                                <span class="icon">🗑️</span>Delete
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                paymentTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">
+                            ${searchTerm ? 'No matching payment transactions found.' : 'No payment transactions found.'}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Update status bar
+            document.getElementById('statusMessage').textContent = `Cash book loaded with ${transactions.length} transactions`;
+            document.getElementById('rowCount').textContent = `${filteredTransactions.length} transactions`;
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

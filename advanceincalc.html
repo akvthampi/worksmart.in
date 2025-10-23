@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advance Increment Calculator for Pay Fixation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #0d1b2a 100%);
+            color: #e0e0e0;
+            line-height: 1.4;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        h1 {
+            color: #64b5f6;
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.7);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: #90caf9;
+            font-size: 1rem;
+        }
+        
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .schedule-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cpc-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .cpc-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(20, 30, 48, 0.8);
+            color: #90caf9;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .cpc-btn.active {
+            background: linear-gradient(135deg, #64b5f6, #1976d2);
+            color: white;
+            border-color: #64b5f6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 181, 246, 0.4);
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #90caf9;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(20, 30, 48, 0.8);
+            border: 2px solid rgba(100, 150, 255, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.5);
+        }
+        
+        .input-group input::placeholder {
+            color: #90a4ae;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #64b5f6, #1976d2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(100, 181, 246, 0.4);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(198, 40, 40, 0.2);
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            display: none;
+            border: 2px solid rgba(229, 57, 53, 0.5);
+            box-shadow: 0 5px 15px rgba(229, 57, 53, 0.3);
+        }
+        
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .result-values {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .result-item {
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .result-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            color: white;
+        }
+        
+        .result-label {
+            font-size: 12px;
+            opacity: 0.9;
+            color: white;
+        }
+        
+        .grade-pay-section {
+            display: none;
+        }
+        
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .disclaimer {
+            font-size: 11px;
+            color: #90a4ae;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        
+        .creator {
+            font-size: 10px;
+            color: #90a4ae;
+            font-style: italic;
+        }
+        
+        .schedule-header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .schedule-header h2 {
+            color: #64b5f6;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .schedule-header p {
+            color: #90caf9;
+            font-size: 13px;
+        }
+        
+        .increment-table {
+            flex: 1;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            border-radius: 6px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th, td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+            color: #e0e0e0;
+        }
+        
+        th {
+            background: rgba(13, 27, 42, 0.9);
+            font-weight: 600;
+            color: #64b5f6;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: rgba(100, 150, 255, 0.1);
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .export-btn {
+            flex: 1;
+            padding: 10px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .input-section, .schedule-section {
+                flex: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .cpc-selector {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .result-values {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <header>
+                <h1>Advance Increments Calculator</h1>
+                <p class="subtitle">Calculate your pay after advance increments</p>
+            </header>
+
+            <div class="cpc-selector">
+                <button class="cpc-btn active" onclick="selectCPC('sixth')">6th CPC</button>
+                <button class="cpc-btn" onclick="selectCPC('seventh')">7th CPC</button>
+            </div>
+
+            <div class="input-group">
+                <label for="employeeName">Name of Employee</label>
+                <input type="text" id="employeeName" placeholder="Enter employee name">
+            </div>
+
+            <div class="input-group">
+                <label for="designation">Designation</label>
+                <input type="text" id="designation" placeholder="Enter designation">
+            </div>
+
+            <div class="input-group">
+                <label for="basicPay">Initial Basic Pay (Rs.)</label>
+                <input type="number" id="basicPay" placeholder="Enter basic pay" min="0">
+            </div>
+
+            <div class="input-group grade-pay-section" id="gradePaySection">
+                <label for="gradePay">Grade Pay (Rs.)</label>
+                <input type="number" id="gradePay" placeholder="Enter grade pay" min="0">
+            </div>
+
+            <div class="input-group">
+                <label for="doj">Date of Joining</label>
+                <input type="date" id="doj">
+            </div>
+
+            <div class="input-group">
+                <label for="nextIncrement">Date of Next Increment</label>
+                <input type="date" id="nextIncrement">
+            </div>
+
+            <div class="input-group">
+                <label for="increments">Number of Advance Increments</label>
+                <input type="number" id="increments" placeholder="Enter number of increments" min="0" max="50" value="1">
+            </div>
+
+            <button class="calculate-btn" onclick="calculatePay()">
+                Calculate Pay
+            </button>
+
+            <div class="result" id="result">
+                <h3>Pay After Advance Increments</h3>
+                <div class="result-values">
+                    <div class="result-item">
+                        <div class="result-value" id="finalBasicPay">Rs.0</div>
+                        <div class="result-label">Basic Pay</div>
+                    </div>
+                    <div class="result-item" id="finalGradePayItem">
+                        <div class="result-value" id="finalGradePay">Rs.0</div>
+                        <div class="result-label">Grade Pay</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="finalTotalPay">Rs.0</div>
+                        <div class="result-label">Total Pay</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportToExcel()">Export to Excel</button>
+                <button class="export-btn" onclick="exportToPDF()">Export to PDF</button>
+            </div>
+
+            <div class="footer">
+                <div class="disclaimer">
+                    Disclaimer: For information purposes only. Not to be quoted as authority
+                </div>
+                <div class="creator">
+                    Created by Anil Kumar V.T.
+                </div>
+            </div>
+        </div>
+
+        <div class="schedule-section">
+            <div class="schedule-header">
+                <h2>Increment Schedule</h2>
+                <p>Detailed breakdown of pay progression</p>
+            </div>
+            <div class="increment-table">
+                <div class="table-container">
+                    <table id="incrementTable">
+                        <thead>
+                            <tr>
+                                <th>Increment No</th>
+                                <th>Basic Pay</th>
+                                <th>Grade Pay</th>
+                                <th>Total Pay</th>
+                                <th>Increment Amt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incrementTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCPC = 'sixth';
+        let currentIncrementData = []; // Store increment data for export
+
+        function selectCPC(cpc) {
+            currentCPC = cpc;
+            document.querySelectorAll('.cpc-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Clear all input fields when switching CPC
+            document.getElementById('basicPay').value = '';
+            document.getElementById('increments').value = '1';
+            document.getElementById('gradePay').value = '';
+            document.getElementById('doj').value = '';
+            document.getElementById('nextIncrement').value = '';
+            
+            // Hide result when switching CPC
+            document.getElementById('result').style.display = 'none';
+
+            // Clear table
+            clearTable();
+
+            // Show/hide grade pay section
+            const gradePaySection = document.getElementById('gradePaySection');
+            const gradePayItem = document.getElementById('finalGradePayItem');
+            
+            if (cpc === 'sixth') {
+                gradePaySection.style.display = 'block';
+                gradePayItem.style.display = 'block';
+            } else {
+                gradePaySection.style.display = 'none';
+                gradePayItem.style.display = 'none';
+            }
+        }
+
+        function roundToNearest(value, nearest) {
+            if (currentCPC === 'sixth') {
+                // For 6th CPC: Round to NEXT multiple of 10 (ceil)
+                return Math.ceil(value / nearest) * nearest;
+            } else {
+                // For 7th CPC: Round to NEAREST multiple of 100 (round)
+                return Math.round(value / nearest) * nearest;
+            }
+        }
+
+        function clearTable() {
+            document.getElementById('incrementTableBody').innerHTML = '';
+            currentIncrementData = [];
+        }
+
+        function calculatePay() {
+            const basicPay = parseFloat(document.getElementById('basicPay').value);
+            const increments = parseInt(document.getElementById('increments').value);
+            const doj = document.getElementById('doj').value;
+            const nextIncrementDate = document.getElementById('nextIncrement').value;
+            
+            if (!basicPay || !increments || basicPay <= 0 || increments < 0 || !doj || !nextIncrementDate) {
+                alert('Please enter valid values for all fields');
+                return;
+            }
+
+            let finalBasicPay, finalGradePay, finalTotalPay;
+            const incrementData = [];
+
+            if (currentCPC === 'sixth') {
+                const gradePay = parseFloat(document.getElementById('gradePay').value);
+                if (!gradePay || gradePay < 0) {
+                    alert('Please enter valid Grade Pay for 6th CPC');
+                    return;
+                }
+
+                // 6th CPC calculation (3% of BP + GP, rounded to next multiple of 10)
+                let currentBasic = basicPay;
+                let currentTotalPay = basicPay + gradePay;
+
+                // Add initial data point (Increment 0)
+                incrementData.push({
+                    incrementNo: 0,
+                    basicPay: currentBasic,
+                    gradePay: gradePay,
+                    totalPay: currentTotalPay,
+                    incrementAmount: 0
+                });
+
+                for (let i = 1; i <= increments; i++) {
+                    // Calculate increment on current stage pay (current basic + grade pay)
+                    const incrementAmount = roundToNearest((currentBasic + gradePay) * 0.03, 10);
+                    currentBasic += incrementAmount;
+                    currentTotalPay = currentBasic + gradePay;
+
+                    incrementData.push({
+                        incrementNo: i,
+                        basicPay: currentBasic,
+                        gradePay: gradePay,
+                        totalPay: currentTotalPay,
+                        incrementAmount: incrementAmount
+                    });
+                }
+
+                finalBasicPay = Math.round(currentBasic);
+                finalGradePay = Math.round(gradePay);
+                finalTotalPay = finalBasicPay + finalGradePay;
+
+            } else {
+                // 7th CPC calculation (3% of Basic Pay, rounded to nearest 100)
+                let currentPay = basicPay;
+
+                // Add initial data point (Increment 0)
+                incrementData.push({
+                    incrementNo: 0,
+                    basicPay: currentPay,
+                    gradePay: 0,
+                    totalPay: currentPay,
+                    incrementAmount: 0
+                });
+
+                for (let i = 1; i <= increments; i++) {
+                    const incrementAmount = roundToNearest(currentPay * 0.03, 100);
+                    currentPay += incrementAmount;
+
+                    incrementData.push({
+                        incrementNo: i,
+                        basicPay: currentPay,
+                        gradePay: 0,
+                        totalPay: currentPay,
+                        incrementAmount: incrementAmount
+                    });
+                }
+
+                finalBasicPay = Math.round(currentPay);
+                finalGradePay = 0;
+                finalTotalPay = finalBasicPay;
+            }
+
+            // Store increment data for export
+            currentIncrementData = incrementData;
+
+            // Display results
+            document.getElementById('finalBasicPay').textContent = 'Rs.' + finalBasicPay.toLocaleString('en-IN');
+            document.getElementById('finalGradePay').textContent = 'Rs.' + finalGradePay.toLocaleString('en-IN');
+            document.getElementById('finalTotalPay').textContent = 'Rs.' + finalTotalPay.toLocaleString('en-IN');
+            
+            document.getElementById('result').style.display = 'block';
+            
+            // Update table
+            updateTable(incrementData);
+        }
+
+        function updateTable(data) {
+            const tableBody = document.getElementById('incrementTableBody');
+            tableBody.innerHTML = '';
+
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.incrementNo === 0 ? 'Initial' : item.incrementNo}</td>
+                    <td>Rs.${Math.round(item.basicPay).toLocaleString('en-IN')}</td>
+                    <td>${currentCPC === 'sixth' ? 'Rs.' + Math.round(item.gradePay).toLocaleString('en-IN') : '-'}</td>
+                    <td>Rs.${Math.round(item.totalPay).toLocaleString('en-IN')}</td>
+                    <td>${item.incrementNo === 0 ? '-' : 'Rs.' + Math.round(item.incrementAmount).toLocaleString('en-IN')}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Export functions
+        function exportToExcel() {
+            if (currentIncrementData.length === 0) {
+                alert('Please calculate pay first to export data');
+                return;
+            }
+
+            const employeeName = document.getElementById('employeeName').value || 'Not Provided';
+            const designation = document.getElementById('designation').value || 'Not Provided';
+            const doj = document.getElementById('doj').value || 'Not Provided';
+            const increments = document.getElementById('increments').value || '0';
+
+            // Prepare data for Excel
+            const excelData = [
+                ['Grant of Advance Increments for Pay Fixation'],
+                [''],
+                ['Name of Employee:', employeeName],
+                ['Designation:', designation],
+                ['Date of Joining:', doj],
+                ['No. of Advance Increments Granted:', increments],
+                [''],
+                ['Increment Schedule'],
+                ['Increment No', 'Basic Pay (Rs.)', 'Grade Pay (Rs.)', 'Total Pay (Rs.)', 'Increment Amount (Rs.)']
+            ];
+
+            currentIncrementData.forEach(item => {
+                excelData.push([
+                    item.incrementNo === 0 ? 'Initial' : item.incrementNo,
+                    Math.round(item.basicPay),
+                    currentCPC === 'sixth' ? Math.round(item.gradePay) : '-',
+                    Math.round(item.totalPay),
+                    item.incrementNo === 0 ? '-' : Math.round(item.incrementAmount)
+                ]);
+            });
+
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Increment Schedule');
+            
+            // Export to file
+            XLSX.writeFile(wb, 'Pay_Fixation_Advance_Increments.xlsx');
+        }
+
+        function exportToPDF() {
+            if (currentIncrementData.length === 0) {
+                alert('Please calculate pay first to export data');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Get input values
+            const employeeName = document.getElementById('employeeName').value || 'Not Provided';
+            const designation = document.getElementById('designation').value || 'Not Provided';
+            const doj = document.getElementById('doj').value || 'Not Provided';
+            const increments = document.getElementById('increments').value || '0';
+            
+            // Add main title
+            doc.setFontSize(16);
+            doc.text('Grant of Advance Increments for Pay Fixation', 14, 15);
+            
+            // Add employee details
+            doc.setFontSize(10);
+            let yPosition = 30;
+            doc.text(`Name of Employee: ${employeeName}`, 14, yPosition);
+            yPosition += 7;
+            doc.text(`Designation: ${designation}`, 14, yPosition);
+            yPosition += 7;
+            doc.text(`Date of Joining: ${doj}`, 14, yPosition);
+            yPosition += 7;
+            doc.text(`No. of Advance Increments to be Given: ${increments}`, 14, yPosition);
+            yPosition += 12;
+            
+            // Prepare table data - FIXED: Ensure numbers are properly formatted
+            const tableData = currentIncrementData.map(item => {
+                return [
+                    item.incrementNo === 0 ? 'Initial' : item.incrementNo.toString(),
+                    'Rs.' + formatNumber(Math.round(item.basicPay)), // Prepend 'Rs.' with clean formatted number
+                    currentCPC === 'sixth' ? 'Rs.' + formatNumber(Math.round(item.gradePay)) : '-', // Prepend 'Rs.' with clean formatted number
+                    'Rs.' + formatNumber(Math.round(item.totalPay)), // Prepend 'Rs.' with clean formatted number
+                    item.incrementNo === 0 ? '-' : 'Rs.' + formatNumber(Math.round(item.incrementAmount)) // Prepend 'Rs.' with clean formatted number
+                ];
+            });
+
+            // Add table
+            doc.autoTable({
+                startY: yPosition,
+                head: [['Increment No', 'Basic Pay (Rs.)', 'Grade Pay (Rs.)', 'Total Pay (Rs.)', 'Increment Amount (Rs.)']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [100, 181, 246] },
+                styles: { fontSize: 8 },
+                columnStyles: {
+                    0: { cellWidth: 25 },
+                    1: { cellWidth: 30 },
+                    2: { cellWidth: 30 },
+                    3: { cellWidth: 30 },
+                    4: { cellWidth: 35 }
+                }
+            });
+
+            // Add footer with creator info
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text('Created by: Anil Kumar V.T.', 14, doc.internal.pageSize.height - 10);
+                doc.text('Page ' + i + ' of ' + pageCount, doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 10);
+            }
+
+            // Save PDF
+            doc.save('Pay_Fixation_Advance_Increments.pdf');
+        }
+
+        /**
+         * REVISED Helper function to format numbers with commas (Indian style) but NO currency symbol.
+         * The original function returned '₹Rs.1,23,456' which was causing the PDF parsing issue.
+         * This version returns '1,23,456'.
+         */
+        function formatNumber(num) {
+            // Use 'en-IN' locale for the Indian grouping system (lakhs/crores)
+            // Use 'style: decimal' to prevent the locale from prepending a currency symbol.
+            return num.toLocaleString('en-IN', { style: 'decimal' });
+        }
+
+        // Initialize with 6th CPC selected
+        selectCPC('sixth');
+
+        // Set default dates (today and 6 months from today)
+        const today = new Date();
+        const nextIncrement = new Date();
+        nextIncrement.setMonth(today.getMonth() + 6);
+        nextIncrement.setDate(1);
+
+        document.getElementById('doj').value = today.toISOString().split('T')[0];
+        document.getElementById('nextIncrement').value = nextIncrement.toISOString().split('T')[0];
+    </script>
+</body>
+</html>

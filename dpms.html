@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disciplinary Proceedings Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --dpms-color: #e67e22;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .dpms-highlight {
+            color: var(--dpms-color);
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(230, 126, 34, 0.5);
+            margin: 0 2px;
+        }
+        
+        .app-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .acronym-hint {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            color: #f1c40f;
+            font-style: italic;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background-color: #d6dbdf;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 7px;
+            border: 2px solid #ddd;
+            border-radius: px;
+            font-size: 0.95rem;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-icon {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .edit-icon {
+            color: var(--secondary-color);
+        }
+        
+        .edit-icon:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .delete-icon {
+            color: var(--accent-color);
+        }
+        
+        .delete-icon:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .search-sort-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .sort-options {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .utility-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .print-options {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .print-options select, .print-options input {
+            max-width: 300px;
+            margin-right: 15px;
+            display: inline-block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            background-color: var(--success-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background-color: var(--accent-color);
+        }
+        
+        /* Print report styles */
+        .print-report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            font-family: Arial Narrow, Arial, sans-serif;
+            table-layout: fixed;
+        }
+        
+        .print-report-table th,
+        .print-report-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+        
+        .print-report-table th {
+            background-color: #040252;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+            
+            .print-report-table {
+                font-size: 8px !important;
+            }
+            
+            .print-report-table th,
+            .print-report-table td {
+                padding: 2px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-sort-container {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .utility-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .actions-cell {
+                flex-direction: column;
+            }
+            
+            .print-options select, .print-options input {
+                max-width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="dpms-highlight">D</span>isciplinary 
+                <span class="dpms-highlight">P</span>roceedings 
+                <span class="dpms-highlight">M</span>anagement 
+                <span class="dpms-highlight">S</span>ystem
+            </h1>
+            <p class="app-description">Manage Rule 14, Rule 16, Rule 8/9, and Rule 10 disciplinary cases with this comprehensive tool. Add, view, edit, and delete case records with ease.</p>
+            <p class="acronym-hint"><span class="dpms-highlight">Programmed by : Anil Kumar VT</span></p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="data-entry">Data Entry</button>
+            <button class="tab-button" data-tab="case-view">Case View</button>
+            <button class="tab-button" data-tab="print-report">Print Report</button>
+        </div>
+        
+        <div id="data-entry" class="tab-content active">
+            <h2>Add New Case Record</h2>
+            <form id="case-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="divisionOffice">Division/Office</label>
+                        <input type="text" id="divisionOffice" name="divisionOffice" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="typeOfCase">Type of Case</label>
+                        <select id="typeOfCase" name="typeOfCase" required>
+                            <option value="">Select Case Type</option>
+                            <option value="Rule 14">Rule 14</option>
+                            <option value="Rule 16">Rule 16</option>
+                            <option value="Rule 8/9">Rule 8/9</option>
+                            <option value="Rule 10">Rule 10</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="chargedOfficial">Name & Particulars of Charged Official</label>
+                        <input type="text" id="chargedOfficial" name="chargedOfficial" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateOfRetirement">Date of Retirement</label>
+                        <input type="date" id="dateOfRetirement" name="dateOfRetirement">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dateOfIssue">Charge Sheet issued on</label>
+                        <input type="date" id="dateOfIssue" name="dateOfIssue" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="caseDetails">Brief Details of Charge</label>
+                        <textarea id="caseDetails" name="caseDetails" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ioName">Name of IO</label>
+                        <input type="text" id="ioName" name="ioName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ioAppointmentDate">Date of Appointment of IO</label>
+                        <input type="date" id="ioAppointmentDate" name="ioAppointmentDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="poName">Name of PO</label>
+                        <input type="text" id="poName" name="poName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="poAppointmentDate">Date of Appointment of PO</label>
+                        <input type="date" id="poAppointmentDate" name="poAppointmentDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="presentStatus">Present Status</label>
+                        <textarea id="presentStatus" name="presentStatus" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inquiryCompletedOn">Inquiry Completed on</label>
+                        <input type="date" id="inquiryCompletedOn" name="inquiryCompletedOn">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="caseDisposedOfOn">Case Disposed of on</label>
+                        <input type="date" id="caseDisposedOfOn" name="caseDisposedOfOn">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="punishmentAwarded">Punishment Awarded</label>
+                        <textarea id="punishmentAwarded" name="punishmentAwarded" rows="2"></textarea>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" class="btn-success">Save Case</button>
+                    <button type="reset" class="btn-warning">Clear Form</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="case-view" class="tab-content">
+            <h2>Case Records</h2>
+            
+            <div class="search-sort-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search cases...">
+                </div>
+                
+                <div class="sort-options">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by">
+                        <option value="divisionOffice">Division/Office</option>
+                        <option value="typeOfCase">Case Type</option>
+                        <option value="chargedOfficial">Charged Official</option>
+                        <option value="dateOfIssue" selected>Date of Issue (Oldest First)</option>
+                        <option value="presentStatus">Present Status</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="utility-buttons">
+                <button id="download-json" class="btn-success">
+                    <i class="fas fa-download"></i> Download JSON
+                </button>
+                <button id="upload-json" class="btn-warning">
+                    <i class="fas fa-upload"></i> Upload JSON
+                </button>
+                <input type="file" id="json-file" accept=".json" style="display: none;">
+            </div>
+            
+            <div class="table-container">
+                <table id="cases-table">
+                    <thead>
+                        <tr>
+                            <th width="4%">S No</th>
+                            <th>Division/Office</th>
+                            <th width="8%">Type of Case</th>
+                            <th>Charged Official</th>
+                            <th width="10%">Charge Sheet Date</th>
+                            <th>Present Status</th>
+                            <th width="5%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cases-table-body">
+                        <!-- Cases will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="print-report" class="tab-content">
+            <h2>Generate Reports</h2>
+            
+            <div class="print-options">
+                <h3>Active Cases Report</h3>
+                <p>Generate a report of all active cases (cases that have not been disposed of)</p>
+                <select id="report-type">
+                    <option value="all">All Case Types</option>
+                    <option value="Rule 14">Rule 14</option>
+                    <option value="Rule 16">Rule 16</option>
+                    <option value="Rule 8/9">Rule 8/9</option>
+                    <option value="Rule 10">Rule 10</option>
+                </select>
+                <button id="generate-report" class="btn-success">
+                    <i class="fas fa-print"></i> Generate Active Cases Report
+                </button>
+            </div>
+            
+            <div class="print-options">
+                <h3>Disposed Cases Report</h3>
+                <p>Generate a report of cases disposed of within a specific date range</p>
+                <label for="disposed-start-date">From:</label>
+                <input type="date" id="disposed-start-date">
+                
+                <label for="disposed-end-date">To:</label>
+                <input type="date" id="disposed-end-date">
+                
+                <select id="disposed-report-type">
+                    <option value="all">All Case Types</option>
+                    <option value="Rule 14">Rule 14</option>
+                    <option value="Rule 16">Rule 16</option>
+                    <option value="Rule 8/9">Rule 8/9</option>
+                    <option value="Rule 10">Rule 10</option>
+                </select>
+                <button id="generate-disposed-report" class="btn-success">
+                    <i class="fas fa-print"></i> Generate Disposed Cases Report
+                </button>
+            </div>
+            
+            <div id="report-output" class="print-section" style="display: none;">
+                <!-- Report content will be generated here -->
+            </div>
+        </div>
+        
+        <div id="notification" class="notification">
+            Operation completed successfully!
+        </div>
+    </div>
+
+    <script>
+        // Data storage and initialization
+        let cases = JSON.parse(localStorage.getItem('dpms-cases')) || [];
+        let currentEditId = null;
+        
+        // DOM Elements
+        const caseForm = document.getElementById('case-form');
+        const casesTableBody = document.getElementById('cases-table-body');
+        const searchInput = document.getElementById('search-input');
+        const sortBy = document.getElementById('sort-by');
+        const notification = document.getElementById('notification');
+        
+        // Initialize the application
+        function initApp() {
+            renderCases();
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    button.classList.add('active');
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+            
+            // Form submission
+            caseForm.addEventListener('submit', handleFormSubmit);
+            
+            // Search and sort
+            searchInput.addEventListener('input', renderCases);
+            sortBy.addEventListener('change', renderCases);
+            
+            // JSON download/upload
+            document.getElementById('download-json').addEventListener('click', downloadJSON);
+            document.getElementById('upload-json').addEventListener('click', () => {
+                document.getElementById('json-file').click();
+            });
+            document.getElementById('json-file').addEventListener('change', uploadJSON);
+            
+            // Report generation
+            document.getElementById('generate-report').addEventListener('click', generateReport);
+            document.getElementById('generate-disposed-report').addEventListener('click', generateDisposedReport);
+        }
+        
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(caseForm);
+            const caseData = Object.fromEntries(formData);
+            
+            // Add ID and timestamp
+            if (currentEditId) {
+                // Editing existing case
+                const index = cases.findIndex(c => c.id === currentEditId);
+                if (index !== -1) {
+                    cases[index] = { ...cases[index], ...caseData };
+                    showNotification('Case updated successfully!');
+                }
+                currentEditId = null;
+            } else {
+                // Adding new case
+                caseData.id = Date.now().toString();
+                caseData.createdAt = new Date().toISOString();
+                cases.push(caseData);
+                showNotification('Case added successfully!');
+            }
+            
+            // Save to localStorage and update UI
+            saveCases();
+            renderCases();
+            caseForm.reset();
+        }
+        
+        // Save cases to localStorage
+        function saveCases() {
+            localStorage.setItem('dpms-cases', JSON.stringify(cases));
+        }
+        
+        // Render cases to the table
+        function renderCases() {
+            let filteredCases = [...cases];
+            
+            // Apply search filter
+            const searchTerm = searchInput.value.toLowerCase();
+            if (searchTerm) {
+                filteredCases = filteredCases.filter(c => 
+                    c.divisionOffice.toLowerCase().includes(searchTerm) ||
+                    c.typeOfCase.toLowerCase().includes(searchTerm) ||
+                    c.chargedOfficial.toLowerCase().includes(searchTerm) ||
+                    c.presentStatus.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Apply sorting
+            const sortField = sortBy.value;
+            filteredCases.sort((a, b) => {
+                if (sortField === 'dateOfIssue') {
+                    return new Date(a[sortField]) - new Date(b[sortField]);
+                } else {
+                    return a[sortField]?.localeCompare(b[sortField]) || 0;
+                }
+            });
+            
+            // Clear table
+            casesTableBody.innerHTML = '';
+            
+            // Populate table
+            if (filteredCases.length === 0) {
+                casesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 20px;">
+                            No cases found. Add a new case using the Data Entry tab.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredCases.forEach((caseItem, index) => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${caseItem.divisionOffice}</td>
+                    <td>${caseItem.typeOfCase}</td>
+                    <td>${caseItem.chargedOfficial}</td>
+                    <td>${formatDate(caseItem.dateOfIssue)}</td>
+                    <td>${caseItem.presentStatus || '-'}</td>
+                    <td class="actions-cell">
+                        <i class="fas fa-edit action-icon edit-icon" data-id="${caseItem.id}"></i>
+                        <i class="fas fa-trash action-icon delete-icon" data-id="${caseItem.id}"></i>
+                    </td>
+                `;
+                
+                casesTableBody.appendChild(tr);
+            });
+            
+            // Add event listeners to action icons
+            document.querySelectorAll('.edit-icon').forEach(icon => {
+                icon.addEventListener('click', () => editCase(icon.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-icon').forEach(icon => {
+                icon.addEventListener('click', () => deleteCase(icon.dataset.id));
+            });
+        }
+        
+        // Edit a case
+        function editCase(id) {
+            const caseToEdit = cases.find(c => c.id === id);
+            if (!caseToEdit) return;
+            
+            // Switch to data entry tab
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector('[data-tab="data-entry"]').classList.add('active');
+            document.getElementById('data-entry').classList.add('active');
+            
+            // Populate form fields
+            Object.keys(caseToEdit).forEach(key => {
+                if (document.getElementById(key)) {
+                    document.getElementById(key).value = caseToEdit[key] || '';
+                }
+            });
+            
+            currentEditId = id;
+        }
+        
+        // Delete a case
+        function deleteCase(id) {
+            if (!confirm('Are you sure you want to delete this case?')) return;
+            
+            cases = cases.filter(c => c.id !== id);
+            saveCases();
+            renderCases();
+            showNotification('Case deleted successfully!');
+        }
+        
+        // Generate active cases report
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            
+            // Filter cases based on report type and exclude disposed cases
+            let filteredCases = cases.filter(c => {
+                if (reportType !== 'all' && c.typeOfCase !== reportType) return false;
+                // Exclude disposed cases (where caseDisposedOfOn is not empty)
+                return !c.caseDisposedOfOn;
+            });
+            
+            if (filteredCases.length === 0) {
+                alert('No active cases found for the selected criteria.');
+                return;
+            }
+            
+            // Generate report HTML
+            let reportHTML = `
+                <h2 style="text-align: center; margin-bottom: 20px;">Active Cases Report - ${reportType === 'all' ? 'All Case Types' : reportType}</h2>
+                <p style="text-align: center; margin-bottom: 20px;">Generated on: ${new Date().toLocaleDateString()}</p>
+                <table class="print-report-table">
+                    <thead>
+                        <tr>
+                            <th width="3%">S No</th>
+                            <th width="10%">Division/Office</th>
+                            <th>Name & Particulars of Charged Official</th>
+                            <th width="5%">C/S issued on</th>
+                            <th>Name of IO</th>
+                            <th width="5%">Date of Appt of IO</th>
+                            <th>Name of PO</th>
+                            <th width="5%">Date of Appt of PO</th>
+                            <th>Present Status</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredCases.forEach((caseItem, index) => {
+                reportHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${caseItem.divisionOffice}</td>
+                        <td>${caseItem.chargedOfficial}</td>
+                        <td>${formatDate(caseItem.dateOfIssue)}</td>
+                        <td>${caseItem.ioName}</td>
+                        <td>${formatDate(caseItem.ioAppointmentDate)}</td>
+                        <td>${caseItem.poName}</td>
+                        <td>${formatDate(caseItem.poAppointmentDate)}</td>
+                        <td>${caseItem.presentStatus || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            reportHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            // Display and print report
+            const reportOutput = document.getElementById('report-output');
+            reportOutput.innerHTML = reportHTML;
+            reportOutput.style.display = 'block';
+            
+            window.print();
+        }
+        
+        // Generate disposed cases report
+        function generateDisposedReport() {
+            const reportType = document.getElementById('disposed-report-type').value;
+            const startDate = document.getElementById('disposed-start-date').value;
+            const endDate = document.getElementById('disposed-end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates for the date range.');
+                return;
+            }
+            
+            // Filter cases based on report type and disposed date range
+            let filteredCases = cases.filter(c => {
+                if (reportType !== 'all' && c.typeOfCase !== reportType) return false;
+                // Only include disposed cases (where caseDisposedOfOn is not empty)
+                if (!c.caseDisposedOfOn) return false;
+                
+                const disposedDate = new Date(c.caseDisposedOfOn);
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                return disposedDate >= start && disposedDate <= end;
+            });
+            
+            if (filteredCases.length === 0) {
+                alert('No disposed cases found for the selected criteria and date range.');
+                return;
+            }
+            
+            // Generate report HTML
+            let reportHTML = `
+                <h2 style="text-align: center; margin-bottom: 20px;">Disposed Cases Report - ${reportType === 'all' ? 'All Case Types' : reportType}</h2>
+                <p style="text-align: center; margin-bottom: 20px;">Date Range: ${formatDate(startDate)} to ${formatDate(endDate)}</p>
+                <p style="text-align: center; margin-bottom: 20px;">Generated on: ${new Date().toLocaleDateString()}</p>
+                <table class="print-report-table">
+                    <thead>
+                        <tr>
+                            <th width="3%">S No</th>
+                            <th width="10%">Division/Office</th>
+                            <th>Name & Particulars of Charged Official</th>
+                            <th width="8%">C/S issued on</th>
+                            <th width="8%">Date of Appt of IO</th>
+                            <th width="8%">Inq Completed on</th>
+                            <th width="8%">Case Disp of on</th>
+                            <th>Punishment Awarded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredCases.forEach((caseItem, index) => {
+                reportHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${caseItem.divisionOffice}</td>
+                        <td>${caseItem.chargedOfficial}</td>
+                        <td>${formatDate(caseItem.dateOfIssue)}</td>
+                        <td>${formatDate(caseItem.ioAppointmentDate)}</td>
+                        <td>${formatDate(caseItem.inquiryCompletedOn)}</td>
+                        <td>${formatDate(caseItem.caseDisposedOfOn)}</td>
+                        <td>${caseItem.punishmentAwarded || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            reportHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            // Display and print report
+            const reportOutput = document.getElementById('report-output');
+            reportOutput.innerHTML = reportHTML;
+            reportOutput.style.display = 'block';
+            
+            window.print();
+        }
+        
+        // Download cases as JSON
+        function downloadJSON() {
+            const dataStr = JSON.stringify(cases, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'dpms-cases.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        // Upload cases from JSON
+        function uploadJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    if (Array.isArray(jsonData)) {
+                        cases = jsonData;
+                        saveCases();
+                        renderCases();
+                        showNotification('Cases imported successfully!');
+                    } else {
+                        showNotification('Invalid JSON format. Expected an array of cases.', true);
+                    }
+                } catch (error) {
+                    showNotification('Error parsing JSON file: ' + error.message, true);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            e.target.value = '';
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.classList.toggle('error', isError);
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN');
+        }
+        
+        // Initialize the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

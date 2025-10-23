@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>File Movement Record Utility</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; box-sizing: border-box;
+      background: #10221f;
+      color: #06240d;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh; width: 100vw; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    h1, h2 { color: #e0e0e0; font-weight: 700; letter-spacing: 1px; margin: 0 0 16px 0; }
+    h1 { padding-left: 16px; border-left: 5px solid #1bb161; font-size: 2.2rem; color: #f0fff0; user-select: none; text-shadow: 0 2px 4px #1bb161aa;}
+    .tabs { display: flex; background: #123022; border-bottom: 2px solid #1bb161; user-select: none; }
+    .tab { padding: 14px 26px; color: #e0e0e0; font-weight: 600; cursor: pointer; border-top-left-radius: 12px; border-top-right-radius: 12px; transition: background 0.3s; }
+    .tab:hover { background: #1bb161; color: #022205; }
+    .tab.active { background: #1bb161; color: #022205; font-weight: 700; border-bottom: 2px solid #10221f; user-select: text; }
+    .tab-content { flex-grow: 1; background: #e8ffe6; color: #044814; border-radius: 0 24px 24px 24px; margin: 12px 16px 16px 16px; padding: 28px 40px; overflow-y: auto; font-size: 1rem; display: flex; flex-direction: column; }
+    label { font-weight: 600; color: #14622E; display: block; margin-bottom: 6px; }
+    input, textarea { width: 100%; padding: 8px 10px; border-radius: 12px; border: 1px solid #1bb161; font-size: 1rem; color: #375935; background: #d4f4ca; margin-bottom: 18px; box-sizing: border-box;}
+    textarea { resize: vertical; }
+    button { background: #1bb161; color: #06240d; border: none; border-radius: 12px; padding: 10px 18px; font-weight: 700; font-size: 1rem; margin: 8px 8px 16px 0; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
+    button:hover { background: #128c48; color: white; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.95rem; color: #044814; margin-top: 20px; }
+    th, td { border: 1px solid #1bb161; padding: 8px 10px; text-align: center; }
+    th { background: #1bb161; color: #06240d; font-weight: 700; user-select: none; white-space: nowrap; }
+    .modify-btn, .delete-btn { background: #21a35d; color: #fff; border-radius: 8px; border: none; padding: 6px 12px; font-weight: 600; cursor: pointer; transition: background 0.3s; margin: 2px;}
+    .modify-btn:hover, .delete-btn:hover { background: #128c48; }
+    #msg { color: #21a35d; font-weight: 700; margin-top: 8px; min-height: 26px;}
+    input.edit-date-returned { width: 110px; text-align: center; font-size: 0.95rem; border-radius: 8px; border: 1px solid #1bb161; background: #d4f4ca; color: #375935; padding: 4px 6px;}
+    .filter-controls { margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
+    #printHeading { display:none; font-weight:700; font-size:18pt; margin-bottom:10px; text-align:center;}
+    @page { size: landscape; margin: 20mm 12mm 20mm 12mm; }
+    @media print {
+      body, html { height: auto; width: auto; background: white; color: black; overflow: visible; }
+      .tabs, #msg, button, input[type=file], .download-upload, .tab-content:not(#report), #filterStart, #filterEnd, label[for=\"filterStart\"], label[for=\"filterEnd\"], h1, h2 { display: none !important; }
+      .tab-content#report { display: block !important; border-radius: 0; margin: 0; padding: 0; overflow: visible; font-size: 12pt; }
+      #printHeading { display: block !important; }
+      table { font-size: 12pt; width: 100%; border: 1px solid black; }
+      th, td { border: 1px solid black; padding: 6px 8px; color: black; }
+      input.edit-date-returned { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <h1>File Movement Record Utility</h1>
+  <div class="tabs">
+    <div class="tab active" data-tab="entry">Entry</div>
+    <div class="tab" data-tab="outstanding">Outstanding Files</div>
+    <div class="tab" data-tab="report">File Movement Report</div>
+  </div>
+
+  <div id="entry" class="tab-content">
+    <form id="fileForm">
+      <label for="fileNumber">File Number</label>
+      <input type="text" id="fileNumber" required />
+      <label for="subject">Subject Matter</label>
+      <textarea id="subject" rows="2" required></textarea>
+      <label for="toWhom">To Whom Sent</label>
+      <input type="text" id="toWhom" required />
+      <label for="dateSent">Date of Sending</label>
+      <input type="date" id="dateSent" required />
+      <label for="dateReturned">Date Returned</label>
+      <input type="date" id="dateReturned" />
+      <button type="submit">Record Outflow</button>
+      <div class="download-upload">
+        <button type="button" onclick="downloadJSON()">Download Records (.json)</button>
+        <input type="file" accept=".json" id="jsonUpload" onchange="uploadJSON()" style="display:none;"/>
+        <button type="button" onclick="document.getElementById('jsonUpload').click()">Load Records (.json)</button>
+      </div>
+      <div id="msg"></div>
+    </form>
+  </div>
+
+  <div id="outstanding" class="tab-content" style="display:none;">
+    <div id="outstandingTableContainer" style="min-height: 460px; overflow-y: auto;"></div>
+  </div>
+
+  <div id="report" class="tab-content" style="display:none;">
+    <div class="filter-controls">
+      <label for="filterStart">Start Date:</label>
+      <input type="date" id="filterStart" />
+      <label for="filterEnd">End Date:</label>
+      <input type="date" id="filterEnd" />
+      <button onclick="printFilteredReport()">Print Report</button>
+    </div>
+    <div id="printHeading"></div>
+    <div id="reportTableContainer" style="min-height: 460px; overflow-y: auto;"></div>
+  </div>
+
+  <script>
+    function formatDateDMY(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if(parts.length !== 3) return dateStr;
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    let records = [];
+    let editRecordId = null;
+    const msg = document.getElementById('msg');
+    const tabs = document.querySelectorAll('.tab');
+    const printHeading = document.getElementById('printHeading');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => { t.classList.remove('active'); document.getElementById(t.dataset.tab).style.display = 'none'; });
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).style.display = 'block';
+      });
+    });
+
+    function renderTables() { renderOutstanding(); renderReport(); }
+    function renderOutstanding() {
+      let out = `<table><thead>
+        <tr>
+          <th>Serial</th>
+          <th>File Number</th>
+          <th>Subject</th>
+          <th>To Whom Sent</th>
+          <th>Date Sent</th>
+          <th>Date Returned</th>
+          <th>Actions</th>
+        </tr></thead><tbody>`;
+      let outstanding = records.filter(r => !r.dateReturned);
+      if (outstanding.length === 0) {
+        out += `<tr><td colspan="7">No outstanding files.</td></tr>`;
+      } else {
+        outstanding.forEach((r, i) => {
+          out += `<tr>
+            <td>${i+1}</td>
+            <td>${r.fileNumber}</td>
+            <td>${r.subject}</td>
+            <td>${r.toWhom}</td>
+            <td>${formatDateDMY(r.dateSent)}</td>
+            <td>${formatDateDMY(r.dateReturned) || '-'}</td>
+            <td>
+              <button class="modify-btn" onclick="modifyRecord(${r.id})">Modify</button>
+              <button class="delete-btn" onclick="deleteRecord(${r.id})">Delete</button>
+            </td>
+          </tr>`;
+        });
+      }
+      out += `</tbody></table>`;
+      document.getElementById('outstandingTableContainer').innerHTML = out;
+    }
+    function renderReport(filteredRecords) {
+      const data = filteredRecords || records;
+      let out = `<table><thead>
+        <tr>
+          <th>Serial</th>
+          <th>File Number</th>
+          <th>Subject</th>
+          <th>To Whom Sent</th>
+          <th>Date Sent</th>
+          <th>Date Returned</th>
+          <th>Actions</th>
+        </tr></thead><tbody>`;
+      if (data.length === 0) {
+        out += `<tr><td colspan="7">No records to show.</td></tr>`;
+      } else {
+        data.forEach((r, i) => {
+          const dateRetDisplay = r.dateReturned ? formatDateDMY(r.dateReturned) : '-';
+          out += `<tr>
+            <td>${i+1}</td>
+            <td>${r.fileNumber}</td>
+            <td>${r.subject}</td>
+            <td>${r.toWhom}</td>
+            <td>${formatDateDMY(r.dateSent)}</td>
+            <td>${dateRetDisplay}</td>
+            <td>
+              <button class="modify-btn" onclick="modifyRecord(${r.id})">Modify</button>
+              <button class="delete-btn" onclick="deleteRecord(${r.id})">Delete</button>
+            </td>
+          </tr>`;
+        });
+      }
+      out += `</tbody></table>`;
+      document.getElementById('reportTableContainer').innerHTML = out;
+    }
+    const fileForm = document.getElementById('fileForm');
+    fileForm.onsubmit = (e) => {
+      e.preventDefault();
+      const fileNumber = document.getElementById('fileNumber').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const toWhom = document.getElementById('toWhom').value.trim();
+      const dateSent = document.getElementById('dateSent').value;
+      const dateReturned = document.getElementById('dateReturned').value;
+      if (!fileNumber || !subject || !dateSent || !toWhom) {
+        msg.innerText = "Please fill all fields.";
+        return;
+      }
+      if (editRecordId !== null) {
+        const idx = records.findIndex(r => r.id === editRecordId);
+        if (idx !== -1) {
+          records[idx] = { id: editRecordId, fileNumber, subject, toWhom, dateSent, dateReturned: dateReturned || null };
+          msg.innerText = `Record modified for file "${fileNumber}".`;
+        }
+        editRecordId = null;
+      } else {
+        records.push({ id: Date.now(), fileNumber, subject, toWhom, dateSent, dateReturned: dateReturned || null });
+        msg.innerText = `File "${fileNumber}" recorded.`;
+      }
+      e.target.reset();
+      renderTables();
+      switchTab('outstanding');
+    }
+    function deleteRecord(id) {
+      if (confirm('Delete this record permanently?')) {
+        records = records.filter(r => r.id !== id);
+        msg.innerText = 'Record deleted.';
+        renderTables();
+      }
+    }
+    function modifyRecord(id) {
+      const rec = records.find(r => r.id === id);
+      if (rec) {
+        document.getElementById('fileNumber').value = rec.fileNumber;
+        document.getElementById('subject').value = rec.subject;
+        document.getElementById('toWhom').value = rec.toWhom;
+        document.getElementById('dateSent').value = rec.dateSent;
+        document.getElementById('dateReturned').value = rec.dateReturned || '';
+        editRecordId = id;
+        msg.innerText = 'Modify the record and submit...';
+        switchTab('entry');
+      }
+    }
+    function switchTab(tabID) {
+      tabs.forEach(t => {
+        t.classList.remove('active');
+        document.getElementById(t.dataset.tab).style.display = 'none';
+      });
+      document.querySelector(`.tab[data-tab="${tabID}"]`).classList.add('active');
+      document.getElementById(tabID).style.display = 'block';
+    }
+    function printFilteredReport() {
+      const startDate = document.getElementById('filterStart').value;
+      const endDate = document.getElementById('filterEnd').value;
+      let filteredRecords = records;
+      if (startDate) filteredRecords = filteredRecords.filter(r => r.dateSent >= startDate);
+      if (endDate) filteredRecords = filteredRecords.filter(r => r.dateSent <= endDate);
+      renderReport(filteredRecords);
+      printHeading.style.display = 'block';
+      printHeading.textContent = `Records of File Movement from ${formatDateDMY(startDate) || 'start'} to ${formatDateDMY(endDate) || 'end'}`;
+      setTimeout(() => window.print(), 300);
+    }
+    function downloadJSON() {
+      const data = JSON.stringify(records, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "file_movement_records.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      msg.innerText = "JSON file downloaded.";
+    }
+    function uploadJSON() {
+      const input = document.getElementById('jsonUpload');
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            records = JSON.parse(e.target.result);
+            msg.innerText = "Records loaded from file.";
+            renderTables();
+          } catch {
+            msg.innerText = "Invalid file format.";
+          }
+        };
+        reader.readAsText(file);
+      }
+      input.value = "";
+    }
+    // LocalStorage persistence
+    function saveToStorage() {
+      localStorage.setItem('file_movement_records', JSON.stringify(records));
+    }
+    function loadFromStorage() {
+      const data = localStorage.getItem('file_movement_records');
+      if (data) {
+        try {
+          records = JSON.parse(data);
+        } catch {}
+      }
+    }
+    // Initial load
+    loadFromStorage();
+    renderTables();
+    // Update storage after changes
+    const originalRenderTables = renderTables;
+    renderTables = function() {
+      originalRenderTables();
+      saveToStorage();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7th CPC Pay Fixation Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #0d1b2a 100%);
+            color: #e0e0e0;
+            line-height: 1.4;
+            padding: 15px 25px; /* 1 inch margins on both sides */
+            min-height: 100vh;
+        }
+        
+        .main-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(13, 27, 42, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+        }
+        
+        .main-header h1 {
+            color: #64b5f6;
+            margin-bottom: 8px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.7);
+            letter-spacing: 1px;
+        }
+        
+        .main-header .subtitle {
+            color: #90caf9;
+            font-size: 1.1rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+        
+        .input-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+        }
+        
+        .matrix-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group {
+            margin-bottom: 12px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #90caf9;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(20, 30, 48, 0.8);
+            border: 2px solid rgba(100, 150, 255, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.5);
+        }
+        
+        .input-group input::placeholder {
+            color: #90a4ae;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #64b5f6, #1976d2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(100, 181, 246, 0.4);
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            display: none;
+            border: 2px solid rgba(76, 175, 80, 0.5);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .result-values {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .result-item {
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .result-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            color: white;
+        }
+        
+        .result-label {
+            font-size: 12px;
+            opacity: 0.9;
+            color: white;
+        }
+        
+        .footer {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .disclaimer {
+            font-size: 11px;
+            color: #90a4ae;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        
+        .creator {
+            font-size: 10px;
+            color: #90a4ae;
+            font-style: italic;
+        }
+        
+        .matrix-header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .matrix-header h2 {
+            color: #64b5f6;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .matrix-header p {
+            color: #90caf9;
+            font-size: 13px;
+        }
+        
+        .matrix-table {
+            flex: 1;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .table-container {
+            flex: 1;
+            overflow-x: auto;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            border-radius: 6px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        th, td {
+            padding: 6px 4px;
+            text-align: center;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            color: #e0e0e0;
+            white-space: nowrap;
+        }
+        
+        th {
+            background: rgba(13, 27, 42, 0.9);
+            font-weight: 600;
+            color: #64b5f6;
+            position: sticky;
+            left: 0;
+        }
+        
+        tr:hover {
+            background: rgba(100, 150, 255, 0.1);
+        }
+        
+        .highlight {
+            background-color: rgba(255, 235, 59, 0.3) !important;
+            font-weight: bold;
+            border: 2px solid #ffeb3b !important;
+            color: #ffeb3b;
+        }
+        
+        .level-header {
+            background-color: rgba(41, 98, 255, 0.2);
+            color: #64b5f6;
+            font-weight: bold;
+            position: sticky;
+            left: 0;
+        }
+        
+        .calculation-steps {
+            text-align: left;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 8px;
+            border-left: 4px solid #64b5f6;
+            font-size: 13px;
+        }
+        
+        .info-box {
+            background: rgba(100, 181, 246, 0.1);
+            border-left: 4px solid #64b5f6;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+        
+        .fixation-rule {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .input-section, .matrix-section {
+                flex: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 15px; /* Slightly reduced margins on mobile */
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-header .subtitle {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px 10px; /* Further reduced margins on small mobile */
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            .main-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .main-header .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .result-values {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Header spanning full width -->
+    <div class="main-header">
+        <h1>7th CPC Pay Fixation Calculator</h1>
+        <p class="subtitle">Calculate your 7th Pay Commission pay based on 6th CPC basic pay and grade pay</p>
+    </div>
+
+    <div class="container">
+        <div class="input-section">
+            <div class="input-group">
+                <label for="basicPay">6th CPC Basic Pay (₹)</label>
+                <input type="number" id="basicPay" placeholder="Enter basic pay" min="0">
+            </div>
+            
+            <div class="input-group">
+                <label for="gradePay">6th CPC Grade Pay (₹)</label>
+                <select id="gradePay">
+                    <option value="">Select Grade Pay</option>
+                    <option value="1800">1800</option>
+                    <option value="1900">1900</option>
+                    <option value="2000">2000</option>
+                    <option value="2400">2400</option>
+                    <option value="2800">2800</option>
+                    <option value="4200">4200</option>
+                    <option value="4600">4600</option>
+                    <option value="4800">4800</option>
+                    <option value="5400">5400</option>
+                    <option value="5400a">5400 (Group A Entry)</option>
+                    <option value="6600">6600</option>
+                    <option value="7600">7600</option>
+                    <option value="8700">8700</option>
+                    <option value="8900">8900</option>
+                    <option value="10000">10000</option>
+                </select>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculatePay()">
+                Calculate 7th CPC Pay
+            </button>
+            
+            <div class="info-box">
+                <p><strong>Calculation Formula:</strong></p>
+                <p>7th CPC Pay = (6th CPC Basic Pay + Grade Pay) × 2.57 (rounded to nearest ₹100)</p>
+            </div>
+            
+            <div class="fixation-rule">
+                <p><strong>Pay Fixation Rule:</strong> If the calculated pay doesn't match any cell in the pay matrix, the next higher value in the same level will be taken.</p>
+            </div>
+
+            <div class="result" id="result">
+                <h3>Your 7th CPC Pay</h3>
+                <div class="result-values">
+                    <div class="result-item">
+                        <div class="result-value" id="resultValue">₹0</div>
+                        <div class="result-label">7th CPC Pay</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="payLevel">-</div>
+                        <div class="result-label">Pay Level</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-value" id="matrixIndex">-</div>
+                        <div class="result-label">Matrix Index</div>
+                    </div>
+                </div>
+                
+                <div class="calculation-steps">
+                    <h4>Calculation Steps:</h4>
+                    <p>6th CPC Basic Pay: ₹<span id="stepBasicPay">0</span></p>
+                    <p>6th CPC Grade Pay: ₹<span id="stepGradePay">0</span></p>
+                    <p>Sum: ₹<span id="stepSum">0</span></p>
+                    <p>Multiplied by 2.57: ₹<span id="stepMultiplied">0</span></p>
+                    <p>Rounded to nearest ₹100: ₹<span id="stepRounded">0</span></p>
+                    <p><strong>Final Pay after fixation: ₹<span id="stepFinalPay">0</span></strong></p>
+                </div>
+            </div>
+            
+            <div id="noInputMessage">
+                <p>Please enter your 6th CPC details to calculate your 7th CPC pay.</p>
+            </div>
+
+            <div class="footer">
+                <div class="disclaimer">
+                    Disclaimer: For information purposes only. Not to be quoted as authority
+                </div>
+                <div class="creator">
+                    Created by Anil Kumar V.T.
+                </div>
+            </div>
+        </div>
+
+        <div class="matrix-section">
+            <div class="matrix-header">
+                <h2>7th CPC Pay Matrix</h2>
+            </div>
+            <div class="matrix-table">
+                <div class="table-container">
+                    <table id="payMatrixTable">
+                        <!-- Table will be populated by JavaScript -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 7th CPC Pay Matrix Data
+        const payMatrix = {
+            // Level 1: Grade Pay 1800
+            1: [18000, 18500, 19100, 19700, 20300, 20900, 21500, 22100, 22800, 23500, 
+                24200, 24900, 25600, 26400, 27200, 28000, 28800, 29700, 30600, 31500,
+                32400, 33400, 34400, 35400, 36500, 37600, 38700, 39900, 41100, 42300,
+                43600, 44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900],
+            
+            // Level 2: Grade Pay 1900
+            2: [19900, 20500, 21100, 21700, 22400, 23100, 23800, 24500, 25200, 26000,
+                26800, 27600, 28400, 29300, 30200, 31100, 32000, 33000, 34000, 35000,
+                36100, 37200, 38300, 39400, 40600, 41800, 43100, 44400, 45700, 47100,
+                48500, 50000, 51500, 53000, 54600, 56200, 57900, 59600, 61400, 63200],
+            
+            // Level 3: Grade Pay 2000
+            3: [21700, 22400, 23100, 23800, 24500, 25200, 26000, 26800, 27600, 28400,
+                29300, 30200, 31100, 32000, 33000, 34000, 35000, 36100, 37200, 38300,
+                39400, 40600, 41800, 43100, 44400, 45700, 47100, 48500, 50000, 51500,
+                53000, 54600, 56200, 57900, 59600, 61400, 63200, 65100, 67100, 69100],
+            
+            // Level 4: Grade Pay 2400
+            4: [25500, 26300, 27100, 27900, 28700, 29600, 30500, 31400, 32300, 33300,
+                34300, 35300, 36400, 37500, 38600, 39800, 41000, 42200, 43500, 44800,
+                46100, 47500, 48900, 50400, 51900, 53500, 55100, 56800, 58500, 60300,
+                62100, 64000, 65900, 67900, 69900, 72000, 74200, 76400, 78700, 81100],
+            
+            // Level 5: Grade Pay 2800
+            5: [29200, 30100, 31000, 31900, 32900, 33900, 34900, 35900, 37000, 38100,
+                39200, 40400, 41600, 42800, 44100, 45400, 46800, 48200, 49600, 51100,
+                52600, 54200, 55800, 57500, 59200, 61000, 62800, 64700, 66600, 68600,
+                70700, 72800, 75000, 77300, 79600, 82000, 84500, 87000, 89600, 92300],
+            
+            // Level 6: Grade Pay 4200
+            6: [35400, 36500, 37600, 38700, 39900, 41100, 42300, 43600, 44900, 46200,
+                47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200,
+                64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600,
+                86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400],
+            
+            // Level 7: Grade Pay 4600
+            7: [44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600,
+                60400, 62200, 64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800,
+                81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900,
+                109100, 112400, 115800, 119300, 122900, 126600, 130400, 134300, 138300, 142400],
+            
+            // Level 8: Grade Pay 4800
+            8: [47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200,
+                64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600,
+                86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400,
+                115800, 119300, 122900, 126600, 130400, 134300, 138300, 142400, 146700, 151100],
+            
+            // Level 9: Grade Pay 5400
+            9: [53100, 54700, 56300, 58000, 59700, 61500, 63300, 65200, 67200, 69200,
+                71300, 73400, 75600, 77900, 80200, 82600, 85100, 87700, 90300, 93000,
+                95800, 98700, 101700, 104800, 107900, 111100, 114400, 117800, 121300, 124900,
+                128600, 132500, 136500, 140600, 144800, 149100, 153600, 158200, 162900, 167800],
+            
+            // Level 10: Grade Pay 5400 (Group A Entry)
+            10: [56100, 57800, 59500, 61300, 63100, 65000, 67000, 69000, 71100, 73200,
+                 75400, 77700, 80000, 82400, 84900, 87400, 90000, 92700, 95500, 98400,
+                 101400, 104400, 107500, 110700, 114000, 117400, 120900, 124500, 128200, 132000,
+                 136000, 140100, 144300, 148600, 153100, 157700, 162400, 167300, 172300, 177500],
+            
+            // Level 11: Grade Pay 6600
+            11: [67700, 69700, 71800, 74000, 76200, 78500, 80900, 83300, 85800, 88400,
+                 91100, 93800, 96600, 99500, 102500, 105600, 108800, 112100, 115500, 119000,
+                 122600, 126300, 130100, 134000, 138000, 142100, 146400, 150800, 155300, 160000,
+                 164800, 169700, 174800, 180000, 185400, 191000, 196700, 202600, 208700, 215000],
+            
+            // Level 12: Grade Pay 7600
+            12: [78800, 81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800,
+                 105900, 109100, 112400, 115800, 119300, 122900, 126600, 130400, 134300, 138300,
+                 142400, 146700, 151100, 155600, 160300, 165100, 170100, 175200, 180500, 185900,
+                 191500, 197200, 203100, 209200, 215500, 222000, 228700, 235600, 242700, 250000],
+            
+            // Level 13: Grade Pay 8700
+            13: [123100, 126800, 130600, 134500, 138500, 142700, 147000, 151400, 155900, 160600,
+                 165400, 170400, 175500, 180800, 186200, 191800, 197600, 203500, 209600, 215900,
+                 222400, 229100, 236000, 243100, 250400, 257900, 265600, 273500, 281600, 290000,
+                 298600, 307500, 316600, 326000, 335600, 345500, 355600, 366000, 376600, 387500],
+            
+            // Level 13A: Grade Pay 8900
+            13.5: [131100, 135000, 139100, 143300, 147600, 152000, 156600, 161300, 166100, 171100,
+                   176200, 181500, 186900, 192500, 198300, 204200, 210300, 216600, 223100, 229800,
+                   236700, 243800, 251100, 258600, 266300, 274200, 282300, 290600, 299100, 307800,
+                   316700, 325800, 335100, 344600, 354300, 364200, 374300, 384600, 395100, 405800],
+            
+            // Level 14: Grade Pay 10000
+            14: [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200,
+                 193800, 199600, 205600, 211800, 218200, 224800, 231600, 238600, 245800, 253200,
+                 260800, 268600, 276600, 284800, 293200, 301800, 310600, 319600, 328800, 338200,
+                 347800, 357600, 367600, 377800, 388200, 398800, 409600, 420600, 431800, 443200]
+        };
+
+        // Mapping of Grade Pay to Pay Level
+        const gradePayToLevel = {
+            '1800': 1,
+            '1900': 2,
+            '2000': 3,
+            '2400': 4,
+            '2800': 5,
+            '4200': 6,
+            '4600': 7,
+            '4800': 8,
+            '5400': 9,
+            '5400a': 10,
+            '6600': 11,
+            '7600': 12,
+            '8700': 13,
+            '8900': 13.5,
+            '10000': 14
+        };
+
+        // DOM Elements
+        const basicPayInput = document.getElementById('basicPay');
+        const gradePaySelect = document.getElementById('gradePay');
+        const result = document.getElementById('result');
+        const resultValue = document.getElementById('resultValue');
+        const payLevelElement = document.getElementById('payLevel');
+        const matrixIndex = document.getElementById('matrixIndex');
+        const stepBasicPay = document.getElementById('stepBasicPay');
+        const stepGradePay = document.getElementById('stepGradePay');
+        const stepSum = document.getElementById('stepSum');
+        const stepMultiplied = document.getElementById('stepMultiplied');
+        const stepRounded = document.getElementById('stepRounded');
+        const stepFinalPay = document.getElementById('stepFinalPay');
+        const noInputMessage = document.getElementById('noInputMessage');
+        const payMatrixTable = document.getElementById('payMatrixTable');
+
+        // Initialize the pay matrix table with horizontal layout
+        function initializePayMatrixTable() {
+            let tableHTML = '<thead><tr><th>Index</th>';
+            
+            // Create header row with level numbers
+            const levels = Object.keys(payMatrix).sort((a, b) => parseFloat(a) - parseFloat(b));
+            levels.forEach(level => {
+                tableHTML += `<th class="level-header">Level ${level}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Find the maximum number of increments across all levels
+            const maxIncrements = Math.max(...Object.values(payMatrix).map(level => level.length));
+            
+            // Create rows for each increment
+            for (let i = 0; i < maxIncrements; i++) {
+                tableHTML += `<tr><td>${i + 1}</td>`;
+                
+                levels.forEach(level => {
+                    const pays = payMatrix[level];
+                    if (i < pays.length) {
+                        tableHTML += `<td id="cell-${level}-${i+1}">${pays[i].toLocaleString()}</td>`;
+                    } else {
+                        tableHTML += `<td></td>`; // Empty cell for levels with fewer increments
+                    }
+                });
+                
+                tableHTML += '</tr>';
+            }
+            
+            tableHTML += '</tbody>';
+            payMatrixTable.innerHTML = tableHTML;
+        }
+
+        // Calculate 7th CPC pay
+        function calculatePay() {
+            const basicPay = parseFloat(basicPayInput.value);
+            const gradePayValue = gradePaySelect.value;
+            
+            if (!basicPay || !gradePayValue) {
+                noInputMessage.style.display = 'block';
+                result.style.display = 'none';
+                return;
+            }
+            
+            noInputMessage.style.display = 'none';
+            
+            const gradePay = parseInt(gradePayValue);
+            const sum = basicPay + gradePay;
+            const multiplied = sum * 2.57;
+            const rounded = Math.round(multiplied / 100) * 100;
+            
+            // Determine pay level
+            const level = gradePayToLevel[gradePayValue];
+            
+            // Find the next higher pay in the matrix
+            const { finalPay, index } = findNextHigherPay(level, rounded);
+            
+            // Display calculation steps
+            stepBasicPay.textContent = basicPay.toLocaleString();
+            stepGradePay.textContent = gradePay.toLocaleString();
+            stepSum.textContent = sum.toLocaleString();
+            stepMultiplied.textContent = multiplied.toFixed(2);
+            stepRounded.textContent = rounded.toLocaleString();
+            stepFinalPay.textContent = finalPay.toLocaleString();
+            
+            // Display result
+            resultValue.textContent = `₹${finalPay.toLocaleString()}`;
+            payLevelElement.textContent = level;
+            matrixIndex.textContent = index;
+            
+            // Highlight the calculated pay in the matrix
+            highlightPayInMatrix(level, index);
+            
+            // Show result section
+            result.style.display = 'block';
+            result.style.animation = 'fadeIn 0.5s ease-in-out';
+        }
+
+        // Find the next higher pay in the matrix
+        function findNextHigherPay(level, calculatedPay) {
+            const pays = payMatrix[level];
+            if (!pays) return { finalPay: calculatedPay, index: 0 };
+            
+            // Find the first pay that is equal to or greater than calculated pay
+            for (let i = 0; i < pays.length; i++) {
+                if (pays[i] >= calculatedPay) {
+                    return { finalPay: pays[i], index: i + 1 };
+                }
+            }
+            
+            // If calculated pay is higher than all values, take the last one
+            return { finalPay: pays[pays.length - 1], index: pays.length };
+        }
+
+        // Highlight the calculated pay in the pay matrix
+        function highlightPayInMatrix(level, index) {
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.classList.remove('highlight');
+            });
+            
+            // Highlight the cell
+            const cell = document.getElementById(`cell-${level}-${index}`);
+            
+            if (cell) {
+                cell.classList.add('highlight');
+                
+                // Scroll to the highlighted cell
+                cell.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }
+        }
+
+        // Test with your example
+        window.addEventListener('load', () => {
+            // Pre-fill with your example for testing
+            basicPayInput.value = 17900;
+            gradePaySelect.value = '2400';
+            
+            // Initialize the matrix table
+            initializePayMatrixTable();
+        });
+    </script>
+</body>
+</html>

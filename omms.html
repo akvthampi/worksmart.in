@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outgoing Mail Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --dpms-color: #e67e22;
+            --reply-due-color: #f39c12;
+            --reply-received-color: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .highlight {
+            color: var(--dpms-color);
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(230, 126, 34, 0.5);
+            margin: 0 2px;
+        }
+        
+        .app-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background-color: #d6dbdf;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 7px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e8f4fc;
+        }
+        
+        .status-reply-due {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--reply-due-color);
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .status-reply-received {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--reply-received-color);
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-icon {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .edit-icon {
+            color: var(--secondary-color);
+        }
+        
+        .edit-icon:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .delete-icon {
+            color: var(--accent-color);
+        }
+        
+        .delete-icon:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .reply-icon {
+            color: var(--success-color);
+        }
+        
+        .reply-icon:hover {
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .search-sort-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .sort-options {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .utility-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .print-options {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .print-options select, .print-options input {
+            max-width: 300px;
+            margin-right: 15px;
+            display: inline-block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            background-color: var(--success-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background-color: var(--accent-color);
+        }
+        
+        /* Graph container */
+        .graph-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .graph-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .graph-canvas-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* Print report styles */
+        .print-report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            font-family: Arial Narrow, Arial, sans-serif;
+            table-layout: fixed;
+        }
+        
+        .print-report-table th,
+        .print-report-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            text-align: left;
+            word-wrap: break-word;
+        }
+        
+        .print-report-table th {
+            background-color: #040252;
+            font-weight: bold;
+        }
+        
+        /* Search highlight */
+        .highlighted {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+                background: white;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+            
+            .print-report-table {
+                font-size: 10px !important;
+                width: 100%;
+            }
+            
+            .print-report-table th,
+            .print-report-table td {
+                padding: 5px !important;
+            }
+            
+            h2 {
+                page-break-before: always;
+            }
+            
+            h2:first-child {
+                page-break-before: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-sort-container {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .utility-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .actions-cell {
+                flex-direction: column;
+            }
+            
+            .print-options select, .print-options input {
+                max-width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+                display: block;
+            }
+            
+            .graph-canvas-container {
+                height: 250px;
+            }
+        }
+
+        /* Additional styles for fixes */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+        }
+        
+        .pagination span {
+            padding: 8px 12px;
+            display: inline-block;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .empty-row {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay">
+        <div class="loading"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>
+                <span class="highlight">O</span>utgoing 
+                <span class="highlight">M</span>ail 
+                <span class="highlight">M</span>anagement 
+                <span class="highlight">S</span>ystem
+            </h1>
+            <p class="app-description">Manage outgoing mail with this comprehensive tool. Add, view, track replies, and generate reports with ease.<br>                <span class="highlight">Programmed by : Anil Kumar VT</span></p>
+            
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="data-entry">Data Entry</button>
+            <button class="tab-button" data-tab="mail-view">View Mails</button>
+            <button class="tab-button" data-tab="print-report">Generate Report</button>
+        </div>
+        
+        <div id="data-entry" class="tab-content active">
+            <h2>Add New Outgoing Mail</h2>
+            <form id="mail-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fileNumber">File Number <span style="color: var(--accent-color)">*</span></label>
+                        <input type="text" id="fileNumber" name="fileNumber" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dateOfIssue">Date of Issue <span style="color: var(--accent-color)">*</span></label>
+                        <input type="date" id="dateOfIssue" name="dateOfIssue" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject <span style="color: var(--accent-color)">*</span></label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="addressedTo">To Whom Addressed <span style="color: var(--accent-color)">*</span></label>
+                        <input type="text" id="addressedTo" name="addressedTo" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="replyDue">Reply Due <span style="color: var(--accent-color)">*</span></label>
+                        <select id="replyDue" name="replyDue" required>
+                            <option value="">Select Option</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="replyReceivedGroup" style="display: none;">
+                        <label for="replyReceived">Reply Received</label>
+                        <select id="replyReceived" name="replyReceived">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" class="btn-success">Save Mail</button>
+                    <button type="reset" class="btn-warning" id="reset-form">Clear Form</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="mail-view" class="tab-content">
+            <h2>Outgoing Mail Records</h2>
+            
+            <div class="search-sort-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search mails...">
+                </div>
+                
+                <div class="sort-options">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by">
+                        <option value="dateOfIssue" selected>Date of Issue (Newest First)</option>
+                        <option value="dateOfIssueAsc">Date of Issue (Oldest First)</option>
+                        <option value="fileNumber">File Number</option>
+                        <option value="addressedTo">Addressed To</option>
+                        <option value="replyDue">Reply Status</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="utility-buttons">
+                <button id="show-pending" class="btn-warning">
+                    <i class="fas fa-clock"></i> Show Mails Awaiting Reply
+                </button>
+                <button id="show-all" class="btn-success">
+                    <i class="fas fa-list"></i> Show All Mails
+                </button>
+                <button id="export-data" class="btn-success">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+                <button id="import-data" class="btn-warning">
+                    <i class="fas fa-upload"></i> Import Data
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+            </div>
+            
+            <div class="table-container">
+                <table id="mail-table">
+                    <thead>
+                        <tr>
+                            <th>File Number</th>
+                            <th>Date of Issue</th>
+                            <th>Subject</th>
+                            <th>Addressed To</th>
+                            <th>Reply Due</th>
+                            <th>Reply Received</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mail-table-body">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="pagination-controls">
+                <button id="prev-page" disabled>Previous</button>
+                <span id="page-info">Page 1 of 1</span>
+                <button id="next-page" disabled>Next</button>
+            </div>
+            
+            <div class="graph-container">
+                <h3 class="graph-title">Outgoing Mails in Last 10 Days</h3>
+                <div class="graph-canvas-container">
+                    <canvas id="mail-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div id="print-report" class="tab-content">
+            <h2>Generate Reports</h2>
+            
+            <div class="print-options">
+                <h3>Date Range Report</h3>
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date">
+                
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date">
+                
+                <button id="generate-date-report" class="btn-success">
+                    <i class="fas fa-file-alt"></i> Generate Date Range Report
+                </button>
+                
+                <button id="print-date-report" class="btn-warning no-print">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+            </div>
+            
+            <div class="table-container no-print">
+                <table id="report-table">
+                    <thead>
+                        <tr>
+                            <th>File Number</th>
+                            <th>Date of Issue</th>
+                            <th>Subject</th>
+                            <th>Addressed To</th>
+                            <th>Reply Due</th>
+                            <th>Reply Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body">
+                        <!-- Report rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="print-section" class="print-section" style="display: none;">
+                <h2 style="text-align: center;">Outgoing Mail Report</h2>
+                <p style="text-align: center;" id="report-date-range"></p>
+                <table class="print-report-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">File Number</th>
+                            <th width="12%">Date of Issue</th>
+                            <th width="30%">Subject</th>
+                            <th width="20%">Addressed To</th>
+                            <th width="10%">Reply Due</th>
+                            <th width="13%">Reply Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="print-table-body">
+                        <!-- Print rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script>
+        // Main data structure
+        let outgoingMail = JSON.parse(localStorage.getItem('outgoingMail')) || [];
+        let currentEditId = null;
+        let mailChart = null;
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentFilteredData = null;
+        
+        // DOM elements
+        const mailForm = document.getElementById('mail-form');
+        const mailTableBody = document.getElementById('mail-table-body');
+        const reportTableBody = document.getElementById('report-table-body');
+        const printTableBody = document.getElementById('print-table-body');
+        const searchInput = document.getElementById('search-input');
+        const sortSelect = document.getElementById('sort-by');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const replyDueSelect = document.getElementById('replyDue');
+        const replyReceivedGroup = document.getElementById('replyReceivedGroup');
+        const notification = document.getElementById('notification');
+        const exportButton = document.getElementById('export-data');
+        const importButton = document.getElementById('import-data');
+        const importFile = document.getElementById('import-file');
+        const showPendingButton = document.getElementById('show-pending');
+        const showAllButton = document.getElementById('show-all');
+        const generateDateReportButton = document.getElementById('generate-date-report');
+        const printDateReportButton = document.getElementById('print-date-report');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const reportDateRange = document.getElementById('report-date-range');
+        const printSection = document.getElementById('print-section');
+        const fileNumberInput = document.getElementById('fileNumber');
+        const prevPageButton = document.getElementById('prev-page');
+        const nextPageButton = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        
+        // Initialize date inputs with default values
+        const today = new Date();
+        const tenDaysAgo = new Date();
+        tenDaysAgo.setDate(today.getDate() - 10);
+        
+        startDateInput.value = formatDateForInput(tenDaysAgo);
+        endDateInput.value = formatDateForInput(today);
+        
+        // Clean up any null or invalid data in storage
+        function cleanData() {
+            outgoingMail = outgoingMail.filter(mail => 
+                mail && 
+                mail.id && 
+                mail.fileNumber && 
+                mail.dateOfIssue && 
+                mail.subject && 
+                mail.addressedTo
+            );
+            saveData();
+        }
+        
+        // Format date for input field (YYYY-MM-DD)
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Format date for display (DD-MM-YYYY)
+        function formatDateForDisplay(dateString) {
+            if (!dateString) return '';
+            const [year, month, day] = dateString.split('-');
+            return `${day}-${month}-${year}`;
+        }
+        
+        // Show notification
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.className = isError ? 'notification error show' : 'notification show';
+            
+            setTimeout(() => {
+                notification.className = 'notification';
+            }, 3000);
+        }
+        
+        // Show/hide loading overlay
+        function setLoading(show) {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
+        }
+        
+        // Toggle reply received field based on reply due selection
+        replyDueSelect.addEventListener('change', function() {
+            if (this.value === 'Yes') {
+                replyReceivedGroup.style.display = 'block';
+            } else {
+                replyReceivedGroup.style.display = 'none';
+            }
+        });
+        
+        // Tab switching functionality
+        function setupTabSwitching() {
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Update active tab button
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Update active tab content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // If switching to mail view, refresh the table and chart
+                    if (tabId === 'mail-view') {
+                        renderMailTable();
+                        renderMailChart();
+                    }
+                    
+                    // If switching to report tab, refresh the chart
+                    if (tabId === 'print-report') {
+                        renderMailChart();
+                    }
+                });
+            });
+        }
+        
+        // Handle form submission
+        mailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const fileNumber = formData.get('fileNumber').trim();
+            
+            // Validate required fields
+            if (!fileNumber || !formData.get('dateOfIssue') || !formData.get('subject') || 
+                !formData.get('addressedTo') || !formData.get('replyDue')) {
+                showNotification('Please fill all required fields!', true);
+                return;
+            }
+            
+            const newMail = {
+                id: currentEditId || Date.now().toString(), // Use existing ID if editing
+                fileNumber: fileNumber,
+                dateOfIssue: formData.get('dateOfIssue'),
+                subject: formData.get('subject'),
+                addressedTo: formData.get('addressedTo'),
+                replyDue: formData.get('replyDue'),
+                replyReceived: formData.get('replyDue') === 'Yes' ? (formData.get('replyReceived') || 'No') : 'No'
+            };
+            
+            if (currentEditId) {
+                // Update existing record
+                const index = outgoingMail.findIndex(mail => mail.id === currentEditId);
+                if (index !== -1) {
+                    outgoingMail[index] = newMail;
+                    showNotification('Mail record updated successfully!');
+                }
+                currentEditId = null;
+                fileNumberInput.disabled = false;
+            } else {
+                // Add new record
+                outgoingMail.push(newMail);
+                showNotification('Outgoing mail record added successfully!');
+            }
+            
+            saveData();
+            renderMailTable();
+            this.reset();
+            replyReceivedGroup.style.display = 'none';
+            
+            // Set today's date as default for date of issue
+            document.getElementById('dateOfIssue').value = formatDateForInput(new Date());
+        });
+        
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('outgoingMail', JSON.stringify(outgoingMail));
+        }
+        
+        // Render mail table with pagination
+        function renderMailTable(filteredData = null) {
+            const data = filteredData || outgoingMail;
+            currentFilteredData = data;
+            
+            // Clean data first to remove any null entries
+            const cleanData = data.filter(mail => 
+                mail && 
+                mail.id && 
+                mail.fileNumber && 
+                mail.dateOfIssue && 
+                mail.subject && 
+                mail.addressedTo
+            );
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(cleanData.length / itemsPerPage);
+            currentPage = Math.min(currentPage, totalPages || 1);
+            
+            // Update pagination controls
+            updatePaginationControls(totalPages);
+            
+            // Get current page data
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, cleanData.length);
+            const pageData = cleanData.slice(startIndex, endIndex);
+            
+            mailTableBody.innerHTML = '';
+            
+            if (pageData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" class="empty-row">No outgoing mail records found</td>`;
+                mailTableBody.appendChild(row);
+                return;
+            }
+            
+            pageData.forEach(mail => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${mail.fileNumber || 'N/A'}</td>
+                    <td>${formatDateForDisplay(mail.dateOfIssue) || 'N/A'}</td>
+                    <td>${mail.subject || 'N/A'}</td>
+                    <td>${mail.addressedTo || 'N/A'}</td>
+                    <td><span class="status-${mail.replyDue === 'Yes' ? 'reply-due' : ''}">${mail.replyDue || 'No'}</span></td>
+                    <td><span class="status-${mail.replyReceived === 'Yes' ? 'reply-received' : ''}">${mail.replyReceived || 'No'}</span></td>
+                    <td class="actions-cell">
+                        <i class="fas fa-edit action-icon edit-icon" data-id="${mail.id}" title="Edit"></i>
+                        <i class="fas fa-trash action-icon delete-icon" data-id="${mail.id}" title="Delete"></i>
+                        ${mail.replyDue === 'Yes' && mail.replyReceived === 'No' ? 
+                            `<i class="fas fa-reply action-icon reply-icon" data-id="${mail.id}" title="Mark as Received"></i>` : ''}
+                    </td>
+                `;
+                
+                mailTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action icons
+            document.querySelectorAll('.edit-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editMail(icon.getAttribute('data-id'));
+                });
+            });
+            
+            document.querySelectorAll('.delete-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteMail(icon.getAttribute('data-id'));
+                });
+            });
+            
+            document.querySelectorAll('.reply-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    markReplyReceived(icon.getAttribute('data-id'));
+                });
+            });
+        }
+        
+        // Update pagination controls
+        function updatePaginationControls(totalPages) {
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+            prevPageButton.disabled = currentPage <= 1;
+            nextPageButton.disabled = currentPage >= totalPages || totalPages === 0;
+        }
+        
+        // Navigate to previous page
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderMailTable(currentFilteredData);
+            }
+        });
+        
+        // Navigate to next page
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil((currentFilteredData || outgoingMail).length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderMailTable(currentFilteredData);
+            }
+        });
+        
+        // Edit mail record
+        function editMail(id) {
+            const mail = outgoingMail.find(m => m.id === id);
+            if (!mail) {
+                showNotification('Mail record not found!', true);
+                return;
+            }
+            
+            // Switch to data entry tab
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-tab="data-entry"]').classList.add('active');
+            
+            tabContents.forEach(content => content.classList.remove('active'));
+            document.getElementById('data-entry').classList.add('active');
+            
+            // Fill form with mail data
+            document.getElementById('fileNumber').value = mail.fileNumber || '';
+            document.getElementById('fileNumber').disabled = false;
+            document.getElementById('dateOfIssue').value = mail.dateOfIssue || '';
+            document.getElementById('subject').value = mail.subject || '';
+            document.getElementById('addressedTo').value = mail.addressedTo || '';
+            document.getElementById('replyDue').value = mail.replyDue || 'No';
+            
+            if (mail.replyDue === 'Yes') {
+                replyReceivedGroup.style.display = 'block';
+                document.getElementById('replyReceived').value = mail.replyReceived || 'No';
+            } else {
+                replyReceivedGroup.style.display = 'none';
+            }
+            
+            currentEditId = id;
+            
+            showNotification('Editing mail record. Remember to save changes!');
+        }
+        
+        // Delete mail record
+        function deleteMail(id) {
+            if (confirm('Are you sure you want to delete this mail record?')) {
+                const initialLength = outgoingMail.length;
+                outgoingMail = outgoingMail.filter(mail => mail.id !== id);
+                
+                if (outgoingMail.length < initialLength) {
+                    saveData();
+                    renderMailTable();
+                    showNotification('Mail record deleted successfully!');
+                } else {
+                    showNotification('Failed to delete mail record!', true);
+                }
+            }
+        }
+        
+        // Mark reply as received
+        function markReplyReceived(id) {
+            if (confirm('Mark this reply as received?')) {
+                const mail = outgoingMail.find(m => m.id === id);
+                if (mail) {
+                    mail.replyReceived = 'Yes';
+                    saveData();
+                    renderMailTable();
+                    showNotification('Reply marked as received!');
+                } else {
+                    showNotification('Mail record not found!', true);
+                }
+            }
+        }
+        
+        // Search functionality
+        function setupSearch() {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (!searchTerm) {
+                    currentPage = 1;
+                    renderMailTable();
+                    return;
+                }
+                
+                const filteredData = outgoingMail.filter(mail => 
+                    mail && (
+                        (mail.fileNumber && mail.fileNumber.toLowerCase().includes(searchTerm)) ||
+                        (mail.subject && mail.subject.toLowerCase().includes(searchTerm)) ||
+                        (mail.addressedTo && mail.addressedTo.toLowerCase().includes(searchTerm)) ||
+                        (mail.dateOfIssue && formatDateForDisplay(mail.dateOfIssue).includes(searchTerm))
+                    )
+                );
+                
+                currentPage = 1;
+                renderMailTable(filteredData);
+            });
+        }
+        
+        // Sort functionality
+        function setupSorting() {
+            sortSelect.addEventListener('change', function() {
+                let sortedData = [...outgoingMail].filter(mail => mail); // Remove any null entries
+                
+                switch(this.value) {
+                    case 'dateOfIssue':
+                        sortedData.sort((a, b) => new Date(b.dateOfIssue) - new Date(a.dateOfIssue));
+                        break;
+                    case 'dateOfIssueAsc':
+                        sortedData.sort((a, b) => new Date(a.dateOfIssue) - new Date(b.dateOfIssue));
+                        break;
+                    case 'fileNumber':
+                        sortedData.sort((a, b) => (a.fileNumber || '').localeCompare(b.fileNumber || ''));
+                        break;
+                    case 'addressedTo':
+                        sortedData.sort((a, b) => (a.addressedTo || '').localeCompare(b.addressedTo || ''));
+                        break;
+                    case 'replyDue':
+                        sortedData.sort((a, b) => (b.replyDue || '').localeCompare(a.replyDue || '') || (b.replyReceived || '').localeCompare(a.replyReceived || ''));
+                        break;
+                }
+                
+                currentPage = 1;
+                renderMailTable(sortedData);
+            });
+        }
+        
+        // Show pending replies
+        function setupPendingButton() {
+            showPendingButton.addEventListener('click', function() {
+                const pendingMails = outgoingMail.filter(mail => 
+                    mail && mail.replyDue === 'Yes' && mail.replyReceived === 'No'
+                );
+                
+                currentPage = 1;
+                renderMailTable(pendingMails);
+                showNotification(`Showing ${pendingMails.length} mails awaiting reply`);
+            });
+        }
+        
+        // Show all mails
+        function setupShowAllButton() {
+            showAllButton.addEventListener('click', function() {
+                currentPage = 1;
+                renderMailTable();
+                searchInput.value = '';
+                showNotification('Showing all mail records');
+            });
+        }
+        
+        // Export data
+        function setupExport() {
+            exportButton.addEventListener('click', function() {
+                setLoading(true);
+                
+                // Clean data before export
+                const cleanData = outgoingMail.filter(mail => 
+                    mail && 
+                    mail.id && 
+                    mail.fileNumber && 
+                    mail.dateOfIssue && 
+                    mail.subject && 
+                    mail.addressedTo
+                );
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    const dataStr = JSON.stringify(cleanData, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = 'outgoing-mail-data.json';
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                    
+                    setLoading(false);
+                    showNotification('Data exported successfully!');
+                }, 500);
+            });
+        }
+        
+        // Import data
+        function setupImport() {
+            importButton.addEventListener('click', function() {
+                importFile.click();
+            });
+            
+            importFile.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                setLoading(true);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        
+                        if (Array.isArray(importedData)) {
+                            if (confirm('Importing data will replace your current records. Continue?')) {
+                                // More flexible validation for imported data
+                                const validData = importedData.filter(item => 
+                                    item && 
+                                    (item.fileNumber || item.subject || item.addressedTo) // At least one identifying field
+                                );
+                                
+                                if (validData.length === 0) {
+                                    throw new Error('No valid data found in the imported file');
+                                }
+                                
+                                // Add unique IDs to any records that don't have them
+                                validData.forEach(item => {
+                                    if (!item.id) {
+                                        item.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                                    }
+                                    // Ensure all required fields have default values
+                                    item.replyDue = item.replyDue || 'No';
+                                    item.replyReceived = item.replyReceived || 'No';
+                                });
+                                
+                                outgoingMail = validData;
+                                saveData();
+                                renderMailTable();
+                                setLoading(false);
+                                showNotification(`Data imported successfully! ${validData.length} records loaded.`);
+                            } else {
+                                setLoading(false);
+                            }
+                        } else {
+                            throw new Error('File should contain a JSON array');
+                        }
+                    } catch (error) {
+                        setLoading(false);
+                        showNotification('Error importing data: ' + error.message, true);
+                        console.error('Import error:', error);
+                    }
+                };
+                reader.onerror = function() {
+                    setLoading(false);
+                    showNotification('Error reading file', true);
+                };
+                reader.readAsText(file);
+                
+                // Reset the file input
+                this.value = '';
+            });
+        }
+        
+        // Generate date range report
+        function setupReportGeneration() {
+            generateDateReportButton.addEventListener('click', function() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                
+                if (!startDate || !endDate) {
+                    showNotification('Please select both start and end dates', true);
+                    return;
+                }
+                
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (start > end) {
+                    showNotification('Start date cannot be after end date', true);
+                    return;
+                }
+                
+                const filteredData = outgoingMail.filter(mail => {
+                    if (!mail || !mail.dateOfIssue) return false;
+                    const mailDate = new Date(mail.dateOfIssue);
+                    return mailDate >= start && mailDate <= end;
+                });
+                
+                renderReportTable(filteredData);
+                renderPrintTable(filteredData);
+                
+                // Show print button
+                printDateReportButton.style.display = 'inline-block';
+                
+                // Set report date range text
+                reportDateRange.textContent = `From ${formatDateForDisplay(startDate)} to ${formatDateForDisplay(endDate)}`;
+                
+                // Show the print section
+                printSection.style.display = 'block';
+                
+                showNotification(`Report generated with ${filteredData.length} records`);
+            });
+        }
+        
+        // Print report
+        function setupPrint() {
+            printDateReportButton.addEventListener('click', function() {
+                window.print();
+            });
+        }
+        
+        // Render report table
+        function renderReportTable(data) {
+            reportTableBody.innerHTML = '';
+            
+            const validData = data.filter(mail => mail);
+            
+            if (validData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="empty-row">No mail records found in the selected date range</td>`;
+                reportTableBody.appendChild(row);
+                return;
+            }
+            
+            validData.forEach(mail => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${mail.fileNumber || 'N/A'}</td>
+                    <td>${formatDateForDisplay(mail.dateOfIssue) || 'N/A'}</td>
+                    <td>${mail.subject || 'N/A'}</td>
+                    <td>${mail.addressedTo || 'N/A'}</td>
+                    <td><span class="status-${mail.replyDue === 'Yes' ? 'reply-due' : ''}">${mail.replyDue || 'No'}</span></td>
+                    <td><span class="status-${mail.replyReceived === 'Yes' ? 'reply-received' : ''}">${mail.replyReceived || 'No'}</span></td>
+                `;
+                
+                reportTableBody.appendChild(row);
+            });
+        }
+        
+        // Render print table
+        function renderPrintTable(data) {
+            printTableBody.innerHTML = '';
+            
+            const validData = data.filter(mail => mail);
+            
+            if (validData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="empty-row">No mail records found in the selected date range</td>`;
+                printTableBody.appendChild(row);
+                return;
+            }
+            
+            validData.forEach(mail => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${mail.fileNumber || 'N/A'}</td>
+                    <td>${formatDateForDisplay(mail.dateOfIssue) || 'N/A'}</td>
+                    <td>${mail.subject || 'N/A'}</td>
+                    <td>${mail.addressedTo || 'N/A'}</td>
+                    <td>${mail.replyDue || 'No'}</td>
+                    <td>${mail.replyReceived || 'No'}</td>
+                `;
+                
+                printTableBody.appendChild(row);
+            });
+        }
+        
+        // Render mail chart
+        function renderMailChart() {
+            const ctx = document.getElementById('mail-chart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (mailChart) {
+                mailChart.destroy();
+            }
+            
+            // Calculate last 10 days
+            const dates = [];
+            const mailCounts = [];
+            
+            for (let i = 9; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                
+                const dateString = formatDateForInput(date);
+                const formattedDate = formatDateForDisplay(dateString);
+                
+                dates.push(formattedDate);
+                
+                // Count mails for this date
+                const count = outgoingMail.filter(mail => mail && mail.dateOfIssue === dateString).length;
+                mailCounts.push(count);
+            }
+            
+            // Create chart
+            mailChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Number of Mails',
+                        data: mailCounts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(199, 199, 199, 0.7)',
+                            'rgba(83, 102, 255, 0.7)',
+                            'rgba(40, 159, 64, 0.7)',
+                            'rgba(210, 99, 132, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 206, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)',
+                            'rgb(199, 199, 199)',
+                            'rgb(83, 102, 255)',
+                            'rgb(40, 159, 64)',
+                            'rgb(210, 99, 132)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Outgoing Mails per Day (Last 10 Days)'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Mails: ${context.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize the application
+        function initApp() {
+            // Clean up any existing bad data
+            cleanData();
+            
+            // Set up all event listeners
+            setupTabSwitching();
+            setupSearch();
+            setupSorting();
+            setupPendingButton();
+            setupShowAllButton();
+            setupExport();
+            setupImport();
+            setupReportGeneration();
+            setupPrint();
+            
+            // Render initial data
+            renderMailTable();
+            renderMailChart();
+            
+            // Set today's date as default for date of issue
+            document.getElementById('dateOfIssue').value = formatDateForInput(new Date());
+        }
+        
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
