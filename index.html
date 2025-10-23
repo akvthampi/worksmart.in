@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,6 +87,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
+            position: relative;
         }
 
         .tool-item:hover {
@@ -113,6 +115,35 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            min-width: 200px;
+        }
+
+        .context-menu-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .context-menu-item:hover {
+            background: #f0f0f0;
+        }
+
+        .context-menu-item i {
+            width: 20px;
+            text-align: center;
         }
 
         /* Main Content Area */
@@ -307,13 +338,13 @@
                 <!-- Communication Tools -->
                 <div class="tool-category">
                     <div class="category-title">Communication</div>
-                    <div class="tool-item" data-file="imms.html">
+                    <div class="tool-item" data-file="imms.html" data-name="Incoming Mail Management">
                         <div class="tool-icon" style="background: #3498db;">
                             <i class="fas fa-inbox"></i>
                         </div>
                         <div class="tool-name">Incoming Mail Management</div>
                     </div>
-                    <div class="tool-item" data-file="omms.html">
+                    <div class="tool-item" data-file="omms.html" data-name="Outgoing Mail Management">
                         <div class="tool-icon" style="background: #2ecc71;">
                             <i class="fas fa-paper-plane"></i>
                         </div>
@@ -324,31 +355,31 @@
                 <!-- Management Tools -->
                 <div class="tool-category">
                     <div class="category-title">Management</div>
-                    <div class="tool-item" data-file="dpms.html">
+                    <div class="tool-item" data-file="dpms.html" data-name="Disciplinary Proceedings">
                         <div class="tool-icon" style="background: #f39c12;">
                             <i class="fas fa-gavel"></i>
                         </div>
                         <div class="tool-name">Disciplinary Proceedings</div>
                     </div>
-                    <div class="tool-item" data-file="chart.html">
+                    <div class="tool-item" data-file="chart.html" data-name="Chart Preparation">
                         <div class="tool-icon" style="background: #9b59b6;">
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <div class="tool-name">Chart Preparation</div>
                     </div>
-                    <div class="tool-item" data-file="fmru.html">
+                    <div class="tool-item" data-file="fmru.html" data-name="File Movement Records">
                         <div class="tool-icon" style="background: #1abc9c;">
                             <i class="fas fa-exchange-alt"></i>
                         </div>
                         <div class="tool-name">File Movement Records</div>
                     </div>
-                    <div class="tool-item" data-file="empleavemgr.html">
+                    <div class="tool-item" data-file="empleavemgr.html" data-name="Employee Leave Tracker">
                         <div class="tool-icon" style="background: #3498db;">
                             <i class="fas fa-user-clock"></i>
                         </div>
                         <div class="tool-name">Employee Leave Tracker</div>
                     </div>
-                    <div class="tool-item" data-file="supleavemgr.html">
+                    <div class="tool-item" data-file="supleavemgr.html" data-name="Supervisor Leave Dashboard">
                         <div class="tool-icon" style="background: #8e44ad;">
                             <i class="fas fa-users-cog"></i>
                         </div>
@@ -359,25 +390,25 @@
                 <!-- Productivity Tools -->
                 <div class="tool-category">
                     <div class="category-title">Productivity</div>
-                    <div class="tool-item" data-file="taskmgr.html">
+                    <div class="tool-item" data-file="taskmgr.html" data-name="Task Manager">
                         <div class="tool-icon" style="background: #e74c3c;">
                             <i class="fas fa-tasks"></i>
                         </div>
                         <div class="tool-name">Task Manager</div>
                     </div>
-                    <div class="tool-item" data-file="firu.html">
+                    <div class="tool-item" data-file="firu.html" data-name="Digital File Index">
                         <div class="tool-icon" style="background: #e91e63;">
                             <i class="fas fa-search"></i>
                         </div>
                         <div class="tool-name">Digital File Index</div>
                     </div>
-                    <div class="tool-item" data-file="quicknotes.html">
+                    <div class="tool-item" data-file="quicknotes.html" data-name="Sticky Notes">
                         <div class="tool-icon" style="background: #03a9f4;">
                             <i class="fas fa-sticky-note"></i>
                         </div>
                         <div class="tool-name">Sticky Notes</div>
                     </div>
-                    <div class="tool-item" data-file="taic.html">
+                    <div class="tool-item" data-file="taic.html" data-name="Target Achievement">
                         <div class="tool-icon" style="background: #f44336;">
                             <i class="fas fa-bullseye"></i>
                         </div>
@@ -388,67 +419,67 @@
                 <!-- Finance Tools -->
                 <div class="tool-category">
                     <div class="category-title">Finance</div>
-                    <div class="tool-item" data-file="dabook.html">
+                    <div class="tool-item" data-file="dabook.html" data-name="Digital Account Book">
                         <div class="tool-icon" style="background: #009688;">
                             <i class="fas fa-book"></i>
                         </div>
                         <div class="tool-name">Digital Account Book</div>
                     </div>
-                    <div class="tool-item" data-file="dcbook.html">
+                    <div class="tool-item" data-file="dcbook.html" data-name="Digital Cash Book">
                         <div class="tool-icon" style="background: #ff9800;">
                             <i class="fas fa-money-bill-wave"></i>
                         </div>
                         <div class="tool-name">Digital Cash Book</div>
                     </div>
-                    <div class="tool-item" data-file="payfixation.html">
+                    <div class="tool-item" data-file="payfixation.html" data-name="Pay Fixation Comparator">
                         <div class="tool-icon" style="background: #673ab7;">
                             <i class="fas fa-calculator"></i>
                         </div>
                         <div class="tool-name">Pay Fixation Comparator</div>
                     </div>
-                    <div class="tool-item" data-file="daratetracker.html">
+                    <div class="tool-item" data-file="daratetracker.html" data-name="DA Rate Tracker">
                         <div class="tool-icon" style="background: #9c27b0;">
                             <i class="fas fa-percentage"></i>
                         </div>
                         <div class="tool-name">DA Rate Tracker</div>
                     </div>
-                    <div class="tool-item" data-file="advanceincalc.html">
+                    <div class="tool-item" data-file="advanceincalc.html" data-name="Advance Increment">
                         <div class="tool-icon" style="background: #4caf50;">
                             <i class="fas fa-rocket"></i>
                         </div>
                         <div class="tool-name">Advance Increment</div>
                     </div>
-                    <div class="tool-item" data-file="sixthtoseventh.html">
+                    <div class="tool-item" data-file="sixthtoseventh.html" data-name="6th to 7th Pay Commission">
                         <div class="tool-icon" style="background: #795548;">
                             <i class="fas fa-business-time"></i>
                         </div>
                         <div class="tool-name">6th to 7th Pay Commission</div>
                     </div>
-                    <div class="tool-item" data-file="eightcpcprojection.html">
+                    <div class="tool-item" data-file="eightcpcprojection.html" data-name="8th CPC Projection">
                         <div class="tool-icon" style="background: #3f51b5;">
                             <i class="fas fa-chart-area"></i>
                         </div>
                         <div class="tool-name">8th CPC Projection</div>
                     </div>
-                    <div class="tool-item" data-file="ppfcalc.html">
+                    <div class="tool-item" data-file="ppfcalc.html" data-name="PPF Investment Calculator">
                         <div class="tool-icon" style="background: #c2185b;">
                             <i class="fas fa-piggy-bank"></i>
                         </div>
                         <div class="tool-name">PPF Investment Calculator</div>
                     </div>
-                    <div class="tool-item" data-file="gratuity.html">
+                    <div class="tool-item" data-file="gratuity.html" data-name="Gratuity Calculator">
                         <div class="tool-icon" style="background: #5c6bc0;">
                             <i class="fas fa-gift"></i>
                         </div>
                         <div class="tool-name">Gratuity Calculator</div>
                     </div>
-                    <div class="tool-item" data-file="pencommute.html">
+                    <div class="tool-item" data-file="pencommute.html" data-name="Pension Commutation Calculator">
                         <div class="tool-icon" style="background: #00bcd4;">
                             <i class="fas fa-coins"></i>
                         </div>
                         <div class="tool-name">Pension Commutation Calculator</div>
                     </div>
-                    <div class="tool-item" data-file="leavencash.html">
+                    <div class="tool-item" data-file="leavencash.html" data-name="Leave Encashment Calculator">
                         <div class="tool-icon" style="background: #f44336;">
                             <i class="fas fa-umbrella-beach"></i>
                         </div>
@@ -459,13 +490,25 @@
                 <!-- Appreciation -->
                 <div class="tool-category">
                     <div class="category-title">Appreciation</div>
-                    <div class="tool-item" data-file="thankyou">
+                    <div class="tool-item" data-file="thankyou" data-name="Thank You!">
                         <div class="tool-icon" style="background: #e91e63;">
                             <i class="fas fa-heart"></i>
                         </div>
                         <div class="tool-name">Thank You!</div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Context Menu -->
+        <div class="context-menu" id="contextMenu">
+            <div class="context-menu-item" id="openInSameTab">
+                <i class="fas fa-window-maximize"></i>
+                <span>Open in same tab</span>
+            </div>
+            <div class="context-menu-item" id="openInNewTab">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Open in new tab</span>
             </div>
         </div>
 
@@ -504,6 +547,12 @@
         const toolFrame = document.getElementById('toolFrame');
         const contentTitle = document.querySelector('.content-title');
         const contentIcon = document.querySelector('.content-icon i');
+        const contextMenu = document.getElementById('contextMenu');
+        const openInSameTab = document.getElementById('openInSameTab');
+        const openInNewTab = document.getElementById('openInNewTab');
+        
+        // Currently selected tool
+        let currentTool = null;
         
         // Initially hide sidebar
         sidebar.classList.add('hidden');
@@ -524,50 +573,91 @@
             }
         });
         
-        // Tool selection functionality
+        // Context menu functionality
         const toolItems = document.querySelectorAll('.tool-item');
         
         toolItems.forEach(item => {
+            // Left click - open in same tab
             item.addEventListener('click', function() {
-                // Remove active class from all items
-                toolItems.forEach(i => i.classList.remove('active'));
-                // Add active class to clicked item
-                this.classList.add('active');
+                openToolInSameTab(this);
+            });
+            
+            // Right click - show context menu
+            item.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                currentTool = this;
                 
-                const toolFile = this.getAttribute('data-file');
-                const toolName = this.querySelector('.tool-name').textContent;
-                const toolIconClass = this.querySelector('.tool-icon i').className;
-                const toolIconBg = this.querySelector('.tool-icon').style.background;
-                
-                // Update header
-                contentTitle.textContent = toolName;
-                contentIcon.className = toolIconClass;
-                contentIcon.parentElement.style.background = toolIconBg;
-                
-                // Hide sidebar and expand main content
-                sidebar.classList.add('hidden');
-                mainContent.classList.add('expanded');
-                
-                // Hide welcome screen and show iframe
-                welcomeScreen.style.display = 'none';
-                toolFrame.style.display = 'block';
-                
-                // Load tool content
-                if (toolFile === 'thankyou') {
-                    toolFrame.style.display = 'none';
-                    welcomeScreen.style.display = 'flex';
-                    welcomeScreen.innerHTML = `
-                        <i class="fas fa-heart" style="font-size: 4rem; color: #e74c3c; margin-bottom: 1.5rem;"></i>
-                        <h2>Thank You!</h2>
-                        <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; line-height: 1.6;">
-                            We appreciate your trust in our tools. Stay productive and have an amazing day!
-                        </p>
-                    `;
-                } else {
-                    toolFrame.src = toolFile;
-                }
+                // Position context menu
+                contextMenu.style.display = 'block';
+                contextMenu.style.left = e.pageX + 'px';
+                contextMenu.style.top = e.pageY + 'px';
             });
         });
+        
+        // Open in same tab
+        openInSameTab.addEventListener('click', function() {
+            if (currentTool) {
+                openToolInSameTab(currentTool);
+                contextMenu.style.display = 'none';
+            }
+        });
+        
+        // Open in new tab
+        openInNewTab.addEventListener('click', function() {
+            if (currentTool) {
+                const toolFile = currentTool.getAttribute('data-file');
+                if (toolFile !== 'thankyou') {
+                    window.open(toolFile, '_blank');
+                }
+                contextMenu.style.display = 'none';
+            }
+        });
+        
+        // Hide context menu when clicking elsewhere
+        document.addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+        });
+        
+        // Function to open tool in same tab
+        function openToolInSameTab(toolItem) {
+            // Remove active class from all items
+            toolItems.forEach(i => i.classList.remove('active'));
+            // Add active class to clicked item
+            toolItem.classList.add('active');
+            
+            const toolFile = toolItem.getAttribute('data-file');
+            const toolName = toolItem.getAttribute('data-name');
+            const toolIconClass = toolItem.querySelector('.tool-icon i').className;
+            const toolIconBg = toolItem.querySelector('.tool-icon').style.background;
+            
+            // Update header
+            contentTitle.textContent = toolName;
+            contentIcon.className = toolIconClass;
+            contentIcon.parentElement.style.background = toolIconBg;
+            
+            // Hide sidebar and expand main content
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('expanded');
+            
+            // Hide welcome screen and show iframe
+            welcomeScreen.style.display = 'none';
+            toolFrame.style.display = 'block';
+            
+            // Load tool content
+            if (toolFile === 'thankyou') {
+                toolFrame.style.display = 'none';
+                welcomeScreen.style.display = 'flex';
+                welcomeScreen.innerHTML = `
+                    <i class="fas fa-heart" style="font-size: 4rem; color: #e74c3c; margin-bottom: 1.5rem;"></i>
+                    <h2>Thank You!</h2>
+                    <p style="font-size: 1.1rem; color: #7f8c8d; max-width: 600px; line-height: 1.6;">
+                        We appreciate your trust in our tools. Stay productive and have an amazing day!
+                    </p>
+                `;
+            } else {
+                toolFrame.src = toolFile;
+            }
+        }
     </script>
 </body>
 </html>
