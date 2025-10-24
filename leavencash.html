@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,27 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --success: #06d6a0;
-            --warning: #ffd166;
-            --danger: #ef476f;
-            --info: #118ab2;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray-100: #f1f3f5;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-400: #ced4da;
-            --gray-500: #adb5bd;
-            --gray-600: #868e96;
-            --gray-700: #495057;
-            --gray-800: #343a40;
-            --gray-900: #212529;
-            --border-radius: 12px;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --box-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --dpms-color: #e67e22;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
         
@@ -35,68 +25,53 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: var(--gray-800);
+            background-color: #f5f7fa;
+            color: #333;
             line-height: 1.6;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
+            width: 95%;
             max-width: 1400px;
             margin: 0 auto;
         }
         
         .main-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
             color: white;
-            box-shadow: var(--box-shadow-lg);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .main-header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,0 100,100 0,100" fill="rgba(255,255,255,0.1)"/></svg>');
-            background-size: 100% 100%;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
         }
         
         .main-header h1 {
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            font-size: 2.2rem;
             display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            z-index: 1;
+            flex-wrap: wrap;
         }
         
-        .main-header h1 svg {
-            width: 36px;
-            height: 36px;
-            margin-right: 12px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        .highlight {
+            color: var(--dpms-color);
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(230, 126, 34, 0.5);
+            margin: 0 2px;
         }
         
         .main-header .subtitle {
             font-size: 1.1rem;
-            opacity: 0.95;
-            font-weight: 400;
-            position: relative;
-            z-index: 1;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .section {
@@ -105,7 +80,7 @@
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: var(--box-shadow);
-            border: 1px solid var(--gray-200);
+            border: 1px solid #ddd;
             transition: var(--transition);
         }
         
@@ -116,18 +91,18 @@
         .section-header {
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--gray-100);
+            border-bottom: 2px solid var(--light-color);
         }
         
         .section-header h2 {
-            color: var(--primary);
+            color: var(--primary-color);
             font-size: 1.5rem;
             margin-bottom: 5px;
             font-weight: 600;
         }
         
         .section-header p {
-            color: var(--gray-600);
+            color: var(--dark-color);
             font-size: 0.95rem;
         }
         
@@ -137,12 +112,6 @@
             gap: 25px;
         }
         
-        .grid-3-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        
         .input-group {
             margin-bottom: 15px;
         }
@@ -150,31 +119,31 @@
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            color: var(--gray-700);
-            font-weight: 500;
+            color: var(--dark-color);
+            font-weight: 600;
             font-size: 0.95rem;
         }
         
         .input-group input, .input-group select {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px;
             background-color: white;
-            border: 2px solid var(--gray-300);
+            border: 2px solid #ddd;
             font-size: 1rem;
-            color: var(--gray-800);
+            color: #333;
             transition: var(--transition);
-            border-radius: 8px;
+            border-radius: 4px;
             font-weight: 400;
         }
         
         .input-group input:focus, .input-group select:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
         
         .input-group input::placeholder {
-            color: var(--gray-500);
+            color: #7f8c8d;
         }
         
         .radio-group {
@@ -188,17 +157,17 @@
             display: flex;
             align-items: center;
             padding: 14px 16px;
-            background: var(--gray-100);
-            border: 2px solid var(--gray-300);
-            border-radius: 8px;
+            background: var(--light-color);
+            border: 2px solid #ddd;
+            border-radius: 4px;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
         }
         
         .radio-option:hover {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.05);
+            border-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.05);
         }
         
         .radio-option input {
@@ -210,7 +179,7 @@
         .submit-btn {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-color: var(--secondary-color);
             color: white;
             border: none;
             font-size: 1.05rem;
@@ -219,16 +188,17 @@
             transition: var(--transition);
             margin-top: 10px;
             margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .submit-btn:hover {
+            background-color: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
         
         .submit-btn i {
@@ -236,46 +206,41 @@
         }
         
         .green-btn {
-            background: linear-gradient(135deg, var(--success), #04b08a);
-            box-shadow: 0 4px 12px rgba(6, 214, 160, 0.3);
+            background-color: var(--success-color);
         }
         
         .green-btn:hover {
-            box-shadow: 0 6px 15px rgba(6, 214, 160, 0.4);
+            background-color: #27ae60;
         }
         
         .red-btn {
-            background: linear-gradient(135deg, var(--danger), #d43a5f);
-            box-shadow: 0 4px 12px rgba(239, 71, 111, 0.3);
+            background-color: var(--accent-color);
         }
         
         .red-btn:hover {
-            box-shadow: 0 6px 15px rgba(239, 71, 111, 0.4);
+            background-color: #c0392b;
         }
         
         .blue-btn {
-            background: linear-gradient(135deg, var(--info), #0d7a99);
-            box-shadow: 0 4px 12px rgba(17, 138, 178, 0.3);
+            background-color: var(--secondary-color);
         }
         
         .blue-btn:hover {
-            box-shadow: 0 6px 15px rgba(17, 138, 178, 0.4);
+            background-color: #2980b9;
         }
         
         .info-box {
-            background: rgba(67, 97, 238, 0.08);
-            border-left: 4px solid var(--primary);
+            background: rgba(52, 152, 219, 0.08);
+            border-left: 4px solid var(--secondary-color);
             padding: 18px;
             margin: 15px 0;
             border-radius: 0 8px 8px 0;
             font-size: 0.95rem;
-            color: var(--gray-700);
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
+            color: var(--dark-color);
         }
         
         .info-box strong {
-            color: var(--primary);
+            color: var(--secondary-color);
         }
         
         .results-container {
@@ -283,7 +248,7 @@
             padding: 25px;
             border-radius: 10px;
             margin-bottom: 20px;
-            border: 1px solid var(--gray-200);
+            border: 1px solid #ddd;
         }
         
         .balance-grid {
@@ -299,7 +264,7 @@
             padding: 25px 20px;
             text-align: center;
             transition: var(--transition);
-            border: 1px solid var(--gray-200);
+            border: 1px solid #ddd;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
@@ -315,19 +280,19 @@
         }
         
         .balance-card:nth-child(1)::before {
-            background: linear-gradient(90deg, var(--success), var(--primary));
+            background: linear-gradient(90deg, var(--success-color), var(--secondary-color));
         }
         
         .balance-card:nth-child(2)::before {
-            background: linear-gradient(90deg, var(--primary), var(--info));
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
         }
         
         .balance-card:nth-child(3)::before {
-            background: linear-gradient(90deg, var(--warning), var(--danger));
+            background: linear-gradient(90deg, var(--warning-color), var(--accent-color));
         }
         
         .balance-card:nth-child(4)::before {
-            background: linear-gradient(90deg, var(--danger), var(--warning));
+            background: linear-gradient(90deg, var(--accent-color), var(--warning-color));
         }
         
         .balance-card:hover {
@@ -345,7 +310,7 @@
             font-size: 2rem;
             font-weight: 700;
             margin-bottom: 5px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -353,14 +318,14 @@
         
         .balance-label {
             font-size: 1.1rem;
-            color: var(--gray-700);
+            color: var(--dark-color);
             margin-bottom: 5px;
             font-weight: 600;
         }
         
         .balance-description {
             font-size: 0.9rem;
-            color: var(--gray-600);
+            color: #7f8c8d;
             font-weight: 500;
         }
         
@@ -368,7 +333,7 @@
             display: flex;
             justify-content: space-between;
             padding: 14px 0;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid #ddd;
         }
         
         .result-item:last-child {
@@ -376,20 +341,20 @@
         }
         
         .result-label {
-            color: var(--gray-700);
+            color: var(--dark-color);
             font-weight: 500;
         }
         
         .result-value {
-            color: var(--gray-900);
+            color: var(--primary-color);
             font-weight: 600;
         }
         
-        .highlight {
-            background: rgba(67, 97, 238, 0.05);
+        .highlight-section {
+            background: rgba(52, 152, 219, 0.05);
             padding: 20px;
             border-radius: 8px;
-            border-left: 4px solid var(--primary);
+            border-left: 4px solid var(--secondary-color);
             margin: 20px 0;
         }
         
@@ -408,7 +373,7 @@
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -431,8 +396,8 @@
             margin-top: 40px;
             text-align: center;
             padding-top: 25px;
-            border-top: 1px solid var(--gray-300);
-            color: var(--gray-600);
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
         }
         
         .disclaimer {
@@ -445,7 +410,7 @@
         .creator {
             font-size: 0.85rem;
             font-style: italic;
-            color: var(--gray-500);
+            color: #7f8c8d;
         }
         
         #toast-message {
@@ -460,7 +425,7 @@
         
         .toast {
             padding: 18px 22px;
-            border-radius: 10px;
+            border-radius: 6px;
             color: white;
             font-weight: 500;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
@@ -475,11 +440,11 @@
         }
         
         .toast-success {
-            background: linear-gradient(135deg, var(--success), #04b08a);
+            background-color: var(--success-color);
         }
         
         .toast-error {
-            background: linear-gradient(135deg, var(--danger), #d43a5f);
+            background-color: var(--accent-color);
         }
         
         .toast i {
@@ -492,7 +457,7 @@
         }
         
         .calculation-steps {
-            background: var(--gray-100);
+            background: var(--light-color);
             padding: 25px;
             border-radius: 8px;
             margin-top: 25px;
@@ -502,7 +467,7 @@
             display: flex;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid var(--gray-300);
+            border-bottom: 1px solid #ddd;
         }
         
         .step:last-child {
@@ -512,7 +477,7 @@
         }
         
         .step-number {
-            background: var(--primary);
+            background: var(--secondary-color);
             color: white;
             width: 28px;
             height: 28px;
@@ -529,16 +494,12 @@
         .step-content {
             flex: 1;
             font-size: 0.95rem;
-            color: var(--gray-700);
+            color: var(--dark-color);
         }
         
         @media (max-width: 1024px) {
             .grid-2-col {
                 grid-template-columns: 1fr;
-            }
-            
-            .container {
-                max-width: 900px;
             }
         }
         
@@ -552,14 +513,11 @@
             }
             
             .main-header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
+                flex-direction: column;
             }
             
-            .main-header .subtitle {
-                font-size: 1rem;
-            }
-            
-            .grid-2-col, .grid-3-col {
+            .grid-2-col {
                 grid-template-columns: 1fr;
             }
             
@@ -590,10 +548,6 @@
                 font-size: 1.6rem;
             }
             
-            .main-header .subtitle {
-                font-size: 0.9rem;
-            }
-            
             .balance-grid {
                 grid-template-columns: 1fr 1fr;
             }
@@ -612,10 +566,9 @@
     <div class="container">
         <div class="main-header">
             <h1>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM9 7.5A.75.75 0 0 0 9 9h1.5c.98 0 1.813.626 2.122 1.5H9A.75.75 0 0 0 9 12h3.622a2.251 2.251 0 0 1-2.122 1.5H9a.75.75 0 0 0-.53 1.28l3 3a.75.75 0 0 0 1.06-1.06L10.8 14.988A3.752 3.752 0 0 0 14.175 12H15a.75.75 0 0 0 0-1.5h-.825A3.733 3.733 0 0 0 13.5 9H15a.75.75 0 0 0 0-1.5H9Z" clip-rule="evenodd" />
-                </svg>
-                Leave Encashment Calculator
+                <span class="highlight">L</span>eave 
+                <span class="highlight">E</span>ncashment 
+                <span class="highlight">C</span>alculator
             </h1>
             <p class="subtitle">Designed by Anil Kumar VT | Calculated as per CCS (Leave) Rules</p>
         </div>
@@ -786,7 +739,7 @@
             
             function showError(message) {
                 resultsContainer.innerHTML = `
-                    <div class="info-box" style="border-left-color: #ef476f; background: rgba(239, 71, 111, 0.08);">
+                    <div class="info-box" style="border-left-color: #e74c3c; background: rgba(231, 76, 60, 0.08);">
                         <strong><i class="fas fa-exclamation-triangle"></i> Error</strong>
                         <p class="mt-1">${message}</p>
                     </div>
@@ -984,42 +937,30 @@
                         hplEncashmentAmount = 0;
                         totalEncashmentAmount = elEncashmentAmount;
 
-                        calculationSteps.push(`Earned Leave to Encash: 50% of ${earnedLeave} = ${elDaysToEncash} days`);
+                        calculationSteps.push(`Earned Leave to Encash: ${elDaysToEncash} days (50% of ${earnedLeave})`);
                         calculationSteps.push(`Formula for EL Encashment: (Pay + DA) / 30 * EL Days`);
                         calculationSteps.push(`EL Calculation: Rs.${totalEmoluments.toLocaleString()} / 30 * ${elDaysToEncash} = Rs.${elEncashmentAmount.toLocaleString()}`);
-                        calculationSteps.push(`HPL Encashment: Rs.0 (not allowed on resignation)`);
                         calculationSteps.push(`Total Encashment: Rs.${totalEncashmentAmount.toLocaleString()}`);
 
-                        // Add note about lapsed HPL
-                        notes.push(`${halfPayLeave} days of Half Pay Leave will lapse.`);
+                        // Add notes about unused leaves
                         const unusedEL = earnedLeave - elDaysToEncash;
                         if (unusedEL > 0) {
                             notes.push(`${unusedEL} days of Earned Leave will lapse.`);
                         }
+                        notes.push(`${halfPayLeave} days of Half Pay Leave will lapse.`);
                     }
                 }
 
-                // Round up to the next higher rupee if there's a fraction
-                if (totalEncashmentAmount % 1 !== 0) {
-                    const originalAmount = totalEncashmentAmount;
-                    totalEncashmentAmount = Math.ceil(totalEncashmentAmount);
-                    calculationSteps.push(`Rounded up to next higher rupee: Rs.${originalAmount.toFixed(2)} → Rs.${totalEncashmentAmount.toLocaleString()}`);
-                }
-
-                // Store data for PDF export
-                window.calculationData = {
+                // Display results
+                displayResults(
                     employeeName,
                     designation,
                     encashmentType,
-                    dateOfJoining: dateOfJoining ? formatDate(dateOfJoining) : "N/A",
-                    dateOfExit: dateOfExit ? formatDate(dateOfExit) : "N/A",
                     years,
                     months,
                     totalMonths,
                     basicPay,
                     daPercentage,
-                    daAmount: basicPay * (daPercentage / 100),
-                    totalEmoluments: basicPay + (basicPay * (daPercentage / 100)),
                     earnedLeave,
                     halfPayLeave,
                     elDaysToEncash,
@@ -1029,302 +970,239 @@
                     totalEncashmentAmount,
                     calculationSteps,
                     notes
-                };
+                );
 
-                // Display results
-                displayResults();
+                // Show export button
                 exportPdfBtn.classList.remove('hidden');
-                showToast("Leave encashment calculated successfully!", 'success');
+                showToast("Leave encashment calculated successfully!", "success");
             }
 
-            function calculateServicePeriod(startDate, endDate) {
-                let years = endDate.getFullYear() - startDate.getFullYear();
-                let months = endDate.getMonth() - startDate.getMonth();
+            function calculateServicePeriod(joiningDate, exitDate) {
+                let years = exitDate.getFullYear() - joiningDate.getFullYear();
+                let months = exitDate.getMonth() - joiningDate.getMonth();
+
                 if (months < 0) {
                     years--;
                     months += 12;
                 }
+
                 // Adjust for day of month
-                if (endDate.getDate() < startDate.getDate()) {
+                if (exitDate.getDate() < joiningDate.getDate()) {
                     months--;
                     if (months < 0) {
                         years--;
                         months += 12;
                     }
                 }
+
                 return { years, months };
             }
 
-            function formatDate(date) {
-                return date.toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-            }
+            function displayResults(
+                employeeName,
+                designation,
+                encashmentType,
+                years,
+                months,
+                totalMonths,
+                basicPay,
+                daPercentage,
+                earnedLeave,
+                halfPayLeave,
+                elDaysToEncash,
+                hplDaysToEncash,
+                elEncashmentAmount,
+                hplEncashmentAmount,
+                totalEncashmentAmount,
+                calculationSteps,
+                notes
+            ) {
+                // Format encashment type for display
+                const encashmentTypeDisplay = 
+                    encashmentType === 'retirement' ? 'Retirement' : 
+                    encashmentType === 'resignation' ? 'Resignation/Quitting' : 
+                    'LTC';
 
-            // === Display Results ===
-
-            function displayResults() {
-                const data = window.calculationData;
-
-                // Create summary cards
-                let summaryCards = `
+                resultsContainer.innerHTML = `
                     <div class="balance-grid">
-                        <div class="balance-card" style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);">
-                            <div class="balance-icon">💰</div>
-                            <div class="balance-value">₹ ${Math.round(data.totalEncashmentAmount).toLocaleString()}</div>
-                            <div class="balance-label">Final Encashment</div>
-                            <div class="balance-description">Total Amount</div>
-                        </div>
-                        <div class="balance-card ${data.encashmentType === 'ltc' ? 'hidden' : ''}" style="background: rgba(67, 97, 238, 0.08); border-color: rgba(67, 97, 238, 0.3);">
-                            <div class="balance-icon">⏱️</div>
-                            <div class="balance-value">${data.years}Y ${data.months}M</div>
-                            <div class="balance-label">Qualifying Service</div>
-                            <div class="balance-description">Years & Months</div>
-                        </div>
-                        <div class="balance-card" style="background: rgba(255, 209, 102, 0.08); border-color: rgba(255, 209, 102, 0.3);">
-                            <div class="balance-icon">📋</div>
-                            <div class="balance-value">${data.encashmentType.toUpperCase()}</div>
-                            <div class="balance-label">Encashment Type</div>
-                            <div class="balance-description">Category</div>
-                        </div>
-                        <div class="balance-card" style="background: rgba(239, 71, 111, 0.08); border-color: rgba(239, 71, 111, 0.3);">
-                            <div class="balance-icon">📅</div>
-                            <div class="balance-value">${data.elDaysToEncash + data.hplDaysToEncash}</div>
-                            <div class="balance-label">Total Days Encashed</div>
-                            <div class="balance-description">Leave Days</div>
-                        </div>
-                    </div>
-                `;
-                
-                let resultsHTML = summaryCards;
-
-                // Success message
-                resultsHTML += `
-                    <div class="info-box" style="border-left-color: #06d6a0; background: rgba(6, 214, 160, 0.08);">
-                        <strong><i class="fas fa-check-circle"></i> Calculation Complete</strong>
-                        <p class="mt-1">Leave encashment calculated successfully for ${data.employeeName}.</p>
-                    </div>
-                `;
-                
-                // Detail table
-                resultsHTML += '<div class="highlight">';
-                
-                const resultRow = (label, value, isHighlight = false, note = null) => {
-                    const highlightClass = isHighlight ? 'style="background: rgba(67, 97, 238, 0.1); padding: 12px; border-radius: 6px;"' : '';
-                    return `
-                        <div class="result-item" ${highlightClass}>
-                            <div class="result-label">${label}</div>
-                            <div class="result-value">
-                                ${value}
-                                ${note ? `<div style="font-size: 0.8rem; color: #666; font-weight: normal; margin-top: 4px;">${note}</div>` : ''}
+                        <div class="balance-card">
+                            <div class="balance-icon">
+                                <i class="fas fa-calendar-check" style="color: #2ecc71;"></i>
                             </div>
+                            <div class="balance-value">${elDaysToEncash}</div>
+                            <div class="balance-label">EL Days Encashed</div>
+                            <div class="balance-description">Earned Leave</div>
                         </div>
-                    `;
-                };
-
-                resultsHTML += resultRow("Employee Name", data.employeeName);
-                resultsHTML += resultRow("Designation", data.designation);
-                resultsHTML += resultRow("Type of Encashment", data.encashmentType.toUpperCase());
-
-                if (data.encashmentType !== 'ltc') {
-                    resultsHTML += resultRow("Date of Joining", data.dateOfJoining);
-                    resultsHTML += resultRow("Date of Exit", data.dateOfExit);
-                    resultsHTML += resultRow("Qualifying Service", `${data.years} Years ${data.months} Months`);
-                }
-
-                // Emoluments details
-                resultsHTML += resultRow("Basic Pay", `₹ ${data.basicPay.toLocaleString()}`);
-                resultsHTML += resultRow(`Dearness Allowance (${data.daPercentage}%)`, `₹ ${data.daAmount.toLocaleString()}`);
-                resultsHTML += resultRow("Total Emoluments (Pay + DA)", `₹ ${data.totalEmoluments.toLocaleString()}`, true);
-
-                // Leave details
-                resultsHTML += resultRow("Earned Leave Available", `${data.earnedLeave} days`);
-                if (data.encashmentType !== 'ltc') {
-                    resultsHTML += resultRow("Half Pay Leave Available", `${data.halfPayLeave} days`);
-                }
-                
-                resultsHTML += resultRow("Earned Leave Encashed", `${data.elDaysToEncash} days`);
-                if (data.encashmentType !== 'ltc') {
-                    resultsHTML += resultRow("Half Pay Leave Encashed", `${data.hplDaysToEncash} days`);
-                }
-
-                // Encashment amounts
-                if (data.encashmentType === 'ltc') {
-                    resultsHTML += resultRow("LTC Encashment Amount", `₹ ${data.elEncashmentAmount.toLocaleString()}`, false, "Formula: (Pay + DA) / 30 * Days (Max 10)");
-                } else {
-                    resultsHTML += resultRow("EL Encashment Amount", `₹ ${data.elEncashmentAmount.toLocaleString()}`, false, "Formula: (Pay + DA) / 30 * EL Days");
-                    resultsHTML += resultRow("HPL Encashment Amount", `₹ ${data.hplEncashmentAmount.toLocaleString()}`, false, "Formula: (Pay + DA) / 60 * HPL Days");
-                }
-
-                resultsHTML += resultRow("Final Leave Encashment Amount", `₹ ${data.totalEncashmentAmount.toLocaleString()}`, true);
-                resultsHTML += '</div>';
-
-                // Add calculation steps
-                if (data.calculationSteps && data.calculationSteps.length > 0) {
-                    resultsHTML += `
-                        <div class="calculation-steps">
-                            <h3 style="color: var(--primary); margin-bottom: 15px; font-weight: 600;">Calculation Steps</h3>
-                            ${data.calculationSteps.map((step, index) => `
-                                <div class="step">
-                                    <div class="step-number">${index + 1}</div>
-                                    <div class="step-content">${step}</div>
-                                </div>
-                            `).join('')}
+                        <div class="balance-card">
+                            <div class="balance-icon">
+                                <i class="fas fa-calendar-minus" style="color: #3498db;"></i>
+                            </div>
+                            <div class="balance-value">${hplDaysToEncash}</div>
+                            <div class="balance-label">HPL Days Encashed</div>
+                            <div class="balance-description">Half Pay Leave</div>
                         </div>
-                    `;
-                }
+                        <div class="balance-card">
+                            <div class="balance-icon">
+                                <i class="fas fa-rupee-sign" style="color: #e74c3c;"></i>
+                            </div>
+                            <div class="balance-value">₹${totalEncashmentAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                            <div class="balance-label">Total Amount</div>
+                            <div class="balance-description">Leave Encashment</div>
+                        </div>
+                        <div class="balance-card">
+                            <div class="balance-icon">
+                                <i class="fas fa-file-invoice-dollar" style="color: #f39c12;"></i>
+                            </div>
+                            <div class="balance-value">${encashmentTypeDisplay}</div>
+                            <div class="balance-label">Encashment Type</div>
+                            <div class="balance-description">${encashmentType === 'ltc' ? 'LTC' : 'Service'}</div>
+                        </div>
+                    </div>
 
-                // Add notes
-                if (data.notes && data.notes.length > 0) {
-                    resultsHTML += `
-                        <div class="info-box" style="border-left-color: #FF9800; background: rgba(255, 152, 0, 0.08); margin-top: 20px;">
-                            <strong><i class="fas fa-info-circle"></i> Important Notes</strong>
-                            <ul style="margin-top: 8px; margin-left: 20px;">
-                                ${data.notes.map(note => `<li>${note}</li>`).join('')}
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Employee Details</h2>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Employee Name</span>
+                            <span class="result-value">${employeeName}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Designation</span>
+                            <span class="result-value">${designation}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Encashment Type</span>
+                            <span class="result-value">${encashmentTypeDisplay}</span>
+                        </div>
+                        ${encashmentType !== 'ltc' ? `
+                            <div class="result-item">
+                                <span class="result-label">Service Period</span>
+                                <span class="result-value">${years} years ${months} months</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Emoluments & Leave Details</h2>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Basic Pay</span>
+                            <span class="result-value">₹${basicPay.toLocaleString()}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">DA Percentage</span>
+                            <span class="result-value">${daPercentage}%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Earned Leave Balance</span>
+                            <span class="result-value">${earnedLeave} days</span>
+                        </div>
+                        ${encashmentType !== 'ltc' ? `
+                            <div class="result-item">
+                                <span class="result-label">Half Pay Leave Balance</span>
+                                <span class="result-value">${halfPayLeave} days</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Encashment Details</h2>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">EL Days Encashed</span>
+                            <span class="result-value">${elDaysToEncash} days</span>
+                        </div>
+                        ${encashmentType !== 'ltc' ? `
+                            <div class="result-item">
+                                <span class="result-label">HPL Days Encashed</span>
+                                <span class="result-value">${hplDaysToEncash} days</span>
+                            </div>
+                        ` : ''}
+                        <div class="result-item">
+                            <span class="result-label">EL Encashment Amount</span>
+                            <span class="result-value">₹${elEncashmentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        ${encashmentType !== 'ltc' ? `
+                            <div class="result-item">
+                                <span class="result-label">HPL Encashment Amount</span>
+                                <span class="result-value">₹${hplEncashmentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        ` : ''}
+                        <div class="result-item" style="background-color: rgba(46, 204, 113, 0.1); padding: 16px; border-radius: 6px; margin-top: 10px;">
+                            <span class="result-label" style="font-size: 1.1rem; font-weight: 700;">Total Encashment Amount</span>
+                            <span class="result-value" style="font-size: 1.2rem; font-weight: 700; color: #27ae60;">₹${totalEncashmentAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
+
+                    <div class="calculation-steps">
+                        <div class="section-header">
+                            <h2>Calculation Steps</h2>
+                        </div>
+                        ${calculationSteps.map((step, index) => `
+                            <div class="step">
+                                <div class="step-number">${index + 1}</div>
+                                <div class="step-content">${step}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${notes.length > 0 ? `
+                        <div class="highlight-section">
+                            <div class="section-header">
+                                <h2>Important Notes</h2>
+                            </div>
+                            <ul style="padding-left: 20px;">
+                                ${notes.map(note => `<li>${note}</li>`).join('')}
                             </ul>
                         </div>
-                    `;
-                }
-
-                // Add important rules
-                resultsHTML += `
-                    <div class="info-box" style="margin-top: 20px;">
-                        <strong><i class="fas fa-book"></i> Key CCS Leave Rules</strong>
-                        <ul style="margin-top: 8px; margin-left: 20px;">
-                            <li>On <strong>Retirement</strong>: Up to 300 days can be encashed (EL first, then HPL)</li>
-                            <li>On <strong>Resignation</strong>: Only 50% of EL can be encashed, HPL lapses</li>
-                            <li>On <strong>LTC</strong>: Up to 10 days of EL can be encashed, HPL not encashable</li>
-                        </ul>
-                    </div>
+                    ` : ''}
                 `;
-
-                resultsContainer.innerHTML = resultsHTML;
             }
 
-            // === PDF Export Logic ===
-            
             function exportToPdf() {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const data = window.calculationData;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                let yPos = margin;
 
-                // Margins
-                const leftMargin = 20;
-                let y = 20;
-
-                // === Header ===
-                doc.setFont('helvetica', 'bold');
+                // Title
                 doc.setFontSize(20);
-                doc.setTextColor(40, 60, 120);
-                doc.text("Leave Encashment Certificate", leftMargin, y);
-                y += 8;
-                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(44, 62, 80);
+                doc.text('Leave Encashment Calculation', pageWidth / 2, yPos, { align: 'center' });
+                yPos += 10;
+
+                // Date
                 doc.setFontSize(10);
                 doc.setTextColor(100, 100, 100);
-                doc.text("Calculated as per CCS (Leave) Rules, 1972", leftMargin, y);
-                y += 10;
+                const today = new Date();
+                doc.text(`Generated on: ${today.toLocaleDateString()}`, pageWidth / 2, yPos, { align: 'center' });
+                yPos += 15;
 
-                // Helper: section title
-                const sectionTitle = (text) => {
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(13);
-                    doc.setTextColor(50, 50, 50);
-                    doc.text(text, leftMargin, y);
-                    y += 8;
-                };
+                // Get content from results container
+                const content = resultsContainer;
 
-                // Helper: key-value row
-                const row = (label, value) => {
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(11);
-                    doc.setTextColor(70, 70, 70);
-                    doc.text(label, leftMargin, y);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(value, leftMargin + 65, y);
-                    y += 7;
-                };
+                // Use html2canvas to capture the content
+                html2canvas(content, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = pageWidth - margin * 2;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                // === Employee Details ===
-                sectionTitle("1. Employee Details");
-                row("Name:", data.employeeName);
-                row("Designation:", data.designation);
-                row("Type of Encashment:", data.encashmentType.toUpperCase());
-                if (data.encashmentType !== 'ltc') {
-                    row("Date of Joining:", data.dateOfJoining);
-                    row("Date of Exit:", data.dateOfExit);
-                    row("Qualifying Service:", `${data.years} Years ${data.months} Months`);
-                } else {
-                    row("Qualifying Service:", "N/A for LTC");
-                }
-                y += 5;
+                    // Add image to PDF
+                    doc.addImage(imgData, 'PNG', margin, yPos, imgWidth, imgHeight);
 
-                // === Emoluments ===
-                sectionTitle("2. Emoluments");
-                row("Basic Pay:", `Rs.${data.basicPay.toLocaleString()}`);
-                row("DA (%):", `${data.daPercentage}%`);
-                row("DA Amount:", `Rs.${data.daAmount.toLocaleString()}`);
-                row("Total Emoluments:", `Rs.${data.totalEmoluments.toLocaleString()}`);
-                y += 5;
-
-                // === Leave Details ===
-                sectionTitle("3. Leave Balance & Encashment");
-                row("Earned Leave (Available):", `${data.earnedLeave} days`);
-                if (data.encashmentType !== 'ltc') {
-                    row("Half Pay Leave (Available):", `${data.halfPayLeave} days`);
-                }
-                row("Earned Leave (Encashed):", `${data.elDaysToEncash} days`);
-                if (data.encashmentType !== 'ltc') {
-                     row("Half Pay Leave (Encashed):", `${data.hplDaysToEncash} days`);
-                }
-                y += 5;
-
-                // === Encashment Calculation ===
-                sectionTitle("4. Encashment Calculation");
-                if (data.encashmentType === 'ltc') {
-                    row("LTC Encashment:", `Rs.${data.elEncashmentAmount.toLocaleString()}`);
-                    row("Note:", "Formula: (Pay + DA) / 30 * Days (Max 10)");
-                } else {
-                    row("EL Encashment:", `Rs.${data.elEncashmentAmount.toLocaleString()}`);
-                    row("HPL Encashment:", `Rs.${data.hplEncashmentAmount.toLocaleString()}`);
-                }
-                y += 4;
-
-                // Total Amount (highlighted)
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(14);
-                doc.setTextColor(0, 100, 0);
-                doc.text(`Total Leave Encashment Amount: Rs.${data.totalEncashmentAmount.toLocaleString()}`, leftMargin, y);
-                y += 12;
-
-                // === Notes (if any) ===
-                if (data.notes && data.notes.length > 0) {
-                    sectionTitle("5. Important Notes");
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-                    data.notes.forEach(note => {
-                        if (y > 260) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                        doc.text(`• ${note}`, leftMargin + 5, y);
-                        y += 6;
-                    });
-                    y += 6;
-                }
-
-                // === Single footer on page 1 only ===
-                const footerText = "Generated by Advanced Leave Encashment Calculator | © 2025";
-                doc.setFontSize(9);
-                doc.setTextColor(150, 150, 150);
-                doc.text(footerText, leftMargin, 285);
-
-                // Save
-                doc.save(`Leave_Encashment_${data.employeeName.replace(/\s+/g, '_')}.pdf`);
-                showToast("PDF exported successfully!", 'success');
+                    // Save the PDF
+                    doc.save('Leave_Encashment_Calculation.pdf');
+                    showToast("PDF exported successfully!", "success");
+                });
             }
         });
     </script>
