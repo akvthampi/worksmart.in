@@ -1,95 +1,622 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>File Movement Record Utility</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    html, body {
-      margin: 0; padding: 0; box-sizing: border-box;
-      background: #10221f;
-      color: #06240d;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh; width: 100vw; overflow: hidden;
-      display: flex; flex-direction: column;
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --dark-color: #34495e;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --dpms-color: #e67e22;
     }
-    h1, h2 { color: #e0e0e0; font-weight: 700; letter-spacing: 1px; margin: 0 0 16px 0; }
-    h1 { padding-left: 16px; border-left: 5px solid #1bb161; font-size: 2.2rem; color: #f0fff0; user-select: none; text-shadow: 0 2px 4px #1bb161aa;}
-    .tabs { display: flex; background: #123022; border-bottom: 2px solid #1bb161; user-select: none; }
-    .tab { padding: 14px 26px; color: #e0e0e0; font-weight: 600; cursor: pointer; border-top-left-radius: 12px; border-top-right-radius: 12px; transition: background 0.3s; }
-    .tab:hover { background: #1bb161; color: #022205; }
-    .tab.active { background: #1bb161; color: #022205; font-weight: 700; border-bottom: 2px solid #10221f; user-select: text; }
-    .tab-content { flex-grow: 1; background: #e8ffe6; color: #044814; border-radius: 0 24px 24px 24px; margin: 12px 16px 16px 16px; padding: 28px 40px; overflow-y: auto; font-size: 1rem; display: flex; flex-direction: column; }
-    label { font-weight: 600; color: #14622E; display: block; margin-bottom: 6px; }
-    input, textarea { width: 100%; padding: 8px 10px; border-radius: 12px; border: 1px solid #1bb161; font-size: 1rem; color: #375935; background: #d4f4ca; margin-bottom: 18px; box-sizing: border-box;}
-    textarea { resize: vertical; }
-    button { background: #1bb161; color: #06240d; border: none; border-radius: 12px; padding: 10px 18px; font-weight: 700; font-size: 1rem; margin: 8px 8px 16px 0; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
-    button:hover { background: #128c48; color: white; }
-    table { border-collapse: collapse; width: 100%; font-size: 0.95rem; color: #044814; margin-top: 20px; }
-    th, td { border: 1px solid #1bb161; padding: 8px 10px; text-align: center; }
-    th { background: #1bb161; color: #06240d; font-weight: 700; user-select: none; white-space: nowrap; }
-    .modify-btn, .delete-btn { background: #21a35d; color: #fff; border-radius: 8px; border: none; padding: 6px 12px; font-weight: 600; cursor: pointer; transition: background 0.3s; margin: 2px;}
-    .modify-btn:hover, .delete-btn:hover { background: #128c48; }
-    #msg { color: #21a35d; font-weight: 700; margin-top: 8px; min-height: 26px;}
-    input.edit-date-returned { width: 110px; text-align: center; font-size: 0.95rem; border-radius: 8px; border: 1px solid #1bb161; background: #d4f4ca; color: #375935; padding: 4px 6px;}
-    .filter-controls { margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
-    #printHeading { display:none; font-weight:700; font-size:18pt; margin-bottom:10px; text-align:center;}
-    @page { size: landscape; margin: 20mm 12mm 20mm 12mm; }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      width: 95%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 5px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .highlight {
+      color: var(--dpms-color);
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(230, 126, 34, 0.5);
+      margin: 0 2px;
+    }
+    
+    .app-description {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 100%;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+    
+    .tabs {
+      display: flex;
+      background-color: var(--light-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .tab.active {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .tab:hover:not(.active) {
+      background-color: #d6dbdf;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 12px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--dark-color);
+      font-size: 0.9rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 7px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.95rem;
+      transition: border 0.3s ease;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--secondary-color);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-danger {
+      background-color: var(--accent-color);
+    }
+    
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+    }
+    
+    .btn-success:hover {
+      background-color: #27ae60;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+    }
+    
+    .btn-warning:hover {
+      background-color: #e67e22;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-start;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+    
+    tr:hover {
+      background-color: #e8f4fc;
+    }
+    
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-icon {
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .edit-icon {
+      color: var(--secondary-color);
+    }
+    
+    .edit-icon:hover {
+      background-color: rgba(52, 152, 219, 0.1);
+    }
+    
+    .delete-icon {
+      color: var(--accent-color);
+    }
+    
+    .delete-icon:hover {
+      background-color: rgba(231, 76, 60, 0.1);
+    }
+    
+    .file-icon {
+      color: var(--success-color);
+    }
+    
+    .file-icon:hover {
+      background-color: rgba(46, 204, 113, 0.1);
+    }
+    
+    .search-sort-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .search-box {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+    }
+    
+    .search-box input {
+      padding-left: 40px;
+    }
+    
+    .sort-options {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .utility-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 6px;
+      color: white;
+      background-color: var(--success-color);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.error {
+      background-color: var(--accent-color);
+    }
+    
+    /* Print report styles */
+    .print-report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9px;
+      font-family: Arial Narrow, Arial, sans-serif;
+      table-layout: fixed;
+    }
+    
+    .print-report-table th,
+    .print-report-table td {
+      border: 1px solid #000;
+      padding: 4px;
+      text-align: left;
+      word-wrap: break-word;
+    }
+    
+    .print-report-table th {
+      background-color: #040252;
+      font-weight: bold;
+    }
+    
+    #printHeading {
+      display: none;
+      font-weight: 700;
+      font-size: 18pt;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* FIXED PRINT STYLES */
     @media print {
-      body, html { height: auto; width: auto; background: white; color: black; overflow: visible; }
-      .tabs, #msg, button, input[type=file], .download-upload, .tab-content:not(#report), #filterStart, #filterEnd, label[for=\"filterStart\"], label[for=\"filterEnd\"], h1, h2 { display: none !important; }
-      .tab-content#report { display: block !important; border-radius: 0; margin: 0; padding: 0; overflow: visible; font-size: 12pt; }
-      #printHeading { display: block !important; }
-      table { font-size: 12pt; width: 100%; border: 1px solid black; }
-      th, td { border: 1px solid black; padding: 6px 8px; color: black; }
-      input.edit-date-returned { display: none !important; }
+      body * {
+        visibility: hidden;
+      }
+      
+      #report, #report * {
+        visibility: visible;
+      }
+      
+      #report {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: white;
+        box-shadow: none;
+        border-radius: 0;
+        overflow: visible;
+      }
+      
+      .container, .tab-content {
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      header, .tabs, .filter-controls, .action-buttons, .utility-buttons, #msg, #notification,
+      button, input, textarea, label, .form-group, .form-grid, .download-upload {
+        display: none !important;
+      }
+      
+      h2, p {
+        display: none !important;
+      }
+      
+      #printHeading {
+        display: block !important;
+      }
+      
+      .table-container {
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        overflow: visible;
+      }
+      
+      table {
+        width: 100%;
+        border: 1px solid #000;
+        font-size: 10pt;
+        min-width: auto;
+      }
+      
+      th, td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        color: #000;
+        background: white !important;
+      }
+      
+      th {
+        background: #f0f0f0 !important;
+        color: #000 !important;
+      }
+      
+      tr:nth-child(even) {
+        background: #f9f9f9 !important;
+      }
+      
+      tr:hover {
+        background: white !important;
+      }
+      
+      .actions-cell {
+        display: none !important;
+      }
+      
+      @page {
+        size: landscape;
+        margin: 10mm;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+        flex-direction: column;
+      }
+      
+      .app-description {
+        padding: 0 10px;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .search-sort-container {
+        flex-direction: column;
+      }
+      
+      .search-box {
+        min-width: 100%;
+      }
+      
+      .utility-buttons {
+        flex-direction: column;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .actions-cell {
+        flex-direction: column;
+      }
+      
+      .filter-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>File Movement Record Utility</h1>
-  <div class="tabs">
-    <div class="tab active" data-tab="entry">Entry</div>
-    <div class="tab" data-tab="outstanding">Outstanding Files</div>
-    <div class="tab" data-tab="report">File Movement Report</div>
-  </div>
-
-  <div id="entry" class="tab-content">
-    <form id="fileForm">
-      <label for="fileNumber">File Number</label>
-      <input type="text" id="fileNumber" required />
-      <label for="subject">Subject Matter</label>
-      <textarea id="subject" rows="2" required></textarea>
-      <label for="toWhom">To Whom Sent</label>
-      <input type="text" id="toWhom" required />
-      <label for="dateSent">Date of Sending</label>
-      <input type="date" id="dateSent" required />
-      <label for="dateReturned">Date Returned</label>
-      <input type="date" id="dateReturned" />
-      <button type="submit">Record Outflow</button>
-      <div class="download-upload">
-        <button type="button" onclick="downloadJSON()">Download Records (.json)</button>
-        <input type="file" accept=".json" id="jsonUpload" onchange="uploadJSON()" style="display:none;"/>
-        <button type="button" onclick="document.getElementById('jsonUpload').click()">Load Records (.json)</button>
-      </div>
-      <div id="msg"></div>
-    </form>
-  </div>
-
-  <div id="outstanding" class="tab-content" style="display:none;">
-    <div id="outstandingTableContainer" style="min-height: 460px; overflow-y: auto;"></div>
-  </div>
-
-  <div id="report" class="tab-content" style="display:none;">
-    <div class="filter-controls">
-      <label for="filterStart">Start Date:</label>
-      <input type="date" id="filterStart" />
-      <label for="filterEnd">End Date:</label>
-      <input type="date" id="filterEnd" />
-      <button onclick="printFilteredReport()">Print Report</button>
+  <div class="container">
+    <header>
+      <h1>
+        <span class="highlight">F</span>ile 
+        <span class="highlight">M</span>ovement 
+        <span class="highlight">R</span>ecord 
+        <span class="highlight">U</span>tility
+      </h1>
+      <p class="app-description">Track file movements with this comprehensive tool. Record outflows, track outstanding files, and generate reports. <br><span class="highlight">Programmed by : Anil Kumar VT</span></p>
+    </header>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="entry">Data Entry</div>
+      <div class="tab" data-tab="outstanding">Outstanding Files</div>
+      <div class="tab" data-tab="report">Generate Report</div>
     </div>
-    <div id="printHeading"></div>
-    <div id="reportTableContainer" style="min-height: 460px; overflow-y: auto;"></div>
+    
+    <!-- Rest of the HTML remains the same -->
+    <div id="entry" class="tab-content active">
+      <h2>Record File Movement</h2>
+      <form id="fileForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fileNumber">File Number</label>
+            <input type="text" id="fileNumber" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="toWhom">To Whom Sent</label>
+            <input type="text" id="toWhom" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="dateSent">Date of Sending</label>
+            <input type="date" id="dateSent" required>
+          </div>
+
+          <div class="form-group">
+            <label for="dateReturned">Date Returned (Optional)</label>
+            <input type="date" id="dateReturned">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="subject">Subject Matter</label>
+          <textarea id="subject" rows="2" required></textarea>
+        </div>
+        
+        <div class="action-buttons">
+          <button type="submit" class="btn-success">
+            <i class="fas fa-file-export"></i> Record Outflow
+          </button>
+          <button type="reset" class="btn-warning">
+            <i class="fas fa-undo"></i> Clear Form
+          </button>
+        </div>
+        
+        <div class="utility-buttons">
+          <button type="button" id="downloadBtn" class="btn-success">
+            <i class="fas fa-download"></i> Download Records (.json)
+          </button>
+          <input type="file" accept=".json" id="jsonUpload" style="display:none;"/>
+          <button type="button" id="uploadBtn" class="btn-warning">
+            <i class="fas fa-upload"></i> Load Records (.json)
+          </button>
+        </div>
+        
+        <div id="msg"></div>
+      </form>
+    </div>
+    
+    <div id="outstanding" class="tab-content">
+      <h2>Outstanding Files</h2>
+      <p>Files that have not been returned yet</p>
+      
+      <div class="table-container">
+        <div id="outstandingTableContainer"></div>
+      </div>
+    </div>
+    
+    <div id="report" class="tab-content">
+      <h2>File Movement Report</h2>
+      
+      <div class="filter-controls">
+        <div class="form-group">
+          <label for="filterStart">Start Date:</label>
+          <input type="date" id="filterStart">
+        </div>
+        <div class="form-group">
+          <label for="filterEnd">End Date:</label>
+          <input type="date" id="filterEnd">
+        </div>
+        <button onclick="printFilteredReport()" class="btn-success">
+          <i class="fas fa-print"></i> Print Report
+        </button>
+      </div>
+      
+      <div id="printHeading"></div>
+      
+      <div class="table-container">
+        <div id="reportTableContainer"></div>
+      </div>
+    </div>
+    
+    <div id="notification" class="notification">
+      Operation completed successfully!
+    </div>
   </div>
 
   <script>
@@ -100,34 +627,70 @@
       return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
 
+    function showNotification(message, isError = false) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.toggle('error', isError);
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
     let records = [];
     let editRecordId = null;
     const msg = document.getElementById('msg');
-    const tabs = document.querySelectorAll('.tab');
     const printHeading = document.getElementById('printHeading');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => { t.classList.remove('active'); document.getElementById(t.dataset.tab).style.display = 'none'; });
-        tab.classList.add('active');
-        document.getElementById(tab.dataset.tab).style.display = 'block';
+    
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+        });
       });
+
+      // Download button
+      document.getElementById('downloadBtn').addEventListener('click', downloadJSON);
+      
+      // Upload button
+      document.getElementById('uploadBtn').addEventListener('click', () => {
+        document.getElementById('jsonUpload').click();
+      });
+      
+      // File upload handler
+      document.getElementById('jsonUpload').addEventListener('change', uploadJSON);
     });
 
-    function renderTables() { renderOutstanding(); renderReport(); }
+    function renderTables() { 
+      renderOutstanding(); 
+      renderReport(); 
+    }
+    
     function renderOutstanding() {
-      let out = `<table><thead>
-        <tr>
-          <th>Serial</th>
-          <th>File Number</th>
-          <th>Subject</th>
-          <th>To Whom Sent</th>
-          <th>Date Sent</th>
-          <th>Date Returned</th>
-          <th>Actions</th>
-        </tr></thead><tbody>`;
+      let out = `<table>
+        <thead>
+          <tr>
+            <th width="5%">Serial</th>
+            <th width="15%">File Number</th>
+            <th>Subject</th>
+            <th width="15%">To Whom Sent</th>
+            <th width="12%">Date Sent</th>
+            <th width="12%">Date Returned</th>
+            <th width="15%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      
       let outstanding = records.filter(r => !r.dateReturned);
       if (outstanding.length === 0) {
-        out += `<tr><td colspan="7">No outstanding files.</td></tr>`;
+        out += `<tr><td colspan="7" style="text-align: center; padding: 20px;">No outstanding files.</td></tr>`;
       } else {
         outstanding.forEach((r, i) => {
           out += `<tr>
@@ -137,9 +700,13 @@
             <td>${r.toWhom}</td>
             <td>${formatDateDMY(r.dateSent)}</td>
             <td>${formatDateDMY(r.dateReturned) || '-'}</td>
-            <td>
-              <button class="modify-btn" onclick="modifyRecord(${r.id})">Modify</button>
-              <button class="delete-btn" onclick="deleteRecord(${r.id})">Delete</button>
+            <td class="actions-cell">
+              <button class="modify-btn" onclick="modifyRecord(${r.id})">
+                <i class="fas fa-edit"></i> Modify
+              </button>
+              <button class="delete-btn btn-danger" onclick="deleteRecord(${r.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
             </td>
           </tr>`;
         });
@@ -147,20 +714,25 @@
       out += `</tbody></table>`;
       document.getElementById('outstandingTableContainer').innerHTML = out;
     }
+    
     function renderReport(filteredRecords) {
       const data = filteredRecords || records;
-      let out = `<table><thead>
-        <tr>
-          <th>Serial</th>
-          <th>File Number</th>
-          <th>Subject</th>
-          <th>To Whom Sent</th>
-          <th>Date Sent</th>
-          <th>Date Returned</th>
-          <th>Actions</th>
-        </tr></thead><tbody>`;
+      let out = `<table>
+        <thead>
+          <tr>
+            <th width="5%">Serial</th>
+            <th width="15%">File Number</th>
+            <th>Subject</th>
+            <th width="15%">To Whom Sent</th>
+            <th width="12%">Date Sent</th>
+            <th width="12%">Date Returned</th>
+            <th width="15%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>`;
+      
       if (data.length === 0) {
-        out += `<tr><td colspan="7">No records to show.</td></tr>`;
+        out += `<tr><td colspan="7" style="text-align: center; padding: 20px;">No records to show.</td></tr>`;
       } else {
         data.forEach((r, i) => {
           const dateRetDisplay = r.dateReturned ? formatDateDMY(r.dateReturned) : '-';
@@ -171,9 +743,13 @@
             <td>${r.toWhom}</td>
             <td>${formatDateDMY(r.dateSent)}</td>
             <td>${dateRetDisplay}</td>
-            <td>
-              <button class="modify-btn" onclick="modifyRecord(${r.id})">Modify</button>
-              <button class="delete-btn" onclick="deleteRecord(${r.id})">Delete</button>
+            <td class="actions-cell">
+              <button class="modify-btn" onclick="modifyRecord(${r.id})">
+                <i class="fas fa-edit"></i> Modify
+              </button>
+              <button class="delete-btn btn-danger" onclick="deleteRecord(${r.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
             </td>
           </tr>`;
         });
@@ -181,6 +757,7 @@
       out += `</tbody></table>`;
       document.getElementById('reportTableContainer').innerHTML = out;
     }
+    
     const fileForm = document.getElementById('fileForm');
     fileForm.onsubmit = (e) => {
       e.preventDefault();
@@ -189,32 +766,45 @@
       const toWhom = document.getElementById('toWhom').value.trim();
       const dateSent = document.getElementById('dateSent').value;
       const dateReturned = document.getElementById('dateReturned').value;
+      
       if (!fileNumber || !subject || !dateSent || !toWhom) {
-        msg.innerText = "Please fill all fields.";
+        msg.innerText = "Please fill all required fields.";
+        showNotification("Please fill all required fields.", true);
         return;
       }
+      
       if (editRecordId !== null) {
         const idx = records.findIndex(r => r.id === editRecordId);
         if (idx !== -1) {
           records[idx] = { id: editRecordId, fileNumber, subject, toWhom, dateSent, dateReturned: dateReturned || null };
           msg.innerText = `Record modified for file "${fileNumber}".`;
+          showNotification(`Record modified for file "${fileNumber}".`);
         }
         editRecordId = null;
       } else {
         records.push({ id: Date.now(), fileNumber, subject, toWhom, dateSent, dateReturned: dateReturned || null });
         msg.innerText = `File "${fileNumber}" recorded.`;
+        showNotification(`File "${fileNumber}" recorded successfully.`);
       }
+      
       e.target.reset();
       renderTables();
-      switchTab('outstanding');
+      
+      // Switch to outstanding tab after adding a new record
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('.tab[data-tab="outstanding"]').classList.add('active');
+      document.getElementById('outstanding').classList.add('active');
     }
+    
     function deleteRecord(id) {
       if (confirm('Delete this record permanently?')) {
         records = records.filter(r => r.id !== id);
-        msg.innerText = 'Record deleted.';
+        showNotification('Record deleted successfully.');
         renderTables();
       }
     }
+    
     function modifyRecord(id) {
       const rec = records.find(r => r.id === id);
       if (rec) {
@@ -225,80 +815,148 @@
         document.getElementById('dateReturned').value = rec.dateReturned || '';
         editRecordId = id;
         msg.innerText = 'Modify the record and submit...';
-        switchTab('entry');
+        showNotification('Editing record. Make changes and submit.');
+        
+        // Switch to entry tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('.tab[data-tab="entry"]').classList.add('active');
+        document.getElementById('entry').classList.add('active');
       }
     }
-    function switchTab(tabID) {
-      tabs.forEach(t => {
-        t.classList.remove('active');
-        document.getElementById(t.dataset.tab).style.display = 'none';
-      });
-      document.querySelector(`.tab[data-tab="${tabID}"]`).classList.add('active');
-      document.getElementById(tabID).style.display = 'block';
-    }
+    
     function printFilteredReport() {
       const startDate = document.getElementById('filterStart').value;
       const endDate = document.getElementById('filterEnd').value;
       let filteredRecords = records;
+      
       if (startDate) filteredRecords = filteredRecords.filter(r => r.dateSent >= startDate);
       if (endDate) filteredRecords = filteredRecords.filter(r => r.dateSent <= endDate);
+      
       renderReport(filteredRecords);
       printHeading.style.display = 'block';
       printHeading.textContent = `Records of File Movement from ${formatDateDMY(startDate) || 'start'} to ${formatDateDMY(endDate) || 'end'}`;
-      setTimeout(() => window.print(), 300);
+      
+      // Ensure we're on the report tab before printing
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('.tab[data-tab="report"]').classList.add('active');
+      document.getElementById('report').classList.add('active');
+      
+      setTimeout(() => {
+        window.print();
+        showNotification('Report generated for printing.');
+      }, 500);
     }
+    
     function downloadJSON() {
-      const data = JSON.stringify(records, null, 2);
-      const blob = new Blob([data], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "file_movement_records.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      msg.innerText = "JSON file downloaded.";
-    }
-    function uploadJSON() {
-      const input = document.getElementById('jsonUpload');
-      const file = input.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          try {
-            records = JSON.parse(e.target.result);
-            msg.innerText = "Records loaded from file.";
-            renderTables();
-          } catch {
-            msg.innerText = "Invalid file format.";
-          }
-        };
-        reader.readAsText(file);
+      try {
+        const data = JSON.stringify(records, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "file_movement_records.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotification("JSON file downloaded successfully.");
+      } catch (error) {
+        showNotification("Error downloading file: " + error.message, true);
       }
+    }
+    
+    function uploadJSON(event) {
+      const input = event.target;
+      const file = input.files[0];
+      
+      if (!file) {
+        showNotification("No file selected.", true);
+        return;
+      }
+      
+      if (!file.name.endsWith('.json')) {
+        showNotification("Please select a JSON file.", true);
+        input.value = "";
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const uploadedData = JSON.parse(e.target.result);
+          
+          // Validate the uploaded data structure
+          if (!Array.isArray(uploadedData)) {
+            throw new Error("Invalid file format: Expected an array of records");
+          }
+          
+          // Check if it has the expected structure
+          if (uploadedData.length > 0) {
+            const sampleRecord = uploadedData[0];
+            if (!sampleRecord.fileNumber || !sampleRecord.subject || !sampleRecord.toWhom || !sampleRecord.dateSent) {
+              throw new Error("Invalid file format: Missing required fields");
+            }
+          }
+          
+          // Ask for confirmation before replacing data
+          if (records.length > 0) {
+            if (!confirm(`This will replace ${records.length} existing records with ${uploadedData.length} new records. Continue?`)) {
+              input.value = "";
+              return;
+            }
+          }
+          
+          records = uploadedData;
+          showNotification(`Successfully loaded ${uploadedData.length} records from file.`);
+          renderTables();
+          
+        } catch (error) {
+          showNotification("Error loading file: " + error.message, true);
+          console.error("Upload error:", error);
+        }
+      };
+      
+      reader.onerror = function() {
+        showNotification("Error reading file.", true);
+      };
+      
+      reader.readAsText(file);
       input.value = "";
     }
+    
     // LocalStorage persistence
     function saveToStorage() {
       localStorage.setItem('file_movement_records', JSON.stringify(records));
     }
+    
     function loadFromStorage() {
       const data = localStorage.getItem('file_movement_records');
       if (data) {
         try {
           records = JSON.parse(data);
-        } catch {}
+        } catch (error) {
+          console.error("Error loading from storage:", error);
+          records = [];
+        }
       }
     }
+    
     // Initial load
     loadFromStorage();
     renderTables();
+    
     // Update storage after changes
     const originalRenderTables = renderTables;
     renderTables = function() {
       originalRenderTables();
       saveToStorage();
     };
+
+    // Set today's date as default for date inputs
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateSent').value = today;
   </script>
 </body>
 </html>
