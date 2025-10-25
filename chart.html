@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,261 +9,446 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .infographic-card {
-            background-color: #ffffff;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        .infographic-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        .chart-container {
-            position: relative;
-            flex-grow: 1;
-            min-height: 0;
-        }
-        .btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-        }
-        .btn-primary {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #2563eb;
-        }
-        .btn-secondary {
-            background-color: #f3f4f6;
-            color: #4b5563;
-            border: 1px solid #d1d5db;
-        }
-        .btn-secondary:hover {
-            background-color: #e5e7eb;
-        }
-        .btn-sm {
-            padding: 0.3rem 0.6rem;
-            font-size: 0.75rem;
-        }
-        #dataTable input {
-            padding: 0.3rem;
-            border-radius: 0.25rem;
-            border: 1px solid #d1d5db;
-            width: 100%;
-            font-size: 0.8rem;
-        }
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        .chart-title-input {
-            border: none;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1f2937;
-            background: transparent;
-            padding: 0.2rem;
-            border-radius: 0.25rem;
-            transition: background-color 0.2s;
-            flex-grow: 1;
-        }
-        .chart-title-input:focus {
-            outline: none;
-            background-color: #f9fafb;
-        }
-        #barChartTitle {
-            width: 100%;
-            max-width: none;
-        }
-        .chart-actions {
-            display: flex;
-            gap: 0.3rem;
-            flex-shrink: 0;
-        }
-        .chart-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .chart-modal-content {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            max-width: 95%;
-            max-height: 95%;
-            position: relative;
-            width: 90vw;
-        }
-        .close-modal {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            color: #6b7280;
-            z-index: 1001;
-        }
-        .close-modal:hover {
-            color: #374151;
-        }
-        .modal-chart-container {
-            height: 80vh;
-            width: 100%;
-            position: relative;
-        }
-        .main-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 0.5rem;
-        }
-        .header-section {
-            padding: 0.5rem 0;
-            margin-bottom: 0.5rem;
-        }
+   <style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+        --light-color: #ecf0f1;
+        --dark-color: #34495e;
+        --success-color: #2ecc71;
+        --warning-color: #f39c12;
+        --dpms-color: #e67e22;
+        --info-color: #3498db;
+        --border-radius: 8px;
+        --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        --box-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .main-header {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        color: white;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .main-header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,0 100,100 0,100" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: 100% 100%;
+    }
+    
+    .main-header h1 {
+        margin-bottom: 8px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .highlight {
+        color: var(--dpms-color);
+        font-weight: bold;
+        margin: 0 2px;
+    }
+    
+    .infographic-card {
+        background-color: #ffffff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 15px;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ddd;
+        height: 100%;
+    }
+    
+    .infographic-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chart-container {
+        position: relative;
+        flex-grow: 1;
+        min-height: 200px;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        width: 100%;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        color: white;
+        box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(44, 62, 80, 0.4);
+    }
+    
+    .btn-secondary {
+        background: var(--light-color);
+        color: var(--dark-color);
+        border: 1px solid #ddd;
+    }
+    
+    .btn-secondary:hover {
+        background: #d6dbdf;
+        transform: translateY(-1px);
+    }
+    
+    .btn-sm {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    #dataTable input {
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .chart-title-input {
+        border: none;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        background: transparent;
+        padding: 5px;
+        border-radius: 4px;
+        transition: var(--transition);
+        flex-grow: 1;
+    }
+    
+    .chart-title-input:focus {
+        outline: none;
+        background-color: #f9fafb;
+    }
+    
+    #barChartTitle {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .chart-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    
+    .chart-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .chart-modal-content {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 20px;
+        max-width: 95%;
+        max-height: 95%;
+        position: relative;
+        width: 90vw;
+        box-shadow: var(--box-shadow-lg);
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+        z-index: 1001;
+    }
+    
+    .close-modal:hover {
+        color: var(--primary-color);
+    }
+    
+    .modal-chart-container {
+        height: 80vh;
+        width: 100%;
+        position: relative;
+    }
+    
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    
+    .content-area {
+        display: flex;
+        flex: 1;
+        gap: 15px;
+        padding: 15px;
+        overflow: hidden;
+        min-height: 0;
+    }
+    
+    .data-panel {
+        flex: 0 0 320px;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border: 1px solid #ddd;
+        min-height: 0;
+    }
+    
+    .data-panel-header {
+        padding: 15px;
+        border-bottom: 2px solid var(--light-color);
+        background: white;
+        flex-shrink: 0;
+    }
+    
+    .data-panel-header h2 {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    
+    .data-panel-header p {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    
+    .data-panel-content {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+    
+    .data-table-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        font-weight: bold;
+        color: var(--dark-color);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        padding: 0 5px;
+        flex-shrink: 0;
+    }
+    
+    .data-table-container {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 15px;
+        min-height: 0;
+    }
+    
+    .data-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    
+    .data-input {
+        padding: 8px;
+        border-radius: 4px;
+        border: 2px solid #ddd;
+        width: 100%;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+    
+    .data-input:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    .data-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+        padding-top: 15px;
+        flex-shrink: 0;
+        border-top: 1px solid #eee;
+    }
+    
+    .action-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .charts-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        min-height: 0;
+        overflow: hidden;
+    }
+    
+    .charts-top {
+        flex: 1;
+        min-height: 0;
+    }
+    
+    .charts-bottom {
+        flex: 1;
+        display: flex;
+        gap: 15px;
+        min-height: 0;
+    }
+    
+    .chart-bottom-item {
+        flex: 1;
+        min-height: 0;
+    }
+    
+    .bar-chart-header {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .bar-chart-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .bar-chart-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    
+    .file-input {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
         .content-area {
-            flex-grow: 1;
-            display: flex;
-            gap: 0.5rem;
-            min-height: 0;
+            flex-direction: column;
+            padding: 10px;
         }
+        
         .data-panel {
-            flex: 0 0 22%;
-            display: flex;
-            flex-direction: column;
+            flex: none;
+            margin-bottom: 10px;
+            width: 100%;
+            min-height: 400px;
         }
-        .charts-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            min-height: 0;
-        }
-        .charts-top {
-            flex: 1;
-            min-height: 0;
-        }
+        
         .charts-bottom {
-            flex: 1;
-            display: flex;
-            gap: 0.5rem;
-            min-height: 0;
-        }
-        .chart-bottom-item {
-            flex: 1;
-            min-height: 0;
-        }
-        .data-table-container {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 0.75rem;
-        }
-        .bar-chart-header {
-            display: flex;
             flex-direction: column;
-            gap: 0.5rem;
         }
-        .bar-chart-title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
+        
+        .main-header h1 {
+            font-size: 1.5rem;
         }
-        .bar-chart-actions {
-            display: flex;
-            gap: 0.3rem;
-            flex-shrink: 0;
+        
+        .main-header .subtitle {
+            font-size: 0.85rem;
         }
-        /* FIXED: Data table layout */
-        .data-table-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            font-weight: bold;
-            color: #374151;
-            font-size: 0.75rem;
-            margin-bottom: 0.5rem;
-            padding: 0 0.25rem;
-        }
-        .data-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            align-items: center;
-        }
-        .data-input {
-            padding: 0.3rem;
-            border-radius: 0.25rem;
-            border: 1px solid #d1d5db;
-            width: 100%;
-            font-size: 0.8rem;
-        }
+        
         .data-actions {
-            display: flex;
+            flex-direction: column;
+        }
+        
+        .data-actions .flex {
             justify-content: space-between;
-            margin-top: auto;
-            padding-top: 0.5rem;
         }
-        .file-input {
-            display: none;
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div class="main-container">
-        <header class="header-section text-center">
-            <h1 class="text-2xl font-extrabold text-gray-900 mb-1">Interactive Infographic Generator</h1>
-            <p class="text-sm text-gray-600 max-w-2xl mx-auto">Enter your data and watch as beautiful infographics are created in real-time.</p>
-        </header>
+        <div class="main-header">
+            <h1>
+                <span class="highlight">I</span>nteractive 
+                <span class="highlight">I</span>nfographic 
+                <span class="highlight">G</span>enerator
+            </h1>
+            <p class="subtitle">Enter your data and watch as beautiful infographics are created in real-time | Programmed by<span class="highlight"> Anil Kumar VT</span></p>
+        </div>
 
         <div class="content-area">
             <!-- Data Input Panel -->
-            <section class="data-panel rounded-xl bg-white shadow flex flex-col">
-                <div class="p-3 border-b">
-                    <h2 class="font-bold text-gray-800">Data Input</h2>
-                    <p class="text-gray-500 text-xs">Enter your data in the rows below.</p>
+            <section class="data-panel">
+                <div class="data-panel-header">
+                    <h2>Data Input</h2>
+                    <p>Enter your data in the rows below.</p>
                 </div>
-                <div class="p-3 flex-grow flex flex-col">
+                <div class="data-panel-content">
                     <div class="data-table-header">
                         <div>Label</div>
                         <div>Value</div>
@@ -273,13 +459,14 @@
                         </div>
                     </div>
                     <div class="data-actions">
-                        <div class="flex gap-2">
-                            <button id="uploadDataBtn" class="btn btn-secondary">Upload Data</button>
-                            <button id="downloadDataBtn" class="btn btn-secondary">Download Data</button>
-                        </div>
-                        <div class="flex gap-2">
+                        <div class="action-group">
                             <button id="addRowBtn" class="btn btn-secondary">Add Row</button>
+                            <button id="deleteRowBtn" class="btn btn-secondary">Delete Row</button>
                             <button id="generateChartsBtn" class="btn btn-primary">Generate</button>
+                        </div>
+                        <div class="action-group">
+                            <button id="downloadDataBtn" class="btn btn-secondary">Download Data</button>
+                            <button id="uploadDataBtn" class="btn btn-secondary">Upload Data</button>
                         </div>
                     </div>
                     <input type="file" id="fileInput" class="file-input" accept=".json">
@@ -367,6 +554,7 @@
         // Get the DOM elements
         const dataTable = document.getElementById('dataTable');
         const addRowBtn = document.getElementById('addRowBtn');
+        const deleteRowBtn = document.getElementById('deleteRowBtn');
         const generateChartsBtn = document.getElementById('generateChartsBtn');
         const chartModal = document.getElementById('chartModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -613,6 +801,14 @@
             lineChart.update();
         }
 
+        // Function to delete the last row
+        function deleteLastRow() {
+            const rows = document.querySelectorAll('.data-row');
+            if (rows.length > 1) {
+                rows[rows.length - 1].remove();
+            }
+        }
+
         // Function to download chart as image with title
         function downloadChart(chartId) {
             const chart = getChartById(chartId);
@@ -796,6 +992,7 @@
         function setupEventListeners() {
             // Event listeners for static buttons
             addRowBtn.addEventListener('click', () => createDataRow());
+            deleteRowBtn.addEventListener('click', deleteLastRow);
             generateChartsBtn.addEventListener('click', updateCharts);
             
             // Event listeners for data export/import
