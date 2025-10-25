@@ -16,6 +16,7 @@
             --success-color: #2ecc71;
             --warning-color: #f39c12;
             --dpms-color: #e67e22;
+            --info-color: #17a2b8;
         }
         
         * {
@@ -187,6 +188,14 @@
             background-color: #e67e22;
         }
         
+        .btn-info {
+            background-color: var(--info-color);
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -301,6 +310,7 @@
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .print-options {
@@ -337,6 +347,14 @@
         
         .notification.error {
             background-color: var(--accent-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .notification.info {
+            background-color: var(--info-color);
         }
         
         /* Graph container */
@@ -401,6 +419,104 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* Backup management styles */
+        .backup-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .backup-list {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .backup-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .backup-item:last-child {
+            border-bottom: none;
+        }
+        
+        .backup-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .backup-info {
+            flex: 1;
+        }
+        
+        .backup-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .backup-meta {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+        
+        .backup-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .backup-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-current {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status-backup {
+            background-color: var(--info-color);
+            color: white;
+        }
+        
+        .backup-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
         }
         
         @media print {
@@ -471,6 +587,20 @@
             .graph-canvas-container {
                 height: 250px;
             }
+            
+            .backup-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .backup-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .backup-actions {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -479,17 +609,18 @@
         <header>
             <h1>
                 <span class="highlight">I</span>ncoming 
-                <span class="highlight"> M</span>ail 
-                <span class="highlight"> R</span>egister 
-                <span class="highlight"> S</span>ystem
+                <span class="highlight">M</span>ail 
+                <span class="highlight">R</span>egister 
+                <span class="highlight">S</span>ystem
             </h1>
-            <p class="app-description">Manage incoming mail with this comprehensive tool. Add, view, file, and generate reports with ease.<br>                <span class="highlight">Programmed by : Anil Kumar VT</span></p>
+            <p class="app-description">Manage Incoming Mail.  Add, view, file, and generate reports with enhanced backup features.<br> <span class="highlight">Programmed by : Anil Kumar VT</span></p>
             
         </header>
         
         <div class="tabs">
             <button class="tab-button active" data-tab="data-entry">Data Entry</button>
             <button class="tab-button" data-tab="mail-view">View Mails</button>
+            <button class="tab-button" data-tab="backup-management">Backup Management</button>
             <button class="tab-button" data-tab="print-report">Generate Report</button>
         </div>
         
@@ -569,10 +700,10 @@
                     <i class="fas fa-list"></i> Show All Mails
                 </button>
                 <button id="download-json" class="btn-success">
-                    <i class="fas fa-download"></i> Download JSON
+                    <i class="fas fa-download"></i> Download Backup
                 </button>
                 <button id="upload-json" class="btn-warning">
-                    <i class="fas fa-upload"></i> Upload JSON
+                    <i class="fas fa-upload"></i> Restore Backup
                 </button>
                 <input type="file" id="json-file" accept=".json" style="display: none;">
             </div>
@@ -599,12 +730,93 @@
             </div>
         </div>
         
+        <div id="backup-management" class="tab-content">
+            <h2>Backup Management</h2>
+            
+            <div class="backup-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-records">0</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-backups">0</div>
+                    <div class="stat-label">Total Backups</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="last-backup">Never</div>
+                    <div class="stat-label">Last Backup</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="storage-used">0 KB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+            
+            <div class="backup-section">
+                <h3>Backup Actions</h3>
+                <div class="utility-buttons">
+                    <button id="create-backup" class="btn-success">
+                        <i class="fas fa-plus"></i> Create New Backup
+                    </button>
+                    <button id="download-all-backups" class="btn-info">
+                        <i class="fas fa-download"></i> Download All Backups
+                    </button>
+                    <button id="restore-backup" class="btn-warning">
+                        <i class="fas fa-upload"></i> Restore from Backup
+                    </button>
+                    <button id="cleanup-backups" class="btn-danger">
+                        <i class="fas fa-trash"></i> Cleanup Old Backups
+                    </button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="backup-retention">Backup Retention (days):</label>
+                    <select id="backup-retention">
+                        <option value="7">7 days</option>
+                        <option value="14">14 days</option>
+                        <option value="30" selected>30 days</option>
+                        <option value="60">60 days</option>
+                        <option value="90">90 days</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="backup-section">
+                <h3>Available Backups</h3>
+                <div class="backup-list" id="backup-list">
+                    <!-- Backups will be listed here -->
+                </div>
+            </div>
+            
+            <div class="backup-section">
+                <h3>Auto-Backup Settings</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="auto-backup-enabled" checked>
+                        Enable Auto-Backup (creates backup on every data change)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="auto-backup-frequency">Auto-Backup Frequency:</label>
+                    <select id="auto-backup-frequency">
+                        <option value="1">Every change</option>
+                        <option value="5" selected>Every 5 changes</option>
+                        <option value="10">Every 10 changes</option>
+                        <option value="25">Every 25 changes</option>
+                    </select>
+                </div>
+                <button id="force-backup" class="btn-info">
+                    <i class="fas fa-sync"></i> Force Backup Now
+                </button>
+            </div>
+        </div>
+        
         <div id="print-report" class="tab-content">
             <h2>Generate Reports</h2>
             
-            <!-- 5-Day Mail Receipt Graph -->
+            <!-- 10-Day Mail Receipt Graph -->
             <div class="graph-container">
-                <h3 class="graph-title">Mail Receipts - Last 5 Days</h3>
+                <h3 class="graph-title">Mail Receipts - Last 10 Days</h3>
                 <div class="graph-canvas-container">
                     <canvas id="mailChart"></canvas>
                 </div>
@@ -651,10 +863,278 @@
     </div>
 
     <script>
-        // Data storage and initialization
+        // Enhanced Backup Manager
+        class BackupManager {
+            constructor() {
+                this.localStorageKey = 'mail-register';
+                this.backupPrefix = 'mail-backup-';
+                this.settingsKey = 'backup-settings';
+                this.changeCount = 0;
+                this.loadSettings();
+            }
+            
+            loadSettings() {
+                this.settings = JSON.parse(localStorage.getItem(this.settingsKey)) || {
+                    autoBackupEnabled: true,
+                    autoBackupFrequency: 5,
+                    backupRetention: 30,
+                    lastBackupDate: null
+                };
+            }
+            
+            saveSettings() {
+                localStorage.setItem(this.settingsKey, JSON.stringify(this.settings));
+            }
+            
+            // Get current data
+            getCurrentData() {
+                return JSON.parse(localStorage.getItem(this.localStorageKey)) || [];
+            }
+            
+            // Create a new backup
+            createBackup(name = null) {
+                const data = this.getCurrentData();
+                const timestamp = new Date();
+                const dateString = timestamp.toISOString().split('T')[0];
+                const timeString = timestamp.toTimeString().split(' ')[0].replace(/:/g, '-');
+                
+                const backupName = name || `backup-${dateString}-${timeString}`;
+                const backupKey = `${this.backupPrefix}${backupName}`;
+                
+                const backupData = {
+                    version: '2.0',
+                    exportDate: timestamp.toISOString(),
+                    recordCount: data.length,
+                    schema: 'mail-register',
+                    name: backupName,
+                    data: data
+                };
+                
+                localStorage.setItem(backupKey, JSON.stringify(backupData));
+                this.settings.lastBackupDate = timestamp.toISOString();
+                this.saveSettings();
+                
+                // Rotate old backups
+                this.rotateBackups();
+                
+                return backupData;
+            }
+            
+            // Rotate backups based on retention policy
+            rotateBackups() {
+                const backups = this.getAllBackups();
+                const retentionDays = this.settings.backupRetention;
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+                
+                backups.forEach(backup => {
+                    const backupDate = new Date(backup.exportDate);
+                    if (backupDate < cutoffDate && !backup.isCurrent) {
+                        localStorage.removeItem(backup.key);
+                    }
+                });
+            }
+            
+            // Get all backups
+            getAllBackups() {
+                const backups = [];
+                const currentData = this.getCurrentData();
+                
+                // Add current data as a virtual backup
+                backups.push({
+                    key: 'current',
+                    name: 'Current Data',
+                    exportDate: new Date().toISOString(),
+                    recordCount: currentData.length,
+                    isCurrent: true,
+                    data: currentData
+                });
+                
+                // Get all stored backups
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith(this.backupPrefix)) {
+                        try {
+                            const backupData = JSON.parse(localStorage.getItem(key));
+                            backups.push({
+                                key: key,
+                                name: backupData.name || key.replace(this.backupPrefix, ''),
+                                exportDate: backupData.exportDate,
+                                recordCount: backupData.recordCount,
+                                isCurrent: false,
+                                data: backupData.data
+                            });
+                        } catch (e) {
+                            console.warn('Invalid backup found:', key);
+                        }
+                    }
+                }
+                
+                // Sort by date (newest first)
+                return backups.sort((a, b) => new Date(b.exportDate) - new Date(a.exportDate));
+            }
+            
+            // Restore from backup
+            restoreBackup(backupKey) {
+                let backupData;
+                
+                if (backupKey === 'current') {
+                    // Already using current data
+                    return true;
+                } else {
+                    backupData = JSON.parse(localStorage.getItem(backupKey));
+                }
+                
+                if (!backupData || !Array.isArray(backupData.data)) {
+                    throw new Error('Invalid backup data');
+                }
+                
+                // Validate data structure
+                const isValid = backupData.data.every(item => 
+                    item.dateOfReceipt && item.fromWhomReceived && item.subject
+                );
+                
+                if (!isValid) {
+                    throw new Error('Invalid data structure in backup');
+                }
+                
+                // Create a backup before restoring
+                this.createBackup(`pre-restore-${new Date().toISOString().split('T')[0]}`);
+                
+                // Restore data
+                localStorage.setItem(this.localStorageKey, JSON.stringify(backupData.data));
+                return true;
+            }
+            
+            // Delete backup
+            deleteBackup(backupKey) {
+                if (backupKey === 'current') {
+                    throw new Error('Cannot delete current data');
+                }
+                localStorage.removeItem(backupKey);
+            }
+            
+            // Download backup as JSON file
+            downloadBackup(backupKey, backupName) {
+                let backupData;
+                
+                if (backupKey === 'current') {
+                    backupData = {
+                        version: '2.0',
+                        exportDate: new Date().toISOString(),
+                        recordCount: this.getCurrentData().length,
+                        schema: 'mail-register',
+                        name: 'current-data',
+                        data: this.getCurrentData()
+                    };
+                } else {
+                    backupData = JSON.parse(localStorage.getItem(backupKey));
+                }
+                
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                const fileName = `${backupName || backupData.name || 'backup'}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', fileName);
+                linkElement.click();
+            }
+            
+            // Download all backups as a zip (conceptual - would need a zip library)
+            downloadAllBackups() {
+                const backups = this.getAllBackups().filter(b => !b.isCurrent);
+                if (backups.length === 0) {
+                    throw new Error('No backups available to download');
+                }
+                
+                // For simplicity, we'll download the most recent backup
+                // In a real implementation, you'd use a zip library like JSZip
+                this.downloadBackup(backups[0].key, 'latest-backup');
+            }
+            
+            // Upload and restore from JSON file
+            uploadBackup(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const backupData = JSON.parse(e.target.result);
+                            
+                            if (!backupData.data || !Array.isArray(backupData.data)) {
+                                reject(new Error('Invalid backup format'));
+                                return;
+                            }
+                            
+                            // Validate data
+                            const isValid = backupData.data.every(item => 
+                                item.dateOfReceipt && item.fromWhomReceived && item.subject
+                            );
+                            
+                            if (!isValid) {
+                                reject(new Error('Invalid data structure in backup'));
+                                return;
+                            }
+                            
+                            // Store as a new backup
+                            const backupName = `imported-${new Date().toISOString().split('T')[0]}`;
+                            const backupKey = `${this.backupPrefix}${backupName}`;
+                            
+                            backupData.name = backupName;
+                            backupData.exportDate = new Date().toISOString();
+                            backupData.recordCount = backupData.data.length;
+                            
+                            localStorage.setItem(backupKey, JSON.stringify(backupData));
+                            resolve(backupData);
+                            
+                        } catch (error) {
+                            reject(new Error('Error parsing backup file: ' + error.message));
+                        }
+                    };
+                    reader.onerror = () => reject(new Error('Error reading file'));
+                    reader.readAsText(file);
+                });
+            }
+            
+            // Auto-backup on data change
+            recordDataChange() {
+                if (!this.settings.autoBackupEnabled) return;
+                
+                this.changeCount++;
+                if (this.changeCount >= this.settings.autoBackupFrequency) {
+                    this.createBackup(`auto-backup-${new Date().toISOString().split('T')[0]}`);
+                    this.changeCount = 0;
+                }
+            }
+            
+            // Get storage usage
+            getStorageUsage() {
+                let totalSize = 0;
+                
+                // Calculate size of current data
+                const currentData = localStorage.getItem(this.localStorageKey);
+                if (currentData) {
+                    totalSize += new Blob([currentData]).size;
+                }
+                
+                // Calculate size of backups
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith(this.backupPrefix)) {
+                        const data = localStorage.getItem(key);
+                        totalSize += new Blob([data]).size;
+                    }
+                }
+                
+                return totalSize;
+            }
+        }
+
+        // Main application code
         let mails = JSON.parse(localStorage.getItem('mail-register')) || [];
         let currentEditId = null;
         let mailChart = null;
+        let backupManager = new BackupManager();
         
         // DOM Elements
         const mailForm = document.getElementById('mail-form');
@@ -668,11 +1148,17 @@
             renderMails();
             setupEventListeners();
             renderMailChart();
+            updateBackupUI();
             
             // Set today's date as default for date inputs
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateOfReceipt').value = today;
             document.getElementById('dated').value = today;
+            
+            // Set backup settings in UI
+            document.getElementById('auto-backup-enabled').checked = backupManager.settings.autoBackupEnabled;
+            document.getElementById('auto-backup-frequency').value = backupManager.settings.autoBackupFrequency;
+            document.getElementById('backup-retention').value = backupManager.settings.backupRetention;
         }
         
         // Set up event listeners
@@ -688,7 +1174,14 @@
                     
                     // Render chart when report tab is selected
                     if (button.dataset.tab === 'print-report') {
-                        renderMailChart();
+                        setTimeout(() => {
+                            renderMailChart();
+                        }, 100);
+                    }
+                    
+                    // Update backup UI when backup tab is selected
+                    if (button.dataset.tab === 'backup-management') {
+                        updateBackupUI();
                     }
                 });
             });
@@ -705,40 +1198,263 @@
             document.getElementById('show-all').addEventListener('click', () => renderMails());
             
             // JSON download/upload
-            document.getElementById('download-json').addEventListener('click', downloadJSON);
+            document.getElementById('download-json').addEventListener('click', () => {
+                backupManager.downloadBackup('current', 'mail-register-backup');
+                showNotification('Backup downloaded successfully!');
+            });
             document.getElementById('upload-json').addEventListener('click', () => {
                 document.getElementById('json-file').click();
             });
-            document.getElementById('json-file').addEventListener('change', uploadJSON);
+            document.getElementById('json-file').addEventListener('change', handleBackupUpload);
             
             // Report generation
             document.getElementById('generate-date-report').addEventListener('click', generateDateReport);
             document.getElementById('generate-pending-report').addEventListener('click', generatePendingReport);
             document.getElementById('generate-filed-report').addEventListener('click', generateFiledReport);
+            
+            // Backup management
+            document.getElementById('create-backup').addEventListener('click', createNewBackup);
+            document.getElementById('download-all-backups').addEventListener('click', downloadAllBackups);
+            document.getElementById('restore-backup').addEventListener('click', () => {
+                document.getElementById('json-file').click();
+            });
+            document.getElementById('cleanup-backups').addEventListener('click', cleanupBackups);
+            document.getElementById('force-backup').addEventListener('click', forceBackup);
+            
+            // Backup settings
+            document.getElementById('auto-backup-enabled').addEventListener('change', updateBackupSettings);
+            document.getElementById('auto-backup-frequency').addEventListener('change', updateBackupSettings);
+            document.getElementById('backup-retention').addEventListener('change', updateBackupSettings);
         }
         
-        // Render mail receipt chart for last 5 days
+        // Update backup settings
+        function updateBackupSettings() {
+            backupManager.settings.autoBackupEnabled = document.getElementById('auto-backup-enabled').checked;
+            backupManager.settings.autoBackupFrequency = parseInt(document.getElementById('auto-backup-frequency').value);
+            backupManager.settings.backupRetention = parseInt(document.getElementById('backup-retention').value);
+            backupManager.saveSettings();
+            showNotification('Backup settings updated!', false, 'info');
+        }
+        
+        // Create new backup
+        function createNewBackup() {
+            const name = prompt('Enter backup name (optional):');
+            backupManager.createBackup(name);
+            updateBackupUI();
+            showNotification('Backup created successfully!');
+        }
+        
+        // Download all backups
+        function downloadAllBackups() {
+            try {
+                backupManager.downloadAllBackups();
+                showNotification('Backup downloaded successfully!');
+            } catch (error) {
+                showNotification(error.message, true);
+            }
+        }
+        
+        // Cleanup old backups
+        function cleanupBackups() {
+            if (confirm('This will permanently delete backups older than the retention period. Continue?')) {
+                backupManager.rotateBackups();
+                updateBackupUI();
+                showNotification('Old backups cleaned up successfully!');
+            }
+        }
+        
+        // Force backup
+        function forceBackup() {
+            backupManager.createBackup(`manual-${new Date().toISOString().split('T')[0]}`);
+            updateBackupUI();
+            showNotification('Backup created successfully!');
+        }
+        
+        // Handle backup upload
+        function handleBackupUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            backupManager.uploadBackup(file)
+                .then(() => {
+                    updateBackupUI();
+                    showNotification('Backup uploaded successfully!');
+                })
+                .catch(error => {
+                    showNotification(error.message, true);
+                });
+            
+            // Reset file input
+            e.target.value = '';
+        }
+        
+        // Update backup management UI
+        function updateBackupUI() {
+            const backups = backupManager.getAllBackups();
+            const backupList = document.getElementById('backup-list');
+            const currentData = backupManager.getCurrentData();
+            
+            // Update stats
+            document.getElementById('total-records').textContent = currentData.length;
+            document.getElementById('total-backups').textContent = backups.length - 1; // Exclude current
+            document.getElementById('last-backup').textContent = 
+                backupManager.settings.lastBackupDate 
+                ? new Date(backupManager.settings.lastBackupDate).toLocaleDateString()
+                : 'Never';
+            
+            const storageUsed = backupManager.getStorageUsage();
+            document.getElementById('storage-used').textContent = 
+                storageUsed < 1024 ? `${storageUsed} B` : 
+                storageUsed < 1024 * 1024 ? `${(storageUsed / 1024).toFixed(1)} KB` : 
+                `${(storageUsed / (1024 * 1024)).toFixed(1)} MB`;
+            
+            // Render backup list
+            backupList.innerHTML = '';
+            
+            if (backups.length === 0) {
+                backupList.innerHTML = '<div class="backup-item">No backups available</div>';
+                return;
+            }
+            
+            backups.forEach(backup => {
+                const backupItem = document.createElement('div');
+                backupItem.className = 'backup-item';
+                
+                const backupDate = new Date(backup.exportDate);
+                const dateString = backupDate.toLocaleDateString();
+                const timeString = backupDate.toLocaleTimeString();
+                
+                backupItem.innerHTML = `
+                    <div class="backup-info">
+                        <div class="backup-name">${backup.name}</div>
+                        <div class="backup-meta">
+                            ${dateString} at ${timeString} • ${backup.recordCount} records
+                            <span class="backup-status ${backup.isCurrent ? 'status-current' : 'status-backup'}">
+                                ${backup.isCurrent ? 'CURRENT' : 'BACKUP'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="backup-actions">
+                        ${!backup.isCurrent ? `
+                            <button class="btn-success restore-btn" data-key="${backup.key}">
+                                <i class="fas fa-undo"></i> Restore
+                            </button>
+                            <button class="btn-info download-btn" data-key="${backup.key}" data-name="${backup.name}">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn-danger delete-btn" data-key="${backup.key}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        ` : `
+                            <button class="btn-info download-btn" data-key="${backup.key}" data-name="${backup.name}">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        `}
+                    </div>
+                `;
+                
+                backupList.appendChild(backupItem);
+            });
+            
+            // Add event listeners to backup actions
+            document.querySelectorAll('.restore-btn').forEach(btn => {
+                btn.addEventListener('click', () => restoreFromBackup(btn.dataset.key));
+            });
+            
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    backupManager.downloadBackup(btn.dataset.key, btn.dataset.name);
+                    showNotification('Backup downloaded successfully!');
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteBackup(btn.dataset.key));
+            });
+        }
+        
+        // Restore from backup
+        function restoreFromBackup(backupKey) {
+            if (backupKey === 'current') {
+                showNotification('This is already the current data', true);
+                return;
+            }
+            
+            if (!confirm('This will replace your current data with the backup. Continue?')) {
+                return;
+            }
+            
+            try {
+                backupManager.restoreBackup(backupKey);
+                // Reload data
+                mails = backupManager.getCurrentData();
+                renderMails();
+                updateBackupUI();
+                showNotification('Data restored successfully from backup!');
+            } catch (error) {
+                showNotification(error.message, true);
+            }
+        }
+        
+        // Delete backup
+        function deleteBackup(backupKey) {
+            if (backupKey === 'current') {
+                showNotification('Cannot delete current data', true);
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to delete this backup? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                backupManager.deleteBackup(backupKey);
+                updateBackupUI();
+                showNotification('Backup deleted successfully!');
+            } catch (error) {
+                showNotification(error.message, true);
+            }
+        }
+
+        // Render mail receipt chart for last 10 days - FIXED VERSION
         function renderMailChart() {
-            const ctx = document.getElementById('mailChart').getContext('2d');
+            const ctx = document.getElementById('mailChart');
+            if (!ctx) return;
             
             // Destroy existing chart if it exists
             if (mailChart) {
                 mailChart.destroy();
             }
             
-            // Get dates for last 5 days
+            // Get dates for last 10 days
             const dates = [];
             const mailCounts = [];
-            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
             
-            for (let i = 4; i >= 0; i--) {
+            // Generate colors for 10 days
+            const colors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#36A2EB'
+            ];
+            
+            // Create dates for last 10 days
+            for (let i = 9; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
-                const dateString = formatDateForDisplay(date.toISOString().split('T')[0]);
-                dates.push(dateString);
+                const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+                const displayDate = formatDateForDisplay(dateString); // DD-MM-YYYY for display
                 
-                // Count mails for this date
-                const count = mails.filter(mail => mail.dateOfReceipt === dateString).length;
+                dates.push(displayDate);
+                
+                // Count mails for this date - FIXED: Use proper date comparison
+                const count = mails.filter(mail => {
+                    // Convert stored date (DD-MM-YYYY) to Date object for comparison
+                    const mailDate = parseDdMmYyyyToDate(mail.dateOfReceipt);
+                    const currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    
+                    // Compare dates (ignoring time)
+                    return mailDate.getTime() === currentDate.getTime();
+                }).length;
+                
                 mailCounts.push(count);
             }
             
@@ -751,18 +1467,30 @@
                         label: 'Number of Mails Received',
                         data: mailCounts,
                         backgroundColor: colors,
-                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderColor: colors.map(color => color),
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Mail Receipts - Last 10 Days',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                precision: 0
+                                stepSize: 1
                             },
                             title: {
                                 display: true,
@@ -775,18 +1503,30 @@
                                 text: 'Date'
                             }
                         }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Mail Receipts for the Last 5 Days'
-                        },
-                        legend: {
-                            display: false
-                        }
                     }
                 }
             });
+        }
+        
+        // Helper function to parse DD-MM-YYYY to Date object
+        function parseDdMmYyyyToDate(dateString) {
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed
+                const year = parseInt(parts[2], 10);
+                return new Date(year, month, day);
+            }
+            return new Date(); // Fallback
+        }
+        
+        // Helper function to format date for display (DD-MM-YYYY)
+        function formatDateForDisplay(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
         
         // Handle form submission
@@ -826,6 +1566,9 @@
             renderMails();
             mailForm.reset();
             
+            // Record data change for auto-backup
+            backupManager.recordDataChange();
+            
             // Reset dates to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateOfReceipt').value = today;
@@ -833,7 +1576,9 @@
             
             // Update chart if we're on the report tab
             if (document.getElementById('print-report').classList.contains('active')) {
-                renderMailChart();
+                setTimeout(() => {
+                    renderMailChart();
+                }, 100);
             }
         }
         
@@ -965,18 +1710,6 @@
             });
         }
         
-        // Parse DD-MM-YYYY date string to Date object
-        function parseDdMmYyyyToDate(dateString) {
-            if (!dateString) return new Date(0);
-            
-            const parts = dateString.split('-');
-            if (parts.length === 3) {
-                // Note: months are 0-indexed in JavaScript Date
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-            return new Date(0);
-        }
-        
         // Show only pending mails
         function showPendingMails() {
             const pendingMails = mails.filter(m => !m.filedIn || !m.dateFiled);
@@ -1042,11 +1775,17 @@
                 mails[index].dateFiled = dateFiled;
                 saveMails();
                 renderMails();
+                
+                // Record data change for auto-backup
+                backupManager.recordDataChange();
+                
                 showNotification('Mail filed successfully!');
                 
                 // Update chart if we're on the report tab
                 if (document.getElementById('print-report').classList.contains('active')) {
-                    renderMailChart();
+                    setTimeout(() => {
+                        renderMailChart();
+                    }, 100);
                 }
             }
         }
@@ -1058,11 +1797,17 @@
             mails = mails.filter(m => m.id !== id);
             saveMails();
             renderMails();
+            
+            // Record data change for auto-backup
+            backupManager.recordDataChange();
+            
             showNotification('Mail deleted successfully!');
             
             // Update chart if we're on the report tab
             if (document.getElementById('print-report').classList.contains('active')) {
-                renderMailChart();
+                setTimeout(() => {
+                    renderMailChart();
+                }, 100);
             }
         }
         
@@ -1169,57 +1914,19 @@
             window.print();
         }
         
-        // Download mails as JSON
-        function downloadJSON() {
-            const dataStr = JSON.stringify(mails, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'mail-register.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-        
-        // Upload mails from JSON
-        function uploadJSON(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const jsonData = JSON.parse(e.target.result);
-                    if (Array.isArray(jsonData)) {
-                        if (confirm('Importing data will replace your current mail register. Are you sure you want to continue?')) {
-                            mails = jsonData;
-                            saveMails();
-                            renderMails();
-                            showNotification('Mails imported successfully!');
-                            
-                            // Update chart if we're on the report tab
-                            if (document.getElementById('print-report').classList.contains('active')) {
-                                renderMailChart();
-                            }
-                        }
-                    } else {
-                        showNotification('Invalid JSON format. Expected an array of mails.', true);
-                    }
-                } catch (error) {
-                    showNotification('Error parsing JSON file: ' + error.message, true);
-                }
-            };
-            reader.readAsText(file);
-            
-            // Reset file input
-            e.target.value = '';
-        }
-        
         // Show notification
-        function showNotification(message, isError = false) {
+        function showNotification(message, isError = false, type = '') {
             notification.textContent = message;
-            notification.classList.toggle('error', isError);
+            notification.className = 'notification';
+            
+            if (type === 'info') {
+                notification.classList.add('info');
+            } else if (isError) {
+                notification.classList.add('error');
+            } else {
+                notification.classList.add('success');
+            }
+            
             notification.classList.add('show');
             
             setTimeout(() => {
