@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -330,8 +329,30 @@
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .sidebar {
-                width: 260px;
-                margin-left: -260px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 1000;
+            }
+            
+            .sidebar.hidden {
+                margin-left: -280px;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            
+            .overlay.active {
+                display: block;
             }
         }
     </style>
@@ -510,6 +531,9 @@
             </div>
         </div>
 
+        <!-- Overlay for mobile -->
+        <div class="overlay" id="overlay"></div>
+
         <!-- Context Menu -->
         <div class="context-menu" id="contextMenu">
             <div class="context-menu-item" id="openInSameTab">
@@ -562,6 +586,7 @@
         const contextMenu = document.getElementById('contextMenu');
         const openInSameTab = document.getElementById('openInSameTab');
         const openInNewTab = document.getElementById('openInNewTab');
+        const overlay = document.getElementById('overlay');
         
         // Currently selected tool
         let currentTool = null;
@@ -574,15 +599,14 @@
         menuTrigger.addEventListener('click', function() {
             sidebar.classList.remove('hidden');
             mainContent.classList.remove('expanded');
+            overlay.classList.add('active');
         });
         
-        // Hide sidebar when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!sidebar.contains(e.target) && !menuTrigger.contains(e.target) && 
-                !sidebar.classList.contains('hidden')) {
-                sidebar.classList.add('hidden');
-                mainContent.classList.add('expanded');
-            }
+        // Hide sidebar when clicking overlay (mobile)
+        overlay.addEventListener('click', function() {
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('expanded');
+            overlay.classList.remove('active');
         });
         
         // Context menu functionality
@@ -650,6 +674,7 @@
             // Hide sidebar and expand main content
             sidebar.classList.add('hidden');
             mainContent.classList.add('expanded');
+            overlay.classList.remove('active');
             
             // Hide welcome screen and show iframe
             welcomeScreen.style.display = 'none';
