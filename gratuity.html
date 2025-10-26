@@ -3,674 +3,1297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkSmart™ Pro - The Ultimate Productivity Hub</title>
+    <title>Gratuity Calculator for Central Government Employees</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
+        /* Reset and base styles */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.5;
+        }
+        body { 
+            min-height: 100vh; 
+            padding: 15px 15px;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .container {
+            width: 100vw;
+            max-width: none;
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            padding: 0 15px;
         }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            width: 280px;
-            background: #2c3e50;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
-            z-index: 100;
-            transition: margin-left 0.3s ease;
-        }
-
-        .sidebar.hidden {
-            margin-left: -280px;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #3d566e;
-        }
-
-        .sidebar-header h1 {
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sidebar-header h1 i {
-            color: #3498db;
-        }
-
-        .tools-list {
-            padding: 15px 0;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .tool-category {
-            margin-bottom: 20px;
-        }
-
-        .category-title {
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #bdc3c7;
-            letter-spacing: 1px;
-        }
-
-        .tool-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-            position: relative;
-        }
-
-        .tool-item:hover {
-            background: #34495e;
-        }
-
-        .tool-item.active {
-            background: #3498db;
-            border-left: 3px solid #fff;
-        }
-
-        .tool-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            color: white;
-        }
-
-        .tool-name {
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Context Menu */
-        .context-menu {
-            position: absolute;
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: none;
-            min-width: 200px;
-        }
-
-        .context-menu-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-        }
-
-        .context-menu-item:hover {
-            background: #f0f0f0;
-        }
-
-        .context-menu-item i {
-            width: 20px;
+        header {
             text-align: center;
+            padding: 20px 0;
+            margin-bottom: 15px;
         }
-
-        /* Main Content Area */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background: #ffffff;
-            position: relative;
-            transition: width 0.3s ease;
-        }
-
-        .main-content.expanded {
-            width: 100vw;
-        }
-
-        .content-header {
-            padding: 15px 25px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: white;
-        }
-
-        .menu-trigger {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #2c3e50;
-            background: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .menu-trigger:hover {
-            background: #e9ecef;
-        }
-
-        .content-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: white;
-            background: #3498db;
-        }
-
-        .content-title {
-            font-size: 1.3rem;
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #2c3e50;
+            padding-left: 15px;
+            letter-spacing: 0.5px;
+            text-align: left;
+            margin-left: 0;
         }
-
-        .tool-frame {
-            flex: 1;
-            border: none;
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-align: left;
+            margin-left: 0;
+            margin-top: 8px;
+        }
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid;
+        }
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .output-section {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        input, select {
             width: 100%;
-            background: #f8f9fa;
+            padding: 10px 12px;
+            border: 1px solid;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(77, 124, 255, 0.3);
+        }
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 2px solid;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .radio-option input {
+            margin: 0;
+            width: 14px;
+            height: 14px;
+        }
+        .radio-option input:checked + label {
+            font-weight: 600;
+        }
+        .radio-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        button {
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .result-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+        }
+        .result-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid;
+        }
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+        .highlight-row {
+            border-left: 3px solid;
+        }
+        .note {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .alert i {
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+        .calculation-steps {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px dashed;
+        }
+        .step {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            position: relative;
+            padding-left: 35px;
+        }
+        .step-number {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid;
+            margin-left: 15px;
+            margin-right: 15px;
+        }
+        .date-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .date-inputs > div {
+            flex: 1;
+        }
+        .hidden {
             display: none;
         }
-
-        .welcome-screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .summary-card {
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, #FF9933 0%, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%, #138808 100%);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid;
         }
-
-        .welcome-overlay {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            backdrop-filter: blur(5px);
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
-
-        .welcome-screen i {
-            font-size: 4rem;
-            color: #3498db;
-            margin-bottom: 1.5rem;
+        .summary-card i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
         }
-
-        .welcome-screen h2 {
-            font-size: 2rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
+        .summary-card h3 {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
         }
-
-        .welcome-screen p {
-            font-size: 1.1rem;
-            color: #7f8c8d;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+        .summary-card p {
+            font-size: 1.2rem;
+            font-weight: 700;
         }
-
-        .menu-hint {
+        .results-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: #f8f9fa;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border: 1px solid #e9ecef;
-            font-size: 1rem;
+            margin-bottom: 12px;
         }
-
-        .menu-icon {
-            display: inline-flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 6px;
-            background: #ffffff;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            vertical-align: middle;
+        .results-header h2 {
+            margin: 0;
         }
-
-        .menu-line {
-            width: 20px;
-            height: 2px;
-            background: #2c3e50;
-            border-radius: 1px;
+        .export-btn-container {
+            margin-top: auto;
+            padding-top: 12px;
         }
-
-        footer {
-            padding: 15px;
-            text-align: center;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-            font-size: 0.9rem;
-            color: #7f8c8d;
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: auto;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
         }
-
-        .heart {
-            color: #e74c3c;
-            animation: heartbeat 1.5s infinite;
+        .theme-toggle:hover {
+            transform: scale(1.1);
         }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            5% { transform: scale(1.1); }
-            10% { transform: scale(1); }
-            15% { transform: scale(1.1); }
-            20% { transform: scale(1); }
-            100% { transform: scale(1); }
-        }
-
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #7f8c8d;
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #95a5a6;
-        }
-
-        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 260px;
-                margin-left: -260px;
+            body {
+                padding: 8px 0;
             }
+            .container {
+                padding: 0 8px;
+            }
+            .app-container {
+                gap: 12px;
+            }
+            .card {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.4rem;
+                text-align: center;
+                padding-left: 0;
+                border-bottom: 2px solid;
+                padding-bottom: 8px;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .subtitle {
+                text-align: center;
+                margin-left: 0;
+                margin-right: 0;
+                font-size: 0.9rem;
+            }
+            .date-inputs {
+                flex-direction: column;
+            }
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            footer {
+                margin-left: 8px;
+                margin-right: 8px;
+                font-size: 0.8rem;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 1.2rem;
+            }
+        }
+        /* Dark Theme */
+        body.dark-theme {
+            background: #0d1525;
+            color: #e0e0e0;
+        }
+        .dark-theme .card {
+            background: #1a243d;
+            border-color: #2a3450;
+        }
+        .dark-theme .section-title {
+            color: #e0e0e0;
+            border-color: #4d7cff;
+        }
+        .dark-theme input, .dark-theme select {
+            background: #0d1525;
+            border-color: #2a3450;
+            color: #e0e0e0;
+        }
+        .dark-theme input:focus, .dark-theme select:focus {
+            border-color: #4d7cff;
+        }
+        .dark-theme .radio-option {
+            border-color: #2a3450;
+            background-color: #0d1525;
+        }
+        .dark-theme .radio-option:hover {
+            border-color: #4d7cff;
+            background-color: #1a243d;
+        }
+        .dark-theme .radio-option input:checked + label {
+            color: #4d7cff;
+        }
+        .dark-theme button {
+            background: #4d7cff;
+            color: white;
+        }
+        .dark-theme button:hover {
+            background: #5d8cff;
+            box-shadow: 0 4px 10px rgba(77, 124, 255, 0.3);
+        }
+        .dark-theme .result-table th {
+            background: #2a3450;
+            color: #4d7cff;
+        }
+        .dark-theme .result-table td {
+            border-color: #2a3450;
+        }
+        .dark-theme .result-table tr:nth-child(even) {
+            background: #1a243d;
+        }
+        .dark-theme .result-table tr:hover {
+            background: #2a3450;
+        }
+        .dark-theme .highlight-row {
+            background: #0d1525 !important;
+            border-left-color: #4d7cff;
+        }
+        .dark-theme .alert-info {
+            background-color: #1a243d;
+            border-left: 3px solid #4d7cff;
+            color: #d0d8e8;
+        }
+        .dark-theme .alert-info i {
+            color: #4d7cff;
+        }
+        .dark-theme .alert-success {
+            background-color: #1a243d;
+            border-left: 3px solid #4CAF50;
+            color: #d0d8e8;
+        }
+        .dark-theme .alert-success i {
+            color: #4CAF50;
+        }
+        .dark-theme .alert-warning {
+            background-color: #1a243d;
+            border-left: 3px solid #FF9800;
+            color: #d0d8e8;
+        }
+        .dark-theme .alert-warning i {
+            color: #FF9800;
+        }
+        .dark-theme .alert-danger {
+            background-color: #1a243d;
+            border-left: 3px solid #f44336;
+            color: #d0d8e8;
+        }
+        .dark-theme .alert-danger i {
+            color: #f44336;
+        }
+        .dark-theme .step {
+            background-color: #0d1525;
+        }
+        .dark-theme .step-number {
+            background: #4d7cff;
+        }
+        .dark-theme footer {
+            background: #1a243d;
+            border-color: #2a3450;
+            color: #a0a8c0;
+        }
+        .dark-theme .summary-card {
+            background: #0d1525;
+            border-color: #2a3450;
+        }
+        .dark-theme .theme-toggle {
+            color: #e0e0e0;
+            background: #1a243d;
+        }
+        /* Light Theme */
+        body.light-theme {
+            background: #f5f7fa;
+            color: #333333;
+        }
+        .light-theme .card {
+            background: #ffffff;
+            border-color: #e1e8ed;
+        }
+        .light-theme .section-title {
+            color: #2c3e50;
+            border-color: #4a90e2;
+        }
+        .light-theme input, .light-theme select {
+            background: #ffffff;
+            border-color: #d1dce5;
+            color: #333333;
+        }
+        .light-theme input:focus, .light-theme select:focus {
+            border-color: #4a90e2;
+        }
+        .light-theme .radio-option {
+            border-color: #d1dce5;
+            background-color: #f8fafc;
+        }
+        .light-theme .radio-option:hover {
+            border-color: #4a90e2;
+            background-color: #edf4fc;
+        }
+        .light-theme .radio-option input:checked + label {
+            color: #4a90e2;
+        }
+        .light-theme button {
+            background: #4a90e2;
+            color: white;
+        }
+        .light-theme button:hover {
+            background: #5aa0f0;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+        }
+        .light-theme .result-table th {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .light-theme .result-table td {
+            border-color: #e1e8ed;
+        }
+        .light-theme .result-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .light-theme .result-table tr:hover {
+            background: #edf4fc;
+        }
+        .light-theme .highlight-row {
+            background: #ffffff !important;
+            border-left-color: #4a90e2;
+        }
+        .light-theme .alert-info {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+            color: #1565c0;
+        }
+        .light-theme .alert-info i {
+            color: #2196f3;
+        }
+        .light-theme .alert-success {
+            background-color: #e8f5e9;
+            border-left: 3px solid #4caf50;
+            color: #2e7d32;
+        }
+        .light-theme .alert-success i {
+            color: #4caf50;
+        }
+        .light-theme .alert-warning {
+            background-color: #fff8e1;
+            border-left: 3px solid #ffc107;
+            color: #ff8f00;
+        }
+        .light-theme .alert-warning i {
+            color: #ffc107;
+        }
+        .light-theme .alert-danger {
+            background-color: #ffebee;
+            border-left: 3px solid #f44336;
+            color: #c62828;
+        }
+        .light-theme .alert-danger i {
+            color: #f44336;
+        }
+        .light-theme .step {
+            background-color: #f8fafc;
+        }
+        .light-theme .step-number {
+            background: #4a90e2;
+        }
+        .light-theme footer {
+            background: #ffffff;
+            border-color: #e1e8ed;
+            color: #7f8c8d;
+        }
+        .light-theme .summary-card {
+            background: #ffffff;
+            border-color: #e1e8ed;
+        }
+        .light-theme .theme-toggle {
+            color: #333333;
+            background: #ffffff;
+        }
+        /* Service card gradients */
+        .dark-theme .service-card {
+            background: linear-gradient(135deg, #2c7bb6 0%, #1a4f7a 100%);
+            color: white;
+        }
+        .dark-theme .service-card i {
+            color: #ffd700;
+        }
+        .dark-theme .amount-card {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+        .dark-theme .amount-card i {
+            color: #ffd700;
+        }
+        .dark-theme .type-card {
+            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            color: white;
+        }
+        .dark-theme .type-card i {
+            color: #ffd700;
+        }
+        .dark-theme .periods-card {
+            background: linear-gradient(135deg, #fd7e14 0%, #e06a0d 100%);
+            color: white;
+        }
+        .dark-theme .periods-card i {
+            color: #ffd700;
+        }
+        .light-theme .service-card {
+            background: linear-gradient(135deg, #64b5f6 0%, #1e88e5 100%);
+            color: white;
+        }
+        .light-theme .service-card i {
+            color: #ffd54f;
+        }
+        .light-theme .amount-card {
+            background: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+            color: white;
+        }
+        .light-theme .amount-card i {
+            color: #ffd54f;
+        }
+        .light-theme .type-card {
+            background: linear-gradient(135deg, #ba68c8 0%, #8e24aa 100%);
+            color: white;
+        }
+        .light-theme .type-card i {
+            color: #ffd54f;
+        }
+        .light-theme .periods-card {
+            background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+            color: white;
+        }
+        .light-theme .periods-card i {
+            color: #ffd54f;
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h1><i class="fas fa-briefcase"></i> WorkSmart™ Pro</h1>
+<body class="dark-theme">
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun"></i>
+    </button>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Gratuity Calculator</h1>
+            <p class="subtitle">Designed by Anil Kumar VT | Calculated as per CCS (Pension) Rules, 2021</p>
+        </header>
+        <div class="app-container">
+            <div class="input-section">
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-user"></i> Employee Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="employeeName">Employee Name</label>
+                            <input type="text" id="employeeName" class="form-control" placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="designation">Designation</label>
+                            <input type="text" id="designation" class="form-control" placeholder="Enter designation">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-clock"></i> Service Details</h2>
+                    <div class="form-group">
+                        <label>Calculation Type</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="retirement" name="calculationType" value="retirement" checked>
+                                <label for="retirement">Retirement Gratuity</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="death" name="calculationType" value="death">
+                                <label for="death">Death Gratuity</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="dateOfJoining">Date of Joining Service</label>
+                            <input type="date" id="dateOfJoining" class="form-control">
+                        </div>
+                        <div class="form-group" id="retirementDateGroup">
+                            <label for="dateOfRetirement">Date of Retirement</label>
+                            <input type="date" id="dateOfRetirement" class="form-control">
+                        </div>
+                        <div class="form-group hidden" id="deathDateGroup">
+                            <label for="dateOfDeath">Date of Death</label>
+                            <input type="date" id="dateOfDeath" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="section-title"><i class="fas fa-money-bill-wave"></i> Emoluments Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="basicPay">Basic Pay at Retirement/Death (₹)</label>
+                            <input type="number" id="basicPay" class="form-control" min="0" placeholder="Enter basic pay">
+                        </div>
+                        <div class="form-group">
+                            <label for="daPercentage">Dearness Allowance Percentage (%)</label>
+                            <input type="number" id="daPercentage" class="form-control" min="0" max="100" step="0.01" placeholder="Enter DA percentage">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="averageEmoluments">Average Emoluments (₹)</label>
+                        <input type="number" id="averageEmoluments" class="form-control" min="0" placeholder="Enter average of last 10 months">
+                        <div class="note">Average of last 10 months' emoluments</div>
+                    </div>
+                    <button id="calculateBtn"><i class="fas fa-calculator"></i> Calculate Gratuity</button>
+                </div>
             </div>
-            
-            <div class="tools-list">
-                <!-- Communication Tools -->
-                <div class="tool-category">
-                    <div class="category-title">Communication</div>
-                    <div class="tool-item" data-file="imms.html" data-name="Incoming Mail Management">
-                        <div class="tool-icon" style="background: #3498db;">
-                            <i class="fas fa-inbox"></i>
-                        </div>
-                        <div class="tool-name">Incoming Mail Management</div>
+            <div class="output-section">
+                <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="results-header">
+                        <h2 class="section-title"><i class="fas fa-chart-bar"></i> Calculation Results</h2>
                     </div>
-                    <div class="tool-item" data-file="omms.html" data-name="Outgoing Mail Management">
-                        <div class="tool-icon" style="background: #2ecc71;">
-                            <i class="fas fa-paper-plane"></i>
+                    <div id="resultsContainer" style="flex: 1;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Welcome to the Gratuity Calculator</strong>
+                                <p>Please enter your details and click "Calculate Gratuity" to see results.</p>
+                            </div>
                         </div>
-                        <div class="tool-name">Outgoing Mail Management</div>
                     </div>
-                </div>
-
-                <!-- Management Tools -->
-                <div class="tool-category">
-                    <div class="category-title">Management</div>
-                    <div class="tool-item" data-file="dpms.html" data-name="Disciplinary Proceedings">
-                        <div class="tool-icon" style="background: #f39c12;">
-                            <i class="fas fa-gavel"></i>
-                        </div>
-                        <div class="tool-name">Disciplinary Proceedings</div>
-                    </div>
-                    <div class="tool-item" data-file="chart.html" data-name="Chart Preparation">
-                        <div class="tool-icon" style="background: #9b59b6;">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="tool-name">Chart Preparation</div>
-                    </div>
-                    <div class="tool-item" data-file="fmru.html" data-name="File Movement Records">
-                        <div class="tool-icon" style="background: #1abc9c;">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <div class="tool-name">File Movement Records</div>
-                    </div>
-                    <div class="tool-item" data-file="empleavemgr.html" data-name="Employee Leave Tracker">
-                        <div class="tool-icon" style="background: #3498db;">
-                            <i class="fas fa-user-clock"></i>
-                        </div>
-                        <div class="tool-name">Employee Leave Tracker</div>
-                    </div>
-                    <div class="tool-item" data-file="supleavemgr.html" data-name="Supervisor Leave Dashboard">
-                        <div class="tool-icon" style="background: #8e44ad;">
-                            <i class="fas fa-users-cog"></i>
-                        </div>
-                        <div class="tool-name">Supervisor Leave Dashboard</div>
-                    </div>
-                </div>
-
-                <!-- Productivity Tools -->
-                <div class="tool-category">
-                    <div class="category-title">Productivity</div>
-                    <div class="tool-item" data-file="taskmgr.html" data-name="Task Manager">
-                        <div class="tool-icon" style="background: #e74c3c;">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div class="tool-name">Task Manager</div>
-                    </div>
-                    <div class="tool-item" data-file="firu.html" data-name="Digital File Index">
-                        <div class="tool-icon" style="background: #e91e63;">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <div class="tool-name">Digital File Index</div>
-                    </div>
-                    <div class="tool-item" data-file="quicknotes.html" data-name="Sticky Notes">
-                        <div class="tool-icon" style="background: #03a9f4;">
-                            <i class="fas fa-sticky-note"></i>
-                        </div>
-                        <div class="tool-name">Sticky Notes</div>
-                    </div>
-                    <div class="tool-item" data-file="taic.html" data-name="Target Achievement">
-                        <div class="tool-icon" style="background: #f44336;">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="tool-name">Target Achievement</div>
-                    </div>
-                </div>
-
-                <!-- Finance Tools -->
-                <div class="tool-category">
-                    <div class="category-title">Finance</div>
-                    <div class="tool-item" data-file="dabook.html" data-name="Digital Account Book">
-                        <div class="tool-icon" style="background: #009688;">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="tool-name">Digital Account Book</div>
-                    </div>
-                    <div class="tool-item" data-file="dcbook.html" data-name="Digital Cash Book">
-                        <div class="tool-icon" style="background: #ff9800;">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="tool-name">Digital Cash Book</div>
-                    </div>
-                    <div class="tool-item" data-file="payfixation.html" data-name="Pay Fixation Comparator">
-                        <div class="tool-icon" style="background: #673ab7;">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="tool-name">Pay Fixation Comparator</div>
-                    </div>
-                    <div class="tool-item" data-file="daratetracker.html" data-name="DA Rate Tracker">
-                        <div class="tool-icon" style="background: #9c27b0;">
-                            <i class="fas fa-percentage"></i>
-                        </div>
-                        <div class="tool-name">DA Rate Tracker</div>
-                    </div>
-                    <div class="tool-item" data-file="advanceincalc.html" data-name="Advance Increment">
-                        <div class="tool-icon" style="background: #4caf50;">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <div class="tool-name">Advance Increment</div>
-                    </div>
-                    <div class="tool-item" data-file="sixthtoseventh.html" data-name="6th to 7th Pay Commission">
-                        <div class="tool-icon" style="background: #795548;">
-                            <i class="fas fa-business-time"></i>
-                        </div>
-                        <div class="tool-name">6th to 7th Pay Commission</div>
-                    </div>
-                    <div class="tool-item" data-file="eightcpcprojection.html" data-name="8th CPC Projection">
-                        <div class="tool-icon" style="background: #3f51b5;">
-                            <i class="fas fa-chart-area"></i>
-                        </div>
-                        <div class="tool-name">8th CPC Projection</div>
-                    </div>
-                    <div class="tool-item" data-file="ppfcalc.html" data-name="PPF Investment Calculator">
-                        <div class="tool-icon" style="background: #c2185b;">
-                            <i class="fas fa-piggy-bank"></i>
-                        </div>
-                        <div class="tool-name">PPF Investment Calculator</div>
-                    </div>
-                    <div class="tool-item" data-file="gratuity.html" data-name="Gratuity Calculator">
-                        <div class="tool-icon" style="background: #5c6bc0;">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                        <div class="tool-name">Gratuity Calculator</div>
-                    </div>
-                    <div class="tool-item" data-file="pencommute.html" data-name="Pension Commutation Calculator">
-                        <div class="tool-icon" style="background: #00bcd4;">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <div class="tool-name">Pension Commutation Calculator</div>
-                    </div>
-                    <div class="tool-item" data-file="leavencash.html" data-name="Leave Encashment Calculator">
-                        <div class="tool-icon" style="background: #f44336;">
-                            <i class="fas fa-umbrella-beach"></i>
-                        </div>
-                        <div class="tool-name">Leave Encashment Calculator</div>
-                    </div>
-                </div>
-
-                <!-- Appreciation -->
-                <div class="tool-category">
-                    <div class="category-title">Appreciation</div>
-                    <div class="tool-item" data-file="thankyou" data-name="Thank You!">
-                        <div class="tool-icon" style="background: #e91e63;">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="tool-name">Thank You!</div>
+                    <div class="export-btn-container">
+                        <button id="exportPdfBtn" class="btn-success hidden"><i class="fas fa-file-pdf"></i> Export to PDF</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Context Menu -->
-        <div class="context-menu" id="contextMenu">
-            <div class="context-menu-item" id="openInSameTab">
-                <i class="fas fa-window-maximize"></i>
-                <span>Open in same tab</span>
-            </div>
-            <div class="context-menu-item" id="openInNewTab">
-                <i class="fas fa-external-link-alt"></i>
-                <span>Open in new tab</span>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="main-content" id="mainContent">
-            <div class="content-header">
-                <div class="menu-trigger" id="menuTrigger">
-                    <i class="fas fa-bars"></i>
-                </div>
-                <div class="content-icon">
-                    <i class="fas fa-briefcase"></i>
-                </div>
-                <div class="content-title">Welcome to WorkSmart™ Dashboard</div>
-            </div>
-            
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-overlay">
-                    <i class="fas fa-hand-pointer"></i>
-                    <h2>Select a Tool to Begin</h2>
-                    <p>Click on the <span class="menu-icon"><span class="menu-line"></span><span class="menu-line"></span><span class="menu-line"></span></span> to open sidebar and select a tool. <br> You can also right-click a tool to open in a new tab. <br> WorkSmart™: Your Pocket Toolkit for Office Efficiency.</p>
-                </div>
-            </div>
-            
-            <iframe class="tool-frame" id="toolFrame"></iframe>
-            
-            <footer>
-                <p>Made with <i class="fas fa-heart heart"></i> by Anil Kumar VT</p>
-            </footer>
-        </div>
+        <footer>
+            <p><strong>Disclaimer:</strong> This calculator provides estimates based on the Central Civil Services Pension Rules, 2021. Actual gratuity amounts may vary based on specific circumstances and official interpretations.</p>
+            <p>© 2025 Advanced Gratuity Calculator for Central Government Employees</p>
+        </footer>
     </div>
-
     <script>
-        // Elements
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        const menuTrigger = document.getElementById('menuTrigger');
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const toolFrame = document.getElementById('toolFrame');
-        const contentTitle = document.querySelector('.content-title');
-        const contentIcon = document.querySelector('.content-icon i');
-        const contextMenu = document.getElementById('contextMenu');
-        const openInSameTab = document.getElementById('openInSameTab');
-        const openInNewTab = document.getElementById('openInNewTab');
-        
-        // Currently selected tool
-        let currentTool = null;
-        
-        // Initially hide sidebar
-        sidebar.classList.add('hidden');
-        mainContent.classList.add('expanded');
-        
-        // Show sidebar when menu trigger is clicked
-        menuTrigger.addEventListener('click', function() {
-            sidebar.classList.remove('hidden');
-            mainContent.classList.remove('expanded');
-        });
-        
-        // Hide sidebar when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!sidebar.contains(e.target) && !menuTrigger.contains(e.target) && 
-                !sidebar.classList.contains('hidden')) {
-                sidebar.classList.add('hidden');
-                mainContent.classList.add('expanded');
-            }
-        });
-        
-        // Context menu functionality
-        const toolItems = document.querySelectorAll('.tool-item');
-        
-        toolItems.forEach(item => {
-            // Left click - open in same tab
-            item.addEventListener('click', function() {
-                openToolInSameTab(this);
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
             
-            // Right click - show context menu
-            item.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                currentTool = this;
-                
-                // Position context menu
-                contextMenu.style.display = 'block';
-                contextMenu.style.left = e.pageX + 'px';
-                contextMenu.style.top = e.pageY + 'px';
-            });
-        });
-        
-        // Open in same tab
-        openInSameTab.addEventListener('click', function() {
-            if (currentTool) {
-                openToolInSameTab(currentTool);
-                contextMenu.style.display = 'none';
-            }
-        });
-        
-        // Open in new tab
-        openInNewTab.addEventListener('click', function() {
-            if (currentTool) {
-                const toolFile = currentTool.getAttribute('data-file');
-                if (toolFile !== 'thankyou') {
-                    window.open(toolFile, '_blank');
+            // Set initial theme
+            const savedTheme = localStorage.getItem('theme') || 'dark-theme';
+            body.className = savedTheme;
+            updateThemeIcon();
+            
+            // Theme toggle functionality
+            themeToggle.addEventListener('click', function() {
+                if (body.classList.contains('dark-theme')) {
+                    body.classList.remove('dark-theme');
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                } else {
+                    body.classList.remove('light-theme');
+                    body.classList.add('dark-theme');
+                    localStorage.setItem('theme', 'dark-theme');
                 }
-                contextMenu.style.display = 'none';
+                updateThemeIcon();
+            });
+            
+            function updateThemeIcon() {
+                const icon = themeToggle.querySelector('i');
+                if (body.classList.contains('dark-theme')) {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
             }
-        });
-        
-        // Hide context menu when clicking elsewhere
-        document.addEventListener('click', function() {
-            contextMenu.style.display = 'none';
-        });
-        
-        // Function to open tool in same tab
-        function openToolInSameTab(toolItem) {
-            // Remove active class from all items
-            toolItems.forEach(i => i.classList.remove('active'));
-            // Add active class to clicked item
-            toolItem.classList.add('active');
             
-            const toolFile = toolItem.getAttribute('data-file');
-            const toolName = toolItem.getAttribute('data-name');
-            const toolIconClass = toolItem.querySelector('.tool-icon i').className;
-            const toolIconBg = toolItem.querySelector('.tool-icon').style.background;
+            const calculateBtn = document.getElementById('calculateBtn');
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const retirementDateGroup = document.getElementById('retirementDateGroup');
+            const deathDateGroup = document.getElementById('deathDateGroup');
+            const calculationTypeRadios = document.querySelectorAll('input[name="calculationType"]');
             
-            // Update header
-            contentTitle.textContent = toolName;
-            contentIcon.className = toolIconClass;
-            contentIcon.parentElement.style.background = toolIconBg;
+            // Toggle between retirement and death date inputs
+            calculationTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'retirement') {
+                        retirementDateGroup.classList.remove('hidden');
+                        deathDateGroup.classList.add('hidden');
+                    } else {
+                        retirementDateGroup.classList.add('hidden');
+                        deathDateGroup.classList.remove('hidden');
+                    }
+                });
+            });
             
-            // Hide sidebar and expand main content
-            sidebar.classList.add('hidden');
-            mainContent.classList.add('expanded');
-            
-            // Hide welcome screen and show iframe
-            welcomeScreen.style.display = 'none';
-            toolFrame.style.display = 'block';
-            
-            // Load tool content
-            if (toolFile === 'thankyou') {
-                toolFrame.style.display = 'none';
-                welcomeScreen.style.display = 'flex';
-                welcomeScreen.innerHTML = `
-                    <div class="welcome-overlay">
-                        <i class="fas fa-heart" style="font-size: 4rem; color: #e74c3c; margin-bottom: 1.5rem;"></i>
-                        <h2>Thank You!</h2>
-                        <p style="font-size: 1.1rem; color: #7f8c8d; line-height: 1.6;">
-                            We appreciate your trust in our tools. Stay productive and have an amazing day!
-                        </p>
+            calculateBtn.addEventListener('click', calculateGratuity);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+
+            function calculateGratuity() {
+                // Get employee details
+                const employeeName = document.getElementById('employeeName').value;
+                const designation = document.getElementById('designation').value;
+                // Get calculation type
+                const calculationType = document.querySelector('input[name="calculationType"]:checked').value;
+                // Get dates
+                const dateOfJoining = new Date(document.getElementById('dateOfJoining').value);
+                let endDate;
+                if (calculationType === 'retirement') {
+                    endDate = new Date(document.getElementById('dateOfRetirement').value);
+                } else {
+                    endDate = new Date(document.getElementById('dateOfDeath').value);
+                }
+                // Get emoluments details
+                const basicPay = parseFloat(document.getElementById('basicPay').value) || 0;
+                const daPercentage = parseFloat(document.getElementById('daPercentage').value) || 0;
+                const averageEmoluments = parseFloat(document.getElementById('averageEmoluments').value) || 0;
+                // Validate inputs
+                if (!employeeName || !designation) {
+                    showError("Please enter employee name and designation.");
+                    return;
+                }
+                if (isNaN(dateOfJoining.getTime())) {
+                    showError("Please enter a valid date of joining.");
+                    return;
+                }
+                if (isNaN(endDate.getTime())) {
+                    showError(`Please enter a valid date of ${calculationType === 'retirement' ? 'retirement' : 'death'}.`);
+                    return;
+                }
+                if (basicPay <= 0 || daPercentage < 0) {
+                    showError("Please enter valid basic pay and DA percentage values.");
+                    return;
+                }
+                if (averageEmoluments <= 0) {
+                    showError("Please enter a valid average emoluments value.");
+                    return;
+                }
+                // Calculate service period
+                const servicePeriod = calculateServicePeriod(dateOfJoining, endDate);
+                let years = servicePeriod.years;
+                let months = servicePeriod.months;
+                const totalMonths = years * 12 + months;
+                // Apply maximum service limit of 33 years for gratuity calculation
+                let serviceLimited = false;
+                if (years > 33 || (years === 33 && months > 0)) {
+                    serviceLimited = true;
+                    years = 33;
+                    months = 0;
+                }
+                // Calculate last drawn emoluments
+                const daAmount = basicPay * (daPercentage / 100);
+                const lastDrawnEmoluments = basicPay + daAmount;
+                // Calculate emoluments (higher of last drawn or average)
+                const emoluments = Math.max(lastDrawnEmoluments, averageEmoluments);
+                // Calculate qualifying service in six-monthly periods
+                const totalPeriods = calculateSixMonthlyPeriods(years, months);
+                // Perform calculation based on calculation type
+                let gratuityAmount = 0;
+                const maxMultiplier = 16.5; // Maximum at 33 years/66 periods
+                const maxCeiling = 2500000; // 25 Lakhs
+                let gratuityType = '';
+                let calculationSteps = [];
+                let eligibilityError = false;
+                if (calculationType === 'retirement') {
+                    // Check eligibility for Retirement Gratuity (minimum 5 years service)
+                    if (totalMonths < 60) {
+                        showError("Retirement Gratuity requires minimum 5 years of qualifying service. For service less than 5 years, only Death Gratuity is payable.");
+                        eligibilityError = true;
+                        return;
+                    }
+                    gratuityType = 'Retirement Gratuity (RG)';
+                    calculationSteps.push("Eligibility: 5+ years of qualifying service confirmed");
+                    calculationSteps.push(`Formula: RG = Emoluments × 1/4 × Total Six-Monthly Periods (P)`);
+                    calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 1/4 × ${totalPeriods}`);
+                    gratuityAmount = emoluments * (1/4) * totalPeriods;
+                    // Apply maximum multiplier (16.5 times emoluments)
+                    const maxByMultiplier = emoluments * maxMultiplier;
+                    if (gratuityAmount > maxByMultiplier) {
+                        calculationSteps.push(`Maximum multiplier applied: Rs.${emoluments.toLocaleString()} × ${maxMultiplier} = Rs.${maxByMultiplier.toLocaleString()}`);
+                        gratuityAmount = maxByMultiplier;
+                    }
+                    // Apply monetary ceiling for RG
+                    if (gratuityAmount > maxCeiling) {
+                        calculationSteps.push(`Monetary ceiling applied: Rs.${gratuityAmount.toLocaleString()} limited to Rs.${maxCeiling.toLocaleString()}`);
+                        gratuityAmount = maxCeiling;
+                    }
+                } else {
+                    // Death Gratuity - No minimum service requirement
+                    gratuityType = 'Death Gratuity (DG)';
+                    // Apply rounding rule for Death Gratuity: 9+ months rounded up to next year
+                    let roundedYears = years;
+                    let roundedMonths = months;
+                    let roundingApplied = false;
+                    if (months >= 9) {
+                        roundedYears = years + 1;
+                        roundedMonths = 0;
+                        roundingApplied = true;
+                        calculationSteps.push(`Service rounding applied: ${years} years ${months} months → ${roundedYears} years (9+ months rounded up)`);
+                    }
+                    // Use rounded years for Death Gratuity calculation
+                    const roundedTotalMonths = roundedYears * 12 + roundedMonths;
+                    if (roundedTotalMonths < 12) {
+                        // Less than 1 year
+                        calculationSteps.push("Service Duration: Less than 1 year");
+                        calculationSteps.push(`Formula: DG = Emoluments × 2`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 2`);
+                        gratuityAmount = emoluments * 2;
+                    } else if (roundedTotalMonths >= 12 && roundedTotalMonths < 60) {
+                        // 1 year or more but less than 5 years
+                        calculationSteps.push("Service Duration: 1 year or more but less than 5 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 6`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 6`);
+                        gratuityAmount = emoluments * 6;
+                    } else if (roundedTotalMonths >= 60 && roundedTotalMonths < 132) {
+                        // 5 years or more but less than 11 years
+                        calculationSteps.push("Service Duration: 5 years or more but less than 11 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 12`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 12`);
+                        gratuityAmount = emoluments * 12;
+                    } else if (roundedTotalMonths >= 132 && roundedTotalMonths < 240) {
+                        // 11 years or more but less than 20 years
+                        calculationSteps.push("Service Duration: 11 years or more but less than 20 years");
+                        calculationSteps.push(`Formula: DG = Emoluments × 20`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 20`);
+                        gratuityAmount = emoluments * 20;
+                    } else {
+                        // 20 years or more
+                        calculationSteps.push("Service Duration: 20 years or more");
+                        calculationSteps.push(`Formula: DG = Emoluments × 1/2 × Total Six-Monthly Periods (P)`);
+                        calculationSteps.push(`Calculation: Rs.${emoluments.toLocaleString()} × 1/2 × ${totalPeriods}`);
+                        gratuityAmount = emoluments * (1/2) * totalPeriods;
+                        // Apply maximum multiplier for 20+ years slab (33 times emoluments)
+                        const maxByMultiplierDG = emoluments * 33;
+                        if (gratuityAmount > maxByMultiplierDG) {
+                            calculationSteps.push(`Maximum multiplier applied: Rs.${emoluments.toLocaleString()} × 33 = Rs.${maxByMultiplierDG.toLocaleString()}`);
+                            gratuityAmount = maxByMultiplierDG;
+                        }
+                    }
+                    // Apply monetary ceiling for DG
+                    if (gratuityAmount > maxCeiling) {
+                        calculationSteps.push(`Monetary ceiling applied: Rs.${gratuityAmount.toLocaleString()} limited to Rs.${maxCeiling.toLocaleString()}`);
+                        gratuityAmount = maxCeiling;
+                    }
+                }
+                if (eligibilityError) return;
+                // Round up to the next higher rupee if there's a fraction
+                if (gratuityAmount % 1 !== 0) {
+                    const originalAmount = gratuityAmount;
+                    gratuityAmount = Math.ceil(gratuityAmount);
+                    calculationSteps.push(`Rounded up to next higher rupee: Rs.${originalAmount.toFixed(2)} → Rs.${gratuityAmount.toLocaleString()}`);
+                }
+                // Store data for PDF export
+                window.calculationData = {
+                    employeeName,
+                    designation,
+                    gratuityType,
+                    basicPay,
+                    daPercentage,
+                    daAmount,
+                    lastDrawnEmoluments,
+                    averageEmoluments,
+                    emoluments,
+                    dateOfJoining: formatDate(dateOfJoining),
+                    endDate: formatDate(endDate),
+                    endDateType: calculationType === 'retirement' ? 'Retirement' : 'Death',
+                    years,
+                    months,
+                    totalMonths,
+                    totalPeriods,
+                    gratuityAmount,
+                    calculationSteps,
+                    serviceLimited,
+                    maxMultiplier,
+                    maxCeiling,
+                    roundingApplied: calculationType === 'death' && months >= 9
+                };
+                // Display results
+                displayResults();
+                exportPdfBtn.classList.remove('hidden');
+            }
+            function calculateServicePeriod(startDate, endDate) {
+                let years = endDate.getFullYear() - startDate.getFullYear();
+                let months = endDate.getMonth() - startDate.getMonth();
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                // Adjust for day of month
+                if (endDate.getDate() < startDate.getDate()) {
+                    months--;
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                }
+                return { years, months };
+            }
+            // Function to calculate six-monthly periods with proper rounding and maximum limit
+            function calculateSixMonthlyPeriods(years, months) {
+                // Maximum service for gratuity is 33 years (66 periods)
+                const maxPeriods = 66;
+                let totalPeriods = years * 2; // Each year gives 2 six-monthly periods
+                // Handle the remaining months
+                if (months >= 6) {
+                    // If 6 or more months, we have at least one complete six-month period
+                    totalPeriods += 1;
+                    months -= 6;
+                }
+                // For remaining months (0-5 months), apply rounding rules
+                if (months >= 3 && months <= 5) {
+                    // 3-5 months: round up by adding one more period
+                    totalPeriods += 1;
+                }
+                // 0-2 months: disregard (no additional period)
+                // Apply maximum limit of 66 periods
+                return Math.min(totalPeriods, maxPeriods);
+            }
+            function formatDate(date) {
+                return date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+            function displayResults() {
+                const data = window.calculationData;
+                // Create summary cards
+                let summaryCards = `
+                    <div class="summary-cards">
+                        <div class="summary-card amount-card">
+                            <i class="fas fa-rupee-sign"></i>
+                            <h3>Gratuity Amount</h3>
+                            <p>Rs.${data.gratuityAmount.toLocaleString()}</p>
+                        </div>
+                        <div class="summary-card service-card">
+                            <i class="fas fa-calendar-alt"></i>
+                            <h3>Service Period</h3>
+                            <p>${data.years}Y ${data.months}M</p>
+                        </div>
+                        <div class="summary-card type-card">
+                            <i class="fas fa-tag"></i>
+                            <h3>Gratuity Type</h3>
+                            <p>${data.gratuityType.split(' ')[0]}</p>
+                        </div>
+                        <div class="summary-card periods-card">
+                            <i class="fas fa-sync-alt"></i>
+                            <h3>Six-Monthly Periods</h3>
+                            <p>${data.totalPeriods}</p>
+                        </div>
                     </div>
                 `;
-            } else {
-                toolFrame.src = toolFile;
+                // Create detailed results table
+                let resultsHTML = `
+                    ${summaryCards}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Gratuity Calculation Complete</strong>
+                            <p>Your gratuity has been calculated successfully based on the provided details.</p>
+                        </div>
+                    </div>
+                    <table class="result-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                        </tr>
+                        <tr>
+                            <td>Employee Name</td>
+                            <td>${data.employeeName}</td>
+                        </tr>
+                        <tr>
+                            <td>Designation</td>
+                            <td>${data.designation}</td>
+                        </tr>
+                        <tr>
+                            <td>Gratuity Type</td>
+                            <td>${data.gratuityType}</td>
+                        </tr>
+                        <tr>
+                            <td>Date of Joining</td>
+                            <td>${data.dateOfJoining}</td>
+                        </tr>
+                        <tr>
+                            <td>Date of ${data.endDateType}</td>
+                            <td>${data.endDate}</td>
+                        </tr>
+                        <tr>
+                            <td>Qualifying Service</td>
+                            <td>${data.years} Years ${data.months} Months (${data.totalMonths} months)</td>
+                        </tr>
+                        <tr>
+                            <td>Total Six-Monthly Periods (P)</td>
+                            <td>${data.totalPeriods}</td>
+                        </tr>
+                        <tr>
+                            <td>Basic Pay</td>
+                            <td>Rs.${data.basicPay.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td>Dearness Allowance (${data.daPercentage}%)</td>
+                            <td>Rs.${data.daAmount.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td>Last Drawn Emoluments</td>
+                            <td>Rs.${data.lastDrawnEmoluments.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td>Average Emoluments</td>
+                            <td>Rs.${data.averageEmoluments.toLocaleString()}</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>Emoluments for Gratuity Calculation</strong></td>
+                            <td><strong>Rs.${data.emoluments.toLocaleString()}</strong></td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>Final Gratuity Amount</strong></td>
+                            <td><strong>Rs.${data.gratuityAmount.toLocaleString()}</strong></td>
+                        </tr>
+                    </table>
+                `;
+                // Add service rounding notice if applicable
+                if (data.roundingApplied) {
+                    resultsHTML += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Service Rounding Applied:</strong> For Death Gratuity, service of ${data.years} years ${data.months} months has been rounded up to ${data.years + 1} years (9+ months rounded up to next year).
+                            </div>
+                        </div>
+                    `;
+                }
+                // Add service limitation notice if applicable
+                if (data.serviceLimited) {
+                    resultsHTML += `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Note:</strong> Service limited to maximum 33 years for gratuity calculation as per rules.
+                            </div>
+                        </div>
+                    `;
+                }
+                // Add calculation steps
+                if (data.calculationSteps && data.calculationSteps.length > 0) {
+                    resultsHTML += `
+                        <div class="calculation-steps">
+                            <h3 class="section-title"><i class="fas fa-calculator"></i> Calculation Steps</h3>
+                            ${data.calculationSteps.map((step, index) => `
+                                <div class="step">
+                                    <div class="step-number">${index + 1}</div>
+                                    <div>${step}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                // Add important notes
+                resultsHTML += `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Important Rules:</strong>
+                            <ul style="margin-top: 8px; margin-left: 20px;">
+                                <li>Retirement Gratuity requires minimum 5 years of qualifying service</li>
+                                <li>Death Gratuity has no minimum service requirement</li>
+                                <li>For Death Gratuity: 9+ months of service rounded up to next year</li>
+                                <li>Maximum gratuity amount: Rs.25,00,000</li>
+                                <li>Fractions of rupee are rounded up to next higher rupee</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.innerHTML = resultsHTML;
             }
-        }
+            function getMonthsExplanation(months) {
+                if (months === 0) return "0 months = 0 additional periods";
+                if (months < 3) return `${months} months = 0 additional periods (less than 3 months disregarded)`;
+                if (months >= 3 && months < 6) return `${months} months = 1 additional period (3-5 months rounded up)`;
+                if (months >= 6) return `${months} months = 1 additional period (6+ months = 1 period)`;
+                return "";
+            }
+            function showError(message) {
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <strong>Error</strong>
+                            <p>${message}</p>
+                        </div>
+                    </div>
+                `;
+                exportPdfBtn.classList.add('hidden');
+            }
+            function exportToPdf() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const data = window.calculationData;
+                // Margins
+                const leftMargin = 20;
+                let y = 20;
+                // === Header ===
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(18);
+                doc.setTextColor(40, 60, 120);
+                doc.text("Gratuity Calculation Report", leftMargin, y);
+                y += 7;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Calculated as per CCS (Pension) Rules, 2021", leftMargin, y);
+                y += 9;
+                // Helper: section title
+                const sectionTitle = (text) => {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(12);
+                    doc.setTextColor(50, 50, 50);
+                    doc.text(text, leftMargin, y);
+                    y += 7;
+                };
+                // Helper: key-value row
+                const row = (label, value) => {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(10);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text(label, leftMargin, y);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(value, leftMargin + 55, y);
+                    y += 6;
+                };
+                // === Employee Details ===
+                sectionTitle("1. Employee Details");
+                row("Name:", data.employeeName);
+                row("Designation:", data.designation);
+                row("Gratuity Type:", data.gratuityType);
+                row("Date of Joining:", data.dateOfJoining);
+                row(`Date of ${data.endDateType}:`, data.endDate);
+                row("Qualifying Service:", `${data.years} Years ${data.months} Months`);
+                if (data.roundingApplied) {
+                    row("Rounded Service (DG):", `${data.years + 1} Years`);
+                }
+                y += 4;
+                // === Emoluments ===
+                sectionTitle("2. Emoluments Details");
+                row("Basic Pay:", `Rs.${data.basicPay.toLocaleString()}`);
+                row("DA (%):", `${data.daPercentage}%`);
+                row("DA Amount:", `Rs.${data.daAmount.toLocaleString()}`);
+                row("Last Drawn Emoluments:", `Rs.${data.lastDrawnEmoluments.toLocaleString()}`);
+                row("Average Emoluments:", `Rs.${data.averageEmoluments.toLocaleString()}`);
+                row("Emoluments for Calculation:", `Rs.${data.emoluments.toLocaleString()}`);
+                y += 4;
+                // === Gratuity Calculation ===
+                sectionTitle("3. Gratuity Calculation");
+                row("Six-Monthly Periods (P):", `${data.totalPeriods}`);
+                if (data.serviceLimited) {
+                    row("Note:", "Service limited to 33 years for calculation");
+                }
+                y += 4;
+                // Gratuity Amount (highlighted)
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(0, 100, 0);
+                doc.text(`Final Gratuity Amount: Rs.${data.gratuityAmount.toLocaleString()}`, leftMargin, y);
+                y += 10;
+                // === Calculation Steps (if any) ===
+                if (data.calculationSteps && data.calculationSteps.length > 0) {
+                    sectionTitle("4. Calculation Steps");
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(0, 0, 0);
+                    data.calculationSteps.forEach(step => {
+                        // If it barely fits, keep it on page 1 by reducing spacing
+                        if (y > 260) {
+                            // Only add page if absolutely necessary (unlikely now)
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`• ${step}`, leftMargin + 5, y);
+                        y += 5;
+                    });
+                    y += 5;
+                }
+                // === Single footer on page 1 only ===
+                const footerText = "Generated by Advanced Gratuity Calculator | © 2025";
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text(footerText, leftMargin, 285);
+                // Save
+                doc.save(`Gratuity_Calculation_${data.employeeName.replace(/\s+/g, '_')}.pdf`);
+            }
+        });
     </script>
 </body>
 </html>
