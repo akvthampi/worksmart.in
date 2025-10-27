@@ -100,7 +100,6 @@
         .section {
             background: white;
             border-radius: var(--border-radius);
-            padding: 25px;
             margin-bottom: 25px;
             box-shadow: var(--box-shadow);
             border: 1px solid #ddd;
@@ -112,9 +111,13 @@
         }
         
         .section-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            padding: 25px;
+            margin-bottom: 0;
             border-bottom: 2px solid var(--light-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .section-header h2 {
@@ -127,6 +130,17 @@
         .section-header p {
             color: #7f8c8d;
             font-size: 0.95rem;
+        }
+        
+        .toggle-icon {
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .section-content {
+            padding: 0 25px 25px 25px;
         }
         
         .balance-grid {
@@ -242,13 +256,6 @@
             color: var(--primary-color);
             font-size: 1.3rem;
             margin: 0;
-        }
-        
-        .toggle-icon {
-            color: var(--primary-color);
-            transition: transform 0.3s ease;
-            width: 24px;
-            height: 24px;
         }
         
         .form-grid {
@@ -597,9 +604,15 @@
         }
         
         /* Style for the collapsible section transition */
-        .transition-max-height {
-            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .collapsible-content {
+            max-height: 0;
             overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .collapsible-content.open {
+            max-height: 2000px; /* Adjust this value based on your content */
+            transition: max-height 0.5s ease-in;
         }
         
         @media (max-width: 768px) {
@@ -686,185 +699,214 @@
 
         <div class="section">
             <div class="section-header">
-                <h2>Current Leave Balances</h2>
-                <p>Track your available leave days and quotas</p>
+                <div>
+                    <h2>Current Leave Balances</h2>
+                    <p>Track your available leave days and quotas</p>
+                </div>
             </div>
-            <div id="balance-display" class="balance-grid"></div>
-            <div class="info-box">
-                <p><strong>Note:</strong> EL, HPL, CCL, ML debit <strong>calendar days</strong>. CL (including half-day), RH, and Commuted Leave debit <strong>working days</strong> or <strong>x2 HPL</strong>, respectively, as per typical CGE rules.</p>
+            <div class="section-content">
+                <div id="balance-display" class="balance-grid"></div>
+                <div class="info-box">
+                    <p><strong>Note:</strong> EL, HPL, CCL, ML debit <strong>calendar days</strong>. CL (including half-day), RH, and Commuted Leave debit <strong>working days</strong> or <strong>x2 HPL</strong>, respectively, as per typical CGE rules.</p>
+                </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="form-container">
-                <div class="form-header" onclick="toggleVisibility('initial-balance-form-container')">
+            <div class="section-header" onclick="toggleSection('initial-balance-section')">
+                <div>
                     <h2>Initial/Adjust Leave Balance Setup (Days)</h2>
-                    <i id="toggle-icon-init" class="fas fa-chevron-down toggle-icon" style="transition: transform 0.3s ease; transform: rotate(180deg);"></i>
+                    <p>Set or update your initial leave balances</p>
                 </div>
-                <div id="initial-balance-form-container" class="transition-max-height" style="max-height: 0;">
-                    <form id="initial-balance-form" class="form-grid">
-                        <div class="input-group">
-                            <label for="initial-el">Earned Leave (EL - Max 300)</label>
-                            <input type="number" id="initial-el" name="EL" placeholder="e.g., 250">
-                        </div>
-                        <div class="input-group">
-                            <label for="initial-hpl">Half Pay Leave (HPL)</label>
-                            <input type="number" id="initial-hpl" name="HPL" placeholder="e.g., 100">
-                        </div>
-                        <div class="input-group">
-                            <label for="initial-cl">Casual Leave (CL - Annual)</label>
-                            <input type="number" id="initial-cl" name="CL" placeholder="e.g., 8">
-                        </div>
-                        <div class="input-group">
-                            <label for="initial-rh">Restricted Holiday (RH - Annual)</label>
-                            <input type="number" id="initial-rh" name="RH" placeholder="e.g., 2">
-                        </div>
-                        <div class="input-group">
-                            <label for="initial-ccl">Child Care Leave (CCL - Lifetime Quota)</label>
-                            <input type="number" id="initial-ccl" name="CCL_Quota" placeholder="e.g., 730">
-                        </div>
-                        <div class="input-group">
-                            <label for="initial-ml">Maternity Leave (ML - Total Days Used)</label>
-                            <input type="number" id="initial-ml" name="ML_Used" placeholder="e.g., 0">
-                            <p style="font-size: 0.8rem; color: #777; margin-top: 5px;">Enter 0 if unused.</p>
-                        </div>
-                        <div style="grid-column: 1 / -1;">
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-check-circle"></i>
-                                Set/Update Initial Balances
-                            </button>
-                        </div>
-                    </form>
+                <i id="toggle-icon-initial-balance" class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div id="initial-balance-section" class="collapsible-content">
+                <div class="section-content">
+                    <div class="form-container">
+                        <form id="initial-balance-form" class="form-grid">
+                            <div class="input-group">
+                                <label for="initial-el">Earned Leave (EL - Max 300)</label>
+                                <input type="number" id="initial-el" name="EL" placeholder="e.g., 250">
+                            </div>
+                            <div class="input-group">
+                                <label for="initial-hpl">Half Pay Leave (HPL)</label>
+                                <input type="number" id="initial-hpl" name="HPL" placeholder="e.g., 100">
+                            </div>
+                            <div class="input-group">
+                                <label for="initial-cl">Casual Leave (CL - Annual)</label>
+                                <input type="number" id="initial-cl" name="CL" placeholder="e.g., 8">
+                            </div>
+                            <div class="input-group">
+                                <label for="initial-rh">Restricted Holiday (RH - Annual)</label>
+                                <input type="number" id="initial-rh" name="RH" placeholder="e.g., 2">
+                            </div>
+                            <div class="input-group">
+                                <label for="initial-ccl">Child Care Leave (CCL - Lifetime Quota)</label>
+                                <input type="number" id="initial-ccl" name="CCL_Quota" placeholder="e.g., 730">
+                            </div>
+                            <div class="input-group">
+                                <label for="initial-ml">Maternity Leave (ML - Total Days Used)</label>
+                                <input type="number" id="initial-ml" name="ML_Used" placeholder="e.g., 0">
+                                <p style="font-size: 0.8rem; color: #777; margin-top: 5px;">Enter 0 if unused.</p>
+                            </div>
+                            <div style="grid-column: 1 / -1;">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-check-circle"></i>
+                                    Set/Update Initial Balances
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="form-container">
-                <div class="section-header">
+            <div class="section-header" onclick="toggleSection('leave-credit-section')">
+                <div>
                     <h2>Record Periodic Leave Credit (Accrual)</h2>
                     <p>Add regular leave credits as they accrue</p>
                 </div>
-                <form id="leave-credit-form" class="form-grid">
-                    <div class="input-group" style="grid-column: 1 / -1;">
-                        <label for="credit-type">Leave Type</label>
-                        <select id="credit-type" name="type" required>
-                            <option value="">Select Type</option>
-                            <option value="EL">Earned Leave (EL - 15 Days)</option>
-                            <option value="HPL">Half Pay Leave (HPL - 10 Days)</option>
-                            <option value="CL">Casual Leave (CL - 8 Days)</option>
-                            <option value="RH">Restricted Holiday (RH - 2 Days)</option>
-                        </select>
+                <i id="toggle-icon-leave-credit" class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div id="leave-credit-section" class="collapsible-content">
+                <div class="section-content">
+                    <div class="form-container">
+                        <form id="leave-credit-form" class="form-grid">
+                            <div class="input-group" style="grid-column: 1 / -1;">
+                                <label for="credit-type">Leave Type</label>
+                                <select id="credit-type" name="type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="EL">Earned Leave (EL - 15 Days)</option>
+                                    <option value="HPL">Half Pay Leave (HPL - 10 Days)</option>
+                                    <option value="CL">Casual Leave (CL - 8 Days)</option>
+                                    <option value="RH">Restricted Holiday (RH - 2 Days)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="credit-date">Date of Credit</label>
+                                <input type="date" id="credit-date" name="creditDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="credit-remark">Remarks (Optional)</label>
+                                <input type="text" id="credit-remark" name="remark" placeholder="e.g., July 1st Accrual">
+                            </div>
+                            <div style="grid-column: 1 / -1;">
+                                <button type="submit" class="submit-btn green-btn">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Record Leave Credit
+                                </button>
+                                <div class="info-box">
+                                    <p>Use this for half-yearly EL/HPL credits (Jan 1, Jul 1) or annual CL/RH credits (Jan 1).</p>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="input-group">
-                        <label for="credit-date">Date of Credit</label>
-                        <input type="date" id="credit-date" name="creditDate" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="credit-remark">Remarks (Optional)</label>
-                        <input type="text" id="credit-remark" name="remark" placeholder="e.g., July 1st Accrual">
-                    </div>
-                    <div style="grid-column: 1 / -1;">
-                        <button type="submit" class="submit-btn green-btn">
-                            <i class="fas fa-plus-circle"></i>
-                            Record Leave Credit
-                        </button>
-                        <div class="info-box">
-                            <p>Use this for half-yearly EL/HPL credits (Jan 1, Jul 1) or annual CL/RH credits (Jan 1).</p>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="form-container">
-                <div class="section-header">
+            <div class="section-header" onclick="toggleSection('leave-transaction-section')">
+                <div>
                     <h2>Record a New Leave Transaction</h2>
                     <p>Add leave periods to track your usage</p>
                 </div>
-                <form id="leave-transaction-form" class="form-grid">
-                    <div class="input-group" style="grid-column: 1 / -1;">
-                        <label for="leave-type">Leave Type</label>
-                        <select id="leave-type" name="type" required>
-                            <option value="">Select Type</option>
-                            <option value="EL">Earned Leave (EL)</option>
-                            <option value="HPL">Half Pay Leave (HPL)</option>
-                            <option value="COMMUTED_HPL">Commuted Leave (Medical - Debits HPL x 2)</option>
-                            <option value="CL_FULL">Casual Leave (Full Day)</option>
-                            <option value="CL_HALF">Casual Leave (Half Day)</option>
-                            <option value="RH">Restricted Holiday (RH)</option>
-                            <option value="CCL">Child Care Leave (CCL)</option>
-                            <option value="ML">Maternity Leave (ML)</option>
-                        </select>
+                <i id="toggle-icon-leave-transaction" class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div id="leave-transaction-section" class="collapsible-content">
+                <div class="section-content">
+                    <div class="form-container">
+                        <form id="leave-transaction-form" class="form-grid">
+                            <div class="input-group" style="grid-column: 1 / -1;">
+                                <label for="leave-type">Leave Type</label>
+                                <select id="leave-type" name="type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="EL">Earned Leave (EL)</option>
+                                    <option value="HPL">Half Pay Leave (HPL)</option>
+                                    <option value="COMMUTED_HPL">Commuted Leave (Medical - Debits HPL x 2)</option>
+                                    <option value="CL_FULL">Casual Leave (Full Day)</option>
+                                    <option value="CL_HALF">Casual Leave (Half Day)</option>
+                                    <option value="RH">Restricted Holiday (RH)</option>
+                                    <option value="CCL">Child Care Leave (CCL)</option>
+                                    <option value="ML">Maternity Leave (ML)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="start-date">Start Date</label>
+                                <input type="date" id="start-date" name="startDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="end-date">End Date</label>
+                                <input type="date" id="end-date" name="endDate" required>
+                            </div>
+                            <div id="half-day-container" class="input-group" style="grid-column: 1 / -1; display: none;">
+                                <label for="half-day-session">Half Day Session</label>
+                                <select id="half-day-session" name="halfDaySession">
+                                    <option value="FORENOON">Forenoon</option>
+                                    <option value="AFTERNOON">Afternoon</option>
+                                </select>
+                            </div>
+                            <div class="input-group" style="grid-column: 1 / -1;">
+                                <label for="purpose">Purpose / Remarks</label>
+                                <input type="text" id="purpose" name="purpose" placeholder="e.g., Family Vacation">
+                            </div>
+                            <div style="grid-column: 1 / -1;">
+                                <button type="submit" class="submit-btn green-btn">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    Add Leave Period & Recalculate
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="input-group">
-                        <label for="start-date">Start Date</label>
-                        <input type="date" id="start-date" name="startDate" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="end-date">End Date</label>
-                        <input type="date" id="end-date" name="endDate" required>
-                    </div>
-                    <div id="half-day-container" class="input-group" style="grid-column: 1 / -1; display: none;">
-                        <label for="half-day-session">Half Day Session</label>
-                        <select id="half-day-session" name="halfDaySession">
-                            <option value="FORENOON">Forenoon</option>
-                            <option value="AFTERNOON">Afternoon</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="grid-column: 1 / -1;">
-                        <label for="purpose">Purpose / Remarks</label>
-                        <input type="text" id="purpose" name="purpose" placeholder="e.g., Family Vacation">
-                    </div>
-                    <div style="grid-column: 1 / -1;">
-                        <button type="submit" class="submit-btn green-btn">
-                            <i class="fas fa-calendar-plus"></i>
-                            Add Leave Period & Recalculate
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="transactions-container">
-                <div class="section-header">
+            <div class="section-header" onclick="toggleSection('transactions-section')">
+                <div>
                     <h2>Transaction History & Data Management</h2>
                     <p>View your leave history and manage your data</p>
                 </div>
-                
-                <div class="action-buttons">
-                    <button onclick="downloadData()" class="action-btn blue-btn">
-                        <i class="fas fa-download"></i>
-                        Download Data
-                    </button>
-                    
-                    <label class="action-btn blue-btn file-input-label">
-                        <i class="fas fa-upload"></i>
-                        Upload Data
-                        <input type="file" id="upload-file-input" accept=".json" class="file-input" onchange="uploadData(event)">
-                    </label>
+                <i id="toggle-icon-transactions" class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div id="transactions-section" class="collapsible-content">
+                <div class="section-content">
+                    <div class="transactions-container">
+                        <div class="action-buttons">
+                            <button onclick="downloadData()" class="action-btn blue-btn">
+                                <i class="fas fa-download"></i>
+                                Download Data
+                            </button>
+                            
+                            <label class="action-btn blue-btn file-input-label">
+                                <i class="fas fa-upload"></i>
+                                Upload Data
+                                <input type="file" id="upload-file-input" accept=".json" class="file-input" onchange="uploadData(event)">
+                            </label>
 
-                    <button onclick="requestClearAllData()" class="action-btn red-btn">
-                        <i class="fas fa-trash"></i>
-                        Clear All Data
-                    </button>
-                </div>
+                            <button onclick="requestClearAllData()" class="action-btn red-btn">
+                                <i class="fas fa-trash"></i>
+                                Clear All Data
+                            </button>
+                        </div>
 
-                <div id="transactions-list-container" class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date Range / Credit Date</th>
-                                <th>Type</th>
-                                <th style="text-align: right;">Days Change</th>
-                                <th class="hidden-mobile">Purpose</th>
-                                <th style="text-align: right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-list"></tbody>
-                    </table>
+                        <div id="transactions-list-container" class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Date Range / Credit Date</th>
+                                        <th>Type</th>
+                                        <th style="text-align: right;">Days Change</th>
+                                        <th class="hidden-mobile">Purpose</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactions-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1046,19 +1088,19 @@
         }
 
         /**
-         * Toggles the visibility of a section (used for the initial setup form).
-         * @param {string} id The ID of the container element.
+         * Toggles the visibility of a section.
+         * @param {string} sectionId The ID of the section container.
          */
-        function toggleVisibility(id) {
-            const container = document.getElementById(id);
-            const icon = document.getElementById(`toggle-icon-init`);
-
-            if (container.style.maxHeight === '0px' || container.style.maxHeight === '') {
-                container.style.maxHeight = container.scrollHeight + "px";
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                container.style.maxHeight = '0px';
+        function toggleSection(sectionId) {
+            const container = document.getElementById(sectionId);
+            const icon = document.getElementById(`toggle-icon-${sectionId.replace('-section', '')}`);
+            
+            container.classList.toggle('open');
+            
+            if (container.classList.contains('open')) {
                 icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
             }
         }
         
