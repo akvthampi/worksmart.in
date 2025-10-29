@@ -233,7 +233,7 @@
     <div class="container">
         <header>
             <h1>Quick Notes</h1>
-            <p class="subtitle">Your notes are automatically saved after 5 seconds of inactivity</p>
+            <p class="subtitle">Your notes are automatically saved after 3 seconds of inactivity</p>
         </header>
         
         <div class="input-area">
@@ -273,7 +273,7 @@
                     saveNote();
                     isTyping = false;
                 }
-            }, 5000); // Save after 5 seconds of inactivity
+            }, 3000); // Save after 3 seconds of inactivity
         });
         
         // Show saving indicator when user starts typing
