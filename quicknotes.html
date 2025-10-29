@@ -1,822 +1,393 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Colourful Sticky Notes App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <title>Quick Notes</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --wall-zoom: 1;
-        }
-
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            height: 100vh;
-            overflow: hidden;
-            color: #333;
         }
-
-        .app-container { display: flex; flex-direction: column; height: 100vh; padding: 16px; gap: 12px }
-
-        .header { text-align: center; padding: 8px 0 }
-        .header h1 { color: #fff; font-size: 2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3) }
-
-        .topbar {
-            display:flex; flex-wrap: wrap; gap: 8px; align-items:center; justify-content:center;
+        
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #0d1b2a 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
         }
-        .topbar .btn, .toolbar .btn { padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.12); background: linear-gradient(45deg,#667eea,#764ba2); color:#fff }
-        .btn.secondary { background:#f5f6ff; color:#333; border:1px solid #d8defa }
-        .btn.warn { background: linear-gradient(45deg,#ff9800,#ff6d00); color:#fff }
-        .btn.danger { background: linear-gradient(45deg,#ff5252,#e53935); color:#fff }
-        .btn.success { background: linear-gradient(45deg,#2ecc71,#27ae60); color:#fff }
-        .btn:disabled { opacity:.6; cursor:not-allowed }
-        .icon-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; background:#fff; border:1px solid #ddd; cursor:pointer }
-
-        .toolbar {
-            display:flex; flex-wrap: wrap; gap: 10px; align-items:center; justify-content:space-between;
-            background: rgba(255,255,255,0.95); padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.1);
         }
-        .group { display:flex; gap:8px; align-items:center; flex-wrap: wrap }
-        .input, select { padding: 8px 10px; border:1px solid #e0e0e0; border-radius: 8px; outline:none }
-        .input:focus, select:focus { border-color:#667eea; box-shadow: 0 0 0 2px rgba(102,126,234,.15) }
-        .chip { background:#eef2ff; color:#3b5bcc; padding: 3px 8px; border-radius: 999px; font-size: 12px; margin-right: 6px }
-        .divider { width: 1px; height: 28px; background:#e9e9ef }
-
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        h1 {
+            color: #64b5f6;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.7);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            color: #90caf9;
+            font-size: 1.1rem;
+        }
+        
         .input-area {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            display:flex; flex-direction: column; gap: 8px;
+            margin-bottom: 30px;
+            position: relative;
         }
-        .input-row { display:flex; gap: 8px; align-items:center; flex-wrap: wrap }
-        #noteInput { flex:1; min-height: 110px; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px; font-size: 1.05rem; resize: vertical; outline:none }
-        #noteInput:focus { border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,.1) }
-        .meta-row { display:flex; gap:8px; align-items:center; flex-wrap: wrap }
-        .auto-save-indicator { text-align:left; min-height: 20px; font-size: .9rem; color:#667eea; opacity:0; transition:opacity .25s ease }
-        .auto-save-indicator.visible { opacity:1 }
-
-        .notes-shell { flex:1; overflow:hidden; border-radius: 12px; background: rgba(255,255,255,.08); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,.08) }
-        .notes-wall {
-            height: 100%; overflow:auto; padding: 12px; display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; align-content:start;
-            zoom: var(--wall-zoom);
+        
+        #note-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px;
+            background-color: rgba(20, 30, 48, 0.8);
+            border: 2px solid rgba(100, 150, 255, 0.3);
+            border-radius: 10px;
+            font-size: 16px;
+            color: #e0e0e0;
+            resize: vertical;
+            transition: all 0.3s ease;
         }
-        .notes-wall.list { display:block }
-        .notes-wall.list .note { width: 100%; transform: none }
-
-        .note {
-            position: relative; padding: 14px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-            transform: rotate(-1deg); transition: all .2s ease; min-height: 140px; display:flex; flex-direction: column; word-wrap: break-word; animation: fadeIn .35s ease-out;
+        
+        #note-input:focus {
+            outline: none;
+            border-color: #64b5f6;
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.5);
         }
-        .note:hover { transform: rotate(0deg) scale(1.02); box-shadow: 0 10px 26px rgba(0,0,0,.18) }
-        .note.editing { transform: rotate(0deg) scale(1.01); box-shadow: 0 0 0 3px #667eea, 0 10px 26px rgba(0,0,0,.15) }
-        .note.dragging { opacity:.7 }
-
-        .note-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px }
-        .note-title { font-weight:700; color:#fff; font-size: 1.05rem; display:flex; align-items:center; gap:6px }
-        .tags { display:flex; gap:6px; flex-wrap: wrap }
-
-        .note-content { flex: 1; font-size: 1.1rem; line-height: 1.5; color:#fff; font-weight: 600 }
-        .note-content ul { margin-left: 18px }
-        .note-content a { color: #003cff; text-decoration: underline; word-break: break-all }
-        .note-edit { flex:1; font-size: 1.1rem; line-height: 1.5; border:none; background: transparent; resize: none; outline:none; font-family: inherit; color:#fff; font-weight:600 }
-
-        .note-actions { position:absolute; top: 8px; right: 8px; display:flex; gap:6px; opacity:0; transition: opacity .2s ease }
-        .note:hover .note-actions, .note.editing .note-actions { opacity:1 }
-        .action-btn { background: rgba(255,255,255,.92); border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 6px rgba(0,0,0,.15) }
-        .action-btn:hover { transform: scale(1.08) }
-        .delete-btn { color:#ff4757 }
-        .edit-btn { color:#2ed573 }
-        .save-btn { color:#3742fa }
-        .cancel-btn { color:#ffa502 }
-        .pin-btn { color:#8b5cf6 }
-        .color-btn { color:#00bcd4 }
-        .export-btn { color:#1565c0 }
-        .remind-btn { color:#ff4081 }
-
-        .note-footer { display:flex; align-items:center; justify-content:space-between; margin-top: 8px }
-        .timestamp { font-size: .8rem; opacity:.8; color: rgba(255,255,255,.9) }
-
-        .color-pop { position:absolute; top: 36px; right: 8px; display:none; background:#fff; border:1px solid #e3e3e3; border-radius: 8px; padding: 6px; gap:6px; box-shadow: 0 8px 20px rgba(0,0,0,.2) }
-        .color-pop.show { display:flex; flex-wrap: wrap }
-        .swatch { width: 20px; height: 20px; border-radius: 50%; border:1px solid #ccc; cursor:pointer }
-
-        .select-checkbox { position:absolute; left:8px; top:8px; display:none }
-        .selection-mode .select-checkbox { display:block }
-
-        /* Fluorescent colors for notes */
-        .note-color-1 { background: rgba(8, 255, 8, 0.9) }
-        .note-color-2 { background: rgba(255, 207, 0, 0.9) }
-        .note-color-3 { background: rgba(254, 20, 147, 0.9) }
-        .note-color-4 { background: rgba(255, 85, 85, 0.9) }
-        .note-color-5 { background: rgba(0, 253, 255, 0.9) }
-        .note-color-6 { background: rgba(204, 255, 2, 0.9) }
-        .note-color-7 { background: rgba(191, 0, 255, 0.9) }
-        .note-color-8 { background: rgba(255, 140, 0, 0.9) }
-
-        /* Scrollbar styling */
-        .notes-wall::-webkit-scrollbar { width: 8px }
-        .notes-wall::-webkit-scrollbar-track { background: #fffefe; border-radius: 4px }
-        .notes-wall::-webkit-scrollbar-thumb { background: #fffefe; border-radius: 4px }
-        .notes-wall::-webkit-scrollbar-thumb:hover { background: #f8f7f7 }
-
-        /* Print */
-        @media print {
-            body { background: #fff }
-            .topbar, .input-area, .status-message { display:none !important }
-            .notes-shell { box-shadow:none; background:#fff }
-            .notes-wall { zoom: 1 }
-            .note { break-inside: avoid; page-break-inside: avoid }
+        
+        #note-input::placeholder {
+            color: #90a4ae;
         }
-
+        
+        .save-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #64b5f6;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .note-card {
+            background: linear-gradient(145deg, rgba(20, 30, 48, 0.9) 0%, rgba(13, 27, 42, 0.9) 100%);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.4);
+            border-color: rgba(100, 181, 246, 0.5);
+        }
+        
+        .note-card.selected {
+            box-shadow: 0 0 20px rgba(100, 181, 246, 0.7);
+            border-color: #64b5f6;
+        }
+        
+        .note-text {
+            word-break: break-word;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(100, 150, 255, 0.2);
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: #90a4ae;
+        }
+        
+        .delete-btn {
+            background: rgba(229, 57, 53, 0.2);
+            border: 1px solid rgba(229, 57, 53, 0.5);
+            color: #e57373;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(229, 57, 53, 0.4);
+            box-shadow: 0 0 8px rgba(229, 57, 53, 0.5);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #90a4ae;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #64b5f6;
+            opacity: 0.7;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #90a4ae;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
         @keyframes fadeIn {
-            from { opacity:0; transform: translateY(10px) rotate(-2deg) }
-            to { opacity:1; transform: translateY(0) rotate(-1deg) }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(100, 181, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(100, 181, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(100, 181, 246, 0); }
+        }
+        
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.6rem }
-            .btn { width: auto }
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .note-card {
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header"><h1>🎨 Colourful Sticky Notes</h1></div>
-
-        <div class="topbar">
-            <div class="group">
-                <button class="btn" id="downloadBtn">📥 Backup</button>
-                <button class="btn" id="uploadBtn">📤 Restore</button>
-                <button class="btn secondary" id="printBtn">🖨️ Print</button>
-                <input type="file" id="fileInput" class="file-input" accept=".sqlite,.json">
-            </div>
-            <div class="group">
-                <button class="btn secondary" id="undoBtn" title="Undo (Ctrl+Z)">↶ Undo</button>
-                <button class="btn secondary" id="redoBtn" title="Redo (Ctrl+Y)">↷ Redo</button>
-            </div>
-        </div>
-
-        <div class="toolbar">
-            <div class="group">
-                <input id="searchInput" class="input" type="search" placeholder="Search notes (content, #tag)">
-                <select id="sortSelect">
-                    <option value="modified_desc">Sort: Modified ⬇</option>
-                    <option value="modified_asc">Modified ⬆</option>
-                    <option value="created_desc">Created ⬇</option>
-                    <option value="created_asc">Created ⬆</option>
-                    <option value="alpha_asc">A → Z</option>
-                    <option value="alpha_desc">Z → A</option>
-                    <option value="pinned_first">Pinned first</option>
-                </select>
-                <button class="btn secondary" id="toggleViewBtn">🔁 Grid/List</button>
-                <label>Zoom <input id="zoomRange" type="range" min="80" max="140" value="100"></label>
-            </div>
-            <div class="group">
-                <button class="btn secondary" id="selectionModeBtn">☑ Selection</button>
-                <button class="btn warn" id="bulkDeleteBtn" disabled>🗑️ Delete Selected</button>
-                <select id="bulkColorSelect" disabled>
-                    <option value="">Bulk color…</option>
-                </select>
-            </div>
-        </div>
-
+    <div class="container">
+        <header>
+            <h1>Quick Notes</h1>
+            <p class="subtitle">Your notes are automatically saved after 5 seconds of inactivity</p>
+        </header>
+        
         <div class="input-area">
-            <div class="input-row">
-                <textarea id="noteInput" placeholder="Type note… Markdown supported (**bold**, *italic*, - list, [text](url)). Auto-saves."></textarea>
-            </div>
-            <div class="meta-row">
-                <input id="tagsInput" class="input" placeholder="Tags (comma separated)">
-                <label>Font size <input id="fontSizeInput" type="number" value="18" min="12" max="32" style="width:80px"></label>
-                <label>Due <input id="dueDateInput" type="datetime-local"></label>
-                <button class="btn secondary" id="templateTodoBtn">🧩 TODO template</button>
-                <button class="btn secondary" id="templateMeetingBtn">🧩 Meeting template</button>
-                <div class="auto-save-indicator" id="autoSaveIndicator">Saving…</div>
-            </div>
+            <textarea id="note-input" placeholder="Start typing your note here..."></textarea>
+            <div class="save-indicator" id="save-indicator">Saving...</div>
         </div>
-
-        <div class="notes-shell">
-            <div class="notes-wall" id="notesWall"></div>
+        
+        <div class="notes-grid" id="notes-container">
+            <!-- Notes will be dynamically inserted here -->
         </div>
+        
+        <footer>
+            <p>Notes are saved automatically in your browser's local storage</p>
+        </footer>
     </div>
 
-    <div class="status-message" id="statusMessage"></div>
-
     <script>
-    class StickyNotesApp {
-        constructor() {
-            this.notes = [];
-            this.saveTimer = null;
-            this.editingNoteId = null;
-            this.searchTerm = '';
-            this.sortMode = 'modified_desc';
-            this.viewList = false;
-            this.zoom = 1;
-            this.selectionMode = false;
-            this.selected = new Set();
-            this.history = []; // undo stack
-            this.redoStack = [];
-            this.renderLimit = 100;
-
-            this.COLORS = [
-                'note-color-1','note-color-2','note-color-3','note-color-4','note-color-5','note-color-6','note-color-7','note-color-8'
-            ];
-
-            this.init();
-        }
-
-        init() {
-            this.loadNotes();
-            this.cacheDom();
-            this.populateBulkColors();
-            this.render();
-            this.setupEventListeners();
-            this.requestNotificationPermission();
-            this.scheduleAllReminders();
-            this.showStatus('App loaded successfully!', 'success');
-        }
-
-        cacheDom() {
-            this.el = {
-                noteInput: document.getElementById('noteInput'),
-                tagsInput: document.getElementById('tagsInput'),
-                fontSizeInput: document.getElementById('fontSizeInput'),
-                dueDateInput: document.getElementById('dueDateInput'),
-                autoSaveIndicator: document.getElementById('autoSaveIndicator'),
-                notesWall: document.getElementById('notesWall'),
-                downloadBtn: document.getElementById('downloadBtn'),
-                uploadBtn: document.getElementById('uploadBtn'),
-                fileInput: document.getElementById('fileInput'),
-                printBtn: document.getElementById('printBtn'),
-                searchInput: document.getElementById('searchInput'),
-                sortSelect: document.getElementById('sortSelect'),
-                toggleViewBtn: document.getElementById('toggleViewBtn'),
-                zoomRange: document.getElementById('zoomRange'),
-                selectionModeBtn: document.getElementById('selectionModeBtn'),
-                bulkDeleteBtn: document.getElementById('bulkDeleteBtn'),
-                bulkColorSelect: document.getElementById('bulkColorSelect'),
-                undoBtn: document.getElementById('undoBtn'),
-                redoBtn: document.getElementById('redoBtn'),
-                templateTodoBtn: document.getElementById('templateTodoBtn'),
-                templateMeetingBtn: document.getElementById('templateMeetingBtn'),
-            };
-        }
-
-        setupEventListeners() {
-            // Autosave on typing with improved feedback
-            this.el.noteInput.addEventListener('input', () => this.handleAutoSave());
-
-            // Templates
-            this.el.templateTodoBtn.addEventListener('click', () => this.insertTemplate('todo'));
-            this.el.templateMeetingBtn.addEventListener('click', () => this.insertTemplate('meeting'));
-
-            // Backup/restore/print
-            this.el.downloadBtn.addEventListener('click', () => this.downloadBackup());
-            this.el.uploadBtn.addEventListener('click', () => this.el.fileInput.click());
-            this.el.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-            this.el.printBtn.addEventListener('click', () => window.print());
-
-            // Search/sort/view/zoom
-            this.el.searchInput.addEventListener('input', (e) => { this.searchTerm = e.target.value; this.render(true); });
-            this.el.sortSelect.addEventListener('change', (e) => { this.sortMode = e.target.value; this.render(true); });
-            this.el.toggleViewBtn.addEventListener('click', () => { this.viewList = !this.viewList; this.render(true); });
-            this.el.zoomRange.addEventListener('input', (e) => { this.zoom = (+e.target.value)/100; document.documentElement.style.setProperty('--wall-zoom', this.zoom); });
-
-            // Selection mode
-this.el.selectionModeBtn.addEventListener('click', () => { this.selectionMode = !this.selectionMode; this.selected.clear(); this.render(true); this.showStatus(this.selectionMode ? 'Selection mode ON — tick checkboxes on notes to select.' : 'Selection mode OFF.'); });
-            this.el.bulkDeleteBtn.addEventListener('click', () => this.bulkDelete());
-            this.el.bulkColorSelect.addEventListener('change', (e) => this.bulkRecolor(e.target.value));
-
-            // Undo/redo and keyboard shortcuts
-            this.el.undoBtn.addEventListener('click', () => this.undo());
-            this.el.redoBtn.addEventListener('click', () => this.redo());
-            document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); this.undo(); }
-                if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) { e.preventDefault(); this.redo(); }
-            });
-
-            // Wall interactions (delegation)
-            this.el.notesWall.addEventListener('click', (e) => this.handleWallClick(e));
-            this.el.notesWall.addEventListener('change', (e) => this.handleWallChange(e));
-            this.el.notesWall.addEventListener('dragstart', (e) => this.handleDragStart(e));
-            this.el.notesWall.addEventListener('dragover', (e) => this.handleDragOver(e));
-            this.el.notesWall.addEventListener('drop', (e) => this.handleDrop(e));
-        }
-
-        populateBulkColors() {
-            this.el.bulkColorSelect.innerHTML = '<option value="">Bulk color…</option>' + this.COLORS.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        // History
-        pushHistory() {
-            try { this.history.push(JSON.stringify(this.notes)); if (this.history.length > 50) this.history.shift(); this.redoStack = []; } catch {}
-        }
-        undo() {
-            if (!this.history.length) return;
-            const snapshot = this.history.pop();
-            try { this.redoStack.push(JSON.stringify(this.notes)); this.notes = JSON.parse(snapshot); this.saveNotes(true); this.render(true); } catch {}
-        }
-        redo() {
-            if (!this.redoStack.length) return;
-            const snapshot = this.redoStack.pop();
-            try { this.history.push(JSON.stringify(this.notes)); this.notes = JSON.parse(snapshot); this.saveNotes(true); this.render(true); } catch {}
-        }
-
-        // Auto-save with better indicator
-        handleAutoSave() {
-            const ind = this.el.autoSaveIndicator;
-            ind.textContent = 'Saving…';
-            ind.classList.add('visible');
-            clearTimeout(this.saveTimer);
-            this.saveTimer = setTimeout(() => { this.createNoteFromComposer(); ind.textContent = 'Saved!'; setTimeout(() => ind.classList.remove('visible'), 800); }, 1500);
-        }
-
-        insertTemplate(type) {
-            const now = new Date();
-            if (type === 'todo') {
-                this.el.noteInput.value = `# TODO\n- [ ] Task 1\n- [ ] Task 2\n- [ ] Task 3\n`;
-            } else if (type === 'meeting') {
-                this.el.noteInput.value = `# Meeting Notes (${now.toLocaleDateString()})\nAttendees: \nAgenda: \n---\n- Item 1\n- Item 2\nDecisions: \nAction items: \n`;
+        // DOM elements
+        const noteInput = document.getElementById('note-input');
+        const notesContainer = document.getElementById('notes-container');
+        const saveIndicator = document.getElementById('save-indicator');
+        
+        // Load notes from local storage when page loads
+        document.addEventListener('DOMContentLoaded', loadNotes);
+        
+        // Auto-save functionality with 5-second debouncing
+        let saveTimeout;
+        let isTyping = false;
+        
+        noteInput.addEventListener('input', function() {
+            isTyping = true;
+            clearTimeout(saveTimeout);
+            saveIndicator.style.opacity = '0';
+            
+            saveTimeout = setTimeout(function() {
+                if (isTyping) {
+                    saveNote();
+                    isTyping = false;
+                }
+            }, 5000); // Save after 5 seconds of inactivity
+        });
+        
+        // Show saving indicator when user starts typing
+        noteInput.addEventListener('focus', function() {
+            if (noteInput.value.trim() && isTyping) {
+                saveIndicator.style.opacity = '1';
             }
-            this.el.noteInput.focus();
-            this.handleAutoSave();
-        }
-
-        // Creation from composer
-        createNoteFromComposer() {
-            const content = (this.el.noteInput.value || '').trim();
-            if (!content) return;
-
-            this.pushHistory();
-
-            const tags = (this.el.tagsInput.value || '').split(',').map(t => t.trim()).filter(Boolean);
-            const fontSize = Math.max(12, Math.min(32, parseInt(this.el.fontSizeInput.value || '18', 10)));
-            const due = this.el.dueDateInput.value ? new Date(this.el.dueDateInput.value).toISOString() : null;
-
-            // Determine next color by cycling
-            let lastIdx = -1;
-            if (this.notes.length > 0) {
-                lastIdx = this.COLORS.indexOf(this.notes[0].colorClass);
-            }
-            const colorClass = this.COLORS[(lastIdx + 1) % this.COLORS.length];
-
-            const now = new Date().toISOString();
-            const note = {
-                id: Date.now(),
-                content,
-                colorClass,
-                createdAt: now,
-                modifiedAt: now,
-                pinned: false,
-                tags,
-                fontSize,
-                dueDate: due,
-                order: (this.notes[0]?.order ?? this.notes.length) + 1
-            };
-
-            this.notes.unshift(note);
-            this.saveNotes();
-            this.render(true);
-            this.clearComposer();
-            this.showStatus('Note created successfully!', 'success');
-            this.scheduleReminder(note);
-        }
-
-        clearComposer() {
-            this.el.noteInput.value = '';
-            // keep tags/font/due for convenience
-        }
-
-        // CRUD helpers
-        startEditing(id) { this.editingNoteId = id; this.render(true); this.showStatus('Editing note…', 'warning'); }
-        saveEditedNote(id, newContent, newTags, newFontSize, newDueDate) {
-            const idx = this.notes.findIndex(n => n.id === id);
-            if (idx === -1) return;
-            if (!newContent.trim()) { this.showStatus('Note content cannot be empty!', 'error'); return; }
-            this.pushHistory();
-            Object.assign(this.notes[idx], {
-                content: newContent.trim(),
-                tags: newTags,
-                fontSize: newFontSize,
-                dueDate: newDueDate,
-                modifiedAt: new Date().toISOString()
-            });
-            this.editingNoteId = null;
-            this.saveNotes();
-            this.render(true);
-            this.showStatus('Note updated!', 'success');
-            this.scheduleReminder(this.notes[idx]);
-        }
-        cancelEditing() { this.editingNoteId = null; this.render(true); }
-        deleteNote(id) {
-            if (!confirm('Delete this note?')) return;
-            this.pushHistory();
-            this.notes = this.notes.filter(n => n.id !== id);
-            this.selected.delete(id);
-            this.saveNotes();
-            this.render(true);
-            this.showStatus('Note deleted.', 'success');
-        }
-
-        bulkDelete() {
-            if (!this.selected.size) return;
-            if (!confirm(`Delete ${this.selected.size} selected note(s)?`)) return;
-            this.pushHistory();
-            this.notes = this.notes.filter(n => !this.selected.has(n.id));
-            this.selected.clear();
-            this.saveNotes();
-            this.render(true);
-            this.showStatus('Selected notes deleted.', 'success');
-        }
-
-bulkRecolor(colorClass) {
-            if (!colorClass) return;
-            if (!this.selected.size) { this.showStatus('Select one or more notes first.', 'warning'); return; }
-            this.pushHistory();
-            this.notes.forEach(n => { if (this.selected.has(n.id)) { n.colorClass = colorClass; n.modifiedAt = new Date().toISOString(); } });
-            this.saveNotes();
-            this.render(true);
-            this.el.bulkColorSelect.value = '';
-            this.showStatus('Selected notes recolored.', 'success');
-        }
-
-        togglePin(id) {
-            const n = this.notes.find(n => n.id === id); if (!n) return;
-            this.pushHistory();
-            n.pinned = !n.pinned; n.modifiedAt = new Date().toISOString();
-            // move to front if pinning
-            if (n.pinned) {
-                this.notes = [n, ...this.notes.filter(x => x.id !== id)];
-            }
-            this.saveNotes();
-            this.render(true);
-        }
-
-        changeColor(id, colorClass) {
-            const n = this.notes.find(n => n.id === id); if (!n) return;
-            this.pushHistory();
-            n.colorClass = colorClass; n.modifiedAt = new Date().toISOString();
-            this.saveNotes();
-            this.render(true);
-        }
-
-        // Drag and drop ordering
-        handleDragStart(e) {
-            const noteEl = e.target.closest('.note'); if (!noteEl) return;
-            e.dataTransfer.setData('text/plain', noteEl.dataset.id);
-            noteEl.classList.add('dragging');
-        }
-        handleDragOver(e) { e.preventDefault(); }
-        handleDrop(e) {
-            e.preventDefault();
-            const fromId = parseInt(e.dataTransfer.getData('text/plain'));
-            const toNoteEl = e.target.closest('.note'); if (!toNoteEl) return;
-            const toId = parseInt(toNoteEl.dataset.id);
-            if (fromId === toId) return;
-            this.pushHistory();
-            const fromIdx = this.notes.findIndex(n => n.id === fromId);
-            const toIdx = this.notes.findIndex(n => n.id === toId);
-            const [moved] = this.notes.splice(fromIdx, 1);
-            this.notes.splice(toIdx, 0, moved);
-            // reassign order
-            this.notes.forEach((n, i) => n.order = this.notes.length - i);
-            this.saveNotes();
-            this.render(true);
-        }
-
-        // Render
-        render(skipScroll = false) {
-            const wall = this.el.notesWall;
-            wall.classList.toggle('list', this.viewList);
-            document.body.classList.toggle('selection-mode', this.selectionMode);
-            this.el.bulkDeleteBtn.disabled = !this.selectionMode || !this.selected.size;
-            this.el.bulkColorSelect.disabled = !this.selectionMode || !this.selected.size;
-
-            const frag = document.createDocumentFragment();
-            const { items, hasMore } = this.getFilteredSortedNotes();
-
-            items.forEach(note => frag.appendChild(this.createNoteElement(note)));
-
-            wall.innerHTML = '';
-            wall.appendChild(frag);
-            if (hasMore) {
-                const more = document.createElement('div');
-                more.style.textAlign = 'center'; more.style.padding = '12px';
-                const btn = document.createElement('button'); btn.className='btn secondary'; btn.textContent='Load more'; btn.onclick = () => { this.renderLimit += 100; this.render(true); };
-                more.appendChild(btn); wall.appendChild(more);
+        });
+        
+        // Save note to local storage
+        function saveNote() {
+            const noteText = noteInput.value.trim();
+            
+            if (noteText) {
+                // Show saving indicator
+                saveIndicator.style.opacity = '1';
+                
+                // Get existing notes or initialize empty array
+                const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+                
+                // Create new note object
+                const newNote = {
+                    id: Date.now(), // Simple ID based on timestamp
+                    text: noteText,
+                    timestamp: new Date().toLocaleString()
+                };
+                
+                // Add to beginning of array (newest first)
+                notes.unshift(newNote);
+                
+                // Save to local storage
+                localStorage.setItem('quickNotes', JSON.stringify(notes));
+                
+                // Clear input
+                noteInput.value = '';
+                
+                // Hide saving indicator after a delay
+                setTimeout(() => {
+                    saveIndicator.style.opacity = '0';
+                }, 1000);
+                
+                // Refresh notes display
+                displayNotes();
             }
         }
-
-        getFilteredSortedNotes() {
-            const term = this.searchTerm.trim().toLowerCase();
-            let arr = this.notes.slice();
-            if (term) {
-                arr = arr.filter(n => (n.content || '').toLowerCase().includes(term) || (n.tags||[]).some(t => ('#'+t).toLowerCase().includes(term) || t.toLowerCase().includes(term)));
-            }
-            // sort
-            const by = this.sortMode;
-            const cmp = {
-                modified_desc: (a,b)=> (b.modifiedAt||b.timestamp||'').localeCompare(a.modifiedAt||a.timestamp||''),
-                modified_asc: (a,b)=> (a.modifiedAt||a.timestamp||'').localeCompare(b.modifiedAt||b.timestamp||''),
-                created_desc: (a,b)=> (b.createdAt||b.timestamp||'').localeCompare(a.createdAt||a.timestamp||''),
-                created_asc: (a,b)=> (a.createdAt||a.timestamp||'').localeCompare(b.createdAt||b.timestamp||''),
-                alpha_asc: (a,b)=> (a.content||'').localeCompare(b.content||''),
-                alpha_desc: (a,b)=> (b.content||'').localeCompare(a.content||''),
-                pinned_first: (a,b)=> (b.pinned===true) - (a.pinned===true) || (b.modifiedAt||'').localeCompare(a.modifiedAt||'')
-            }[by] || ((a,b)=> (b.modifiedAt||'').localeCompare(a.modifiedAt||''));
-            arr.sort(cmp);
-
-            const hasMore = arr.length > this.renderLimit;
-            return { items: arr.slice(0, this.renderLimit), hasMore };
+        
+        // Load notes from local storage
+        function loadNotes() {
+            displayNotes();
         }
-
-        createNoteElement(note) {
-            const el = document.createElement('div');
-            el.className = `note ${note.colorClass}`;
-            el.dataset.id = note.id;
-            el.setAttribute('draggable', 'true');
-
-            // selection checkbox
-            const cb = document.createElement('input'); cb.type='checkbox'; cb.className='select-checkbox'; cb.checked = this.selected.has(note.id); cb.dataset.id = note.id;
-            el.appendChild(cb);
-
-            const header = document.createElement('div'); header.className='note-header';
-            const title = document.createElement('div'); title.className='note-title';
-            if (note.pinned) { const pin = document.createElement('span'); pin.textContent='📌'; title.appendChild(pin); }
-            const tagsWrap = document.createElement('div'); tagsWrap.className='tags'; (note.tags||[]).forEach(t => { const c=document.createElement('span'); c.className='chip'; c.textContent = '#'+t; tagsWrap.appendChild(c); });
-            header.appendChild(title);
-            header.appendChild(tagsWrap);
-            el.appendChild(header);
-
-            const actions = document.createElement('div'); actions.className='note-actions';
-            actions.innerHTML = `
-                <button class="action-btn pin-btn" title="Pin">📌</button>
-                <button class="action-btn color-btn" title="Color">🎨</button>
-                <button class="action-btn edit-btn" title="Edit">✎</button>
-                <button class="action-btn export-btn" title="Export TXT">⤓</button>
-                <button class="action-btn remind-btn" title="Set reminder">⏰</button>
-                <button class="action-btn delete-btn" title="Delete">×</button>
-            `;
-            el.appendChild(actions);
-
-            const colorPop = document.createElement('div'); colorPop.className='color-pop';
-            colorPop.innerHTML = this.COLORS.map(c => `<div class="swatch ${c}" data-color="${c}"></div>`).join('');
-            el.appendChild(colorPop);
-
-            if (this.editingNoteId === note.id) {
-                el.classList.add('editing');
-                const ta = document.createElement('textarea'); ta.className='note-edit'; ta.value = note.content;
-                ta.style.fontSize = (note.fontSize||18)+'px';
-                const editMeta = document.createElement('div'); editMeta.style.display='flex'; editMeta.style.gap='6px'; editMeta.style.marginTop='6px';
-                editMeta.innerHTML = `
-                    <input class="input tags-edit" placeholder="Tags (comma)" value="${(note.tags||[]).join(', ')}" />
-                    <label>Font <input class="input font-edit" type="number" min="12" max="32" value="${note.fontSize||18}" style="width:80px"></label>
-                    <label>Due <input class="input due-edit" type="datetime-local" value="${note.dueDate? this.toLocalInputValue(note.dueDate):''}"></label>
-                `;
-                const btns = document.createElement('div'); btns.className='note-footer';
-                btns.innerHTML = `
-                    <div class="timestamp">${this.formatTimestamp(note.modifiedAt || note.createdAt || note.timestamp)}</div>
-                    <div>
-                        <button class="action-btn save-btn" title="Save">✓</button>
-                        <button class="action-btn cancel-btn" title="Cancel">✕</button>
+        
+        // Display notes in the UI
+        function displayNotes() {
+            const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            
+            if (notes.length === 0) {
+                notesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i>📝</i>
+                        <h3>No notes yet</h3>
+                        <p>Start typing above to create your first note!</p>
                     </div>
                 `;
-                el.appendChild(ta); el.appendChild(editMeta); el.appendChild(btns);
-            } else {
-                const content = document.createElement('div'); content.className='note-content'; content.style.fontSize = (note.fontSize||18)+'px';
-                content.innerHTML = this.renderMarkdownSafe(note.content||'');
-                el.appendChild(content);
-                const footer = document.createElement('div'); footer.className='note-footer';
-                footer.innerHTML = `<div class="timestamp">${this.formatTimestamp(note.modifiedAt || note.createdAt || note.timestamp)}${note.dueDate? ' • Due: '+this.formatDue(note.dueDate):''}</div>`;
-                el.appendChild(footer);
-            }
-
-            return el;
-        }
-
-        handleWallClick(e) {
-            const noteEl = e.target.closest('.note');
-            if (!noteEl) return;
-            const id = parseInt(noteEl.dataset.id);
-
-            if (e.target.classList.contains('delete-btn')) return this.deleteNote(id);
-            if (e.target.classList.contains('edit-btn')) return this.startEditing(id);
-            if (e.target.classList.contains('cancel-btn')) return this.cancelEditing();
-            if (e.target.classList.contains('save-btn')) {
-                const ta = noteEl.querySelector('.note-edit');
-                const tagsStr = noteEl.querySelector('.tags-edit').value || '';
-                const font = parseInt(noteEl.querySelector('.font-edit').value || '18', 10);
-                const dueVal = noteEl.querySelector('.due-edit').value;
-                const tags = tagsStr.split(',').map(t => t.trim()).filter(Boolean);
-                const due = dueVal ? new Date(dueVal).toISOString() : null;
-                return this.saveEditedNote(id, ta.value, tags, Math.max(12, Math.min(32, font)), due);
-            }
-            if (e.target.classList.contains('pin-btn')) return this.togglePin(id);
-            if (e.target.classList.contains('export-btn')) return this.exportSingleNote(id);
-            if (e.target.classList.contains('remind-btn')) return this.quickReminder(id);
-            if (e.target.classList.contains('color-btn')) {
-                const pop = noteEl.querySelector('.color-pop'); pop.classList.toggle('show');
                 return;
             }
-            if (e.target.classList.contains('swatch')) {
-                const color = e.target.dataset.color; this.changeColor(id, color);
-                const pop = noteEl.querySelector('.color-pop'); if (pop) pop.classList.remove('show');
-                return;
-            }
+            
+            notesContainer.innerHTML = '';
+            
+            notes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note-card';
+                noteElement.innerHTML = `
+                    <div class="note-text">${escapeHtml(note.text)}</div>
+                    <div class="note-footer">
+                        <span class="timestamp">${note.timestamp}</span>
+                        <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
+                    </div>
+                `;
+                
+                // Add click event to select note
+                noteElement.addEventListener('click', function() {
+                    // Remove selected class from all notes
+                    document.querySelectorAll('.note-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked note
+                    this.classList.add('selected');
+                });
+                
+                notesContainer.appendChild(noteElement);
+            });
         }
-
-        handleWallChange(e) {
-            if (e.target.classList.contains('select-checkbox')) {
-                const id = parseInt(e.target.dataset.id);
-                if (e.target.checked) this.selected.add(id); else this.selected.delete(id);
-                this.el.bulkDeleteBtn.disabled = !this.selected.size;
-                this.el.bulkColorSelect.disabled = !this.selected.size;
-            }
+        
+        // Delete a note
+        function deleteNote(id) {
+            // Prevent event bubbling to avoid selecting the note when deleting
+            event.stopPropagation();
+            
+            let notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+            notes = notes.filter(note => note.id !== id);
+            localStorage.setItem('quickNotes', JSON.stringify(notes));
+            displayNotes();
         }
-
-        // Markdown rendering (safe subset)
-        renderMarkdownSafe(text) {
-            const esc = (s)=> s.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[ch]));
-            let t = esc(text);
-            // headings (# )
-            t = t.replace(/^# (.*)$/gm, '<strong>$1</strong>');
-            // bold/italic
-            t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
-            // unordered lists
-            t = t.replace(/(^|\n)-( +)(.*)(?=\n|$)/g, (m, p1, p2, p3) => `${p1}<ul><li>${p3}</li></ul>`);
-            t = t.replace(/\n<ul>\n/g, '<ul>').replace(/<\/li><\/ul><ul><li>/g, '</li><li>').replace(/<\/ul>\n/g, '</ul>');
-            // links [text](url)
-            t = t.replace(/\[(.+?)\]\((https?:[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-            // newlines
-            t = t.replace(/\n/g, '<br>');
-            return t;
+        
+        // Helper function to escape HTML for security
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-
-        toLocalInputValue(iso) {
-            const d = new Date(iso);
-            const pad = (n)=> String(n).padStart(2,'0');
-            const yyyy=d.getFullYear(), mm=pad(d.getMonth()+1), dd=pad(d.getDate()), hh=pad(d.getHours()), mi=pad(d.getMinutes());
-            return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-        }
-
-        quickReminder(id) {
-            const n = this.notes.find(n => n.id === id); if (!n) return;
-            const in5 = new Date(Date.now()+5*60*1000).toISOString();
-            this.pushHistory();
-            n.dueDate = in5; n.modifiedAt = new Date().toISOString();
-            this.saveNotes(); this.render(true); this.scheduleReminder(n);
-            this.showStatus('Reminder set for 5 minutes from now.', 'success');
-        }
-
-        formatTimestamp(ts) {
-            const date = new Date(ts);
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        }
-        formatDue(ts) {
-            const d = new Date(ts);
-            return d.toLocaleString([], {hour:'2-digit', minute:'2-digit', year:'numeric', month:'short', day:'2-digit'});
-        }
-
-        showStatus(message, type='success') {
-            const el = document.getElementById('statusMessage');
-            el.textContent = message; el.className = 'status-message';
-            if (type==='error') el.classList.add('error');
-            else if (type==='warning') el.classList.add('warning');
-            el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2500);
-        }
-
-        // Notifications
-        requestNotificationPermission() {
-            if (!('Notification' in window)) return;
-            if (Notification.permission === 'default') Notification.requestPermission();
-        }
-        scheduleAllReminders() { (this.notes||[]).forEach(n => this.scheduleReminder(n)); }
-        scheduleReminder(note) {
-            if (!note.dueDate) return;
-            const dueMs = new Date(note.dueDate).getTime();
-            const delta = dueMs - Date.now();
-            if (delta <= 0) { this.fireReminder(note); return; }
-            setTimeout(() => this.fireReminder(note), Math.min(delta, 2147483647)); // cap to max setTimeout
-        }
-        fireReminder(note) {
-            try {
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('Sticky Notes Reminder', { body: (note.content||'').slice(0,100), silent:false });
-                }
-            } catch {}
-            this.showStatus('Reminder: ' + (note.content||'').slice(0,40) + '…', 'warning');
-        }
-
-        // Storage
-        loadNotes() {
-            try {
-                const saved = localStorage.getItem('stickyNotes');
-                if (saved) {
-                    const arr = JSON.parse(saved);
-                    // migrate old shape to new
-                    this.notes = (arr||[]).map((n, i) => ({
-                        id: n.id || Date.now()+i,
-                        content: n.content || '',
-                        colorClass: n.colorClass || this.COLORS[i % this.COLORS.length],
-                        createdAt: n.createdAt || n.timestamp || new Date().toISOString(),
-                        modifiedAt: n.modifiedAt || n.timestamp || n.createdAt || new Date().toISOString(),
-                        pinned: !!n.pinned,
-                        tags: n.tags || [],
-                        fontSize: n.fontSize || 18,
-                        dueDate: n.dueDate || null,
-                        order: n.order != null ? n.order : (arr.length - i)
-                    }));
-                } else {
-                    this.notes = [];
-                }
-            } catch (e) {
-                console.error('Error loading notes', e);
-                this.notes = [];
-            }
-        }
-        saveNotes(skipStatus=false) {
-            try {
-                const str = JSON.stringify(this.notes);
-                localStorage.setItem('stickyNotes', str);
-                if (!skipStatus) {
-                    const size = this.getStorageSize(); if (size > 4_000_000) this.showStatus('Warning: Storage almost full.', 'warning');
-                }
-            } catch (e) {
-                if (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014) {
-                    this.showStatus('Storage full! Export your notes.', 'error');
-                    this.downloadJSONBackup();
-                } else {
-                    console.error('Error saving notes', e);
-                    this.showStatus('Error saving notes.', 'error');
-                }
-            }
-        }
-        getStorageSize() { let total=0; for (let k in localStorage) if (localStorage.hasOwnProperty(k)) total += (localStorage[k].length*2); return total; }
-
-        // Backup/restore (existing kept)
-        async downloadBackup() {
-            try {
-                if (typeof initSqlJs === 'function') { await this.downloadSQLiteBackup(); }
-                else { this.downloadJSONBackup(); }
-            } catch (e) { console.error('SQLite backup failed, fallback JSON', e); this.downloadJSONBackup(); }
-        }
-        async downloadSQLiteBackup() {
-            const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` });
-            const db = new SQL.Database();
-            db.run(`CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT, colorClass TEXT, timestamp TEXT, createdAt TEXT, modifiedAt TEXT, pinned INTEGER, tags TEXT, fontSize INTEGER, dueDate TEXT, ord INTEGER)`);
-            const stmt = db.prepare(`INSERT INTO notes (id, content, colorClass, timestamp, createdAt, modifiedAt, pinned, tags, fontSize, dueDate, ord) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-            (this.notes||[]).forEach(n => stmt.run([n.id, n.content, n.colorClass, n.modifiedAt || n.createdAt, n.createdAt, n.modifiedAt, n.pinned?1:0, JSON.stringify(n.tags||[]), n.fontSize||18, n.dueDate||null, n.order||0]));
-            stmt.free();
-            const data = db.export(); const buffer = new Uint8Array(data);
-            const blob = new Blob([buffer], { type: 'application/x-sqlite3' });
-            const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='stickynotes_backup.sqlite'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); db.close();
-            this.showStatus('Backup downloaded successfully!', 'success');
-        }
-        downloadJSONBackup() {
-            const dataStr = JSON.stringify(this.notes, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='stickynotes_backup.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-            this.showStatus('JSON backup downloaded successfully!', 'success');
-        }
-        async handleFileUpload(event) {
-            const file = event.target.files[0]; if (!file) return;
-            if (!confirm('Importing will overwrite all existing notes. Continue?')) { event.target.value=''; return; }
-            try {
-                if (file.name.endsWith('.sqlite')) { await this.importSQLiteBackup(file); }
-                else if (file.name.endsWith('.json')) { await this.importJSONBackup(file); }
-                else { throw new Error('Unsupported file format'); }
-            } catch (e) { console.error('Import error', e); this.showStatus('Error importing backup.', 'error'); } finally { event.target.value=''; }
-        }
-        async importSQLiteBackup(file) {
-            const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` });
-            const arrayBuffer = await file.arrayBuffer(); const uint8Array = new Uint8Array(arrayBuffer); const db = new SQL.Database(uint8Array);
-            let notes=[]; try {
-                const res = db.exec('SELECT id, content, colorClass, timestamp, createdAt, modifiedAt, pinned, tags, fontSize, dueDate, ord FROM notes');
-                if (res.length) {
-                    const cols=res[0].columns, vals=res[0].values; notes = vals.map(row => { const o={}; cols.forEach((c,i)=> o[c]=row[i]); o.tags = typeof o.tags==='string'? JSON.parse(o.tags||'[]'): (o.tags||[]); o.pinned = !!o.pinned; o.order = o.ord||0; o.createdAt = o.createdAt || o.timestamp; o.modifiedAt = o.modifiedAt || o.timestamp; delete o.ord; return o; });
-                }
-            } finally { db.close(); }
-            this.pushHistory(); this.notes = notes; this.saveNotes(); this.render(true); this.showStatus('SQLite backup imported successfully!', 'success');
-        }
-        async importJSONBackup(file) {
-            const text = await file.text(); const arr = JSON.parse(text);
-            if (!Array.isArray(arr)) throw new Error('Invalid JSON');
-            this.pushHistory(); this.notes = arr; this.saveNotes(); this.render(true); this.showStatus('JSON backup imported successfully!', 'success');
-        }
-
-        exportSingleNote(id) {
-            const n = this.notes.find(n=>n.id===id); if (!n) return;
-            const txt = `${(n.tags||[]).map(t=>'#'+t).join(' ')}\n${n.content}\n`;
-            const blob = new Blob([txt], { type:'text/plain' }); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`note-${id}.txt`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-    }
-
-    // Initialize the application when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => { window.stickyNotesApp = new StickyNotesApp(); });
     </script>
 </body>
 </html>
