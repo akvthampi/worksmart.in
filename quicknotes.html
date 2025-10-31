@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -172,6 +171,67 @@
             opacity: 0.7;
         }
         
+        /* Data Management Section */
+        .data-management {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(20, 30, 48, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        .data-management h2 {
+            color: #64b5f6;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .data-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .data-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .data-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .data-btn.download {
+            background: #27ae60;
+        }
+        
+        .data-btn.download:hover {
+            background: #219653;
+        }
+        
+        .data-btn.upload {
+            background: #e67e22;
+        }
+        
+        .data-btn.upload:hover {
+            background: #d35400;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
         footer {
             text-align: center;
             margin-top: 30px;
@@ -208,6 +268,11 @@
             .note-card {
                 padding: 15px;
             }
+            
+            .data-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
         }
         
         @media (max-width: 480px) {
@@ -236,6 +301,20 @@
             <p class="subtitle">Your notes are automatically saved after 3 seconds of inactivity</p>
         </header>
         
+        <!-- Data Management Section -->
+        <div class="data-management">
+            <h2>Data Management</h2>
+            <div class="data-buttons">
+                <button class="data-btn download" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download Notes
+                </button>
+                <button class="data-btn upload" id="uploadBtn">
+                    <i class="fas fa-upload"></i> Upload Notes
+                </button>
+                <input type="file" id="fileInput" class="file-input" accept=".json">
+            </div>
+        </div>
+        
         <div class="input-area">
             <textarea id="note-input" placeholder="Start typing your note here..."></textarea>
             <div class="save-indicator" id="save-indicator">Saving...</div>
@@ -250,14 +329,23 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
         // DOM elements
         const noteInput = document.getElementById('note-input');
         const notesContainer = document.getElementById('notes-container');
         const saveIndicator = document.getElementById('save-indicator');
         
+        // Data Management Elements
+        const downloadBtn = document.getElementById('downloadBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        
         // Load notes from local storage when page loads
-        document.addEventListener('DOMContentLoaded', loadNotes);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            setupDataManagement();
+        });
         
         // Auto-save functionality with 5-second debouncing
         let saveTimeout;
@@ -387,6 +475,86 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+        
+        // Setup Data Management Functions
+        function setupDataManagement() {
+            // Download Notes
+            downloadBtn.addEventListener('click', function() {
+                try {
+                    // Get notes from localStorage
+                    const notes = JSON.parse(localStorage.getItem('quickNotes')) || [];
+                    
+                    // Create data object with metadata
+                    const data = {
+                        notes: notes,
+                        exportDate: new Date().toISOString(),
+                        version: "Quick Notes v1.0",
+                        totalNotes: notes.length
+                    };
+                    
+                    // Create and download file
+                    const dataStr = JSON.stringify(data, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `quick-notes-${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                    
+                    alert('Notes exported successfully!');
+                } catch (error) {
+                    console.error('Export error:', error);
+                    alert('Error exporting notes. Please try again.');
+                }
+            });
+            
+            // Upload Notes
+            uploadBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                if (file.type !== 'application/json') {
+                    alert('Please select a valid JSON file.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        // Validate data structure
+                        if (!data.notes || !Array.isArray(data.notes)) {
+                            alert('Invalid file format. Please select a valid notes export file.');
+                            return;
+                        }
+                        
+                        // Confirm before importing
+                        if (!confirm('This will overwrite your current notes. Are you sure you want to proceed?')) {
+                            return;
+                        }
+                        
+                        // Save notes to localStorage
+                        localStorage.setItem('quickNotes', JSON.stringify(data.notes));
+                        
+                        // Refresh display
+                        displayNotes();
+                        
+                        alert('Notes imported successfully!');
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        alert('Error importing notes. Please make sure the file is valid.');
+                    }
+                };
+                reader.readAsText(file);
+            });
         }
     </script>
 </body>
