@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Outgoing Mail Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,12 +26,14 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
+            font-size: 16px;
         }
         
         .container {
@@ -43,19 +46,20 @@
         header {
             background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
             color: white;
-            padding: 20px 0;
+            padding: 15px 0;
             text-align: center;
             border-radius: 8px 8px 0 0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             margin-bottom: 10px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
+            line-height: 1.3;
         }
         
         .highlight {
@@ -66,10 +70,11 @@
         }
         
         .app-description {
-            font-size: 1rem;
+            font-size: 0.9rem;
             opacity: 0.9;
             max-width: 800px;
             margin: 0 auto;
+            padding: 0 10px;
         }
         
         .tabs {
@@ -77,20 +82,25 @@
             background-color: var(--light-color);
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .tab-button {
             flex: 1;
-            padding: 15px;
+            padding: 12px 8px;
             text-align: center;
             background: none;
             border: none;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .tab-button.active {
@@ -104,11 +114,11 @@
         
         .tab-content {
             display: none;
-            padding: 20px;
+            padding: 15px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .tab-content.active {
@@ -119,7 +129,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .form-group {
@@ -136,11 +146,12 @@
         
         input, select, textarea {
             width: 100%;
-            padding: 7px;
+            padding: 12px;
             border: 2px solid #ddd;
             border-radius: 4px;
-            font-size: 0.95rem;
+            font-size: 16px; /* Prevents zoom on iOS */
             transition: border 0.3s ease;
+            min-height: 44px;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -159,6 +170,13 @@
             font-size: 1rem;
             font-weight: 600;
             transition: background-color 0.3s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         button:hover {
@@ -193,15 +211,16 @@
             display: flex;
             gap: 10px;
             justify-content: flex-end;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .table-container {
             overflow-x: auto;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            -webkit-overflow-scrolling: touch;
         }
         
         table {
@@ -211,9 +230,10 @@
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 12px 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            font-size: 0.9rem;
         }
         
         th {
@@ -254,9 +274,16 @@
         
         .action-icon {
             cursor: pointer;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             transition: background-color 0.3s ease;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .edit-icon {
@@ -286,14 +313,14 @@
         .search-sort-container {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
         
         .search-box {
             flex: 1;
-            min-width: 300px;
+            min-width: 250px;
             position: relative;
         }
         
@@ -313,41 +340,44 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .utility-buttons {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
         
         .print-options {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .print-options select, .print-options input {
             max-width: 300px;
-            margin-right: 15px;
+            margin-right: 10px;
             display: inline-block;
         }
         
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
+            left: 15px;
             padding: 15px 20px;
             border-radius: 6px;
             color: white;
             background-color: var(--success-color);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transform: translateX(100%);
+            transform: translateX(150%);
             transition: transform 0.3s ease;
             z-index: 1000;
+            max-width: calc(100% - 30px);
         }
         
         .notification.show {
@@ -361,21 +391,21 @@
         /* Graph container */
         .graph-container {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .graph-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 15px;
             color: var(--primary-color);
             text-align: center;
         }
         
         .graph-canvas-container {
-            height: 300px;
+            height: 250px;
             position: relative;
         }
         
@@ -469,53 +499,11 @@
             }
         }
         
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-                flex-direction: column;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-sort-container {
-                flex-direction: column;
-            }
-            
-            .search-box {
-                min-width: 100%;
-            }
-            
-            .utility-buttons {
-                flex-direction: column;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .actions-cell {
-                flex-direction: column;
-            }
-            
-            .print-options select, .print-options input {
-                max-width: 100%;
-                margin-right: 0;
-                margin-bottom: 10px;
-                display: block;
-            }
-            
-            .graph-canvas-container {
-                height: 250px;
-            }
-        }
-
-        /* Additional styles for fixes */
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 15px;
             gap: 10px;
         }
         
@@ -548,6 +536,163 @@
             color: #777;
             font-style: italic;
         }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .container {
+                width: 98%;
+                padding: 3px;
+            }
+            
+            header {
+                padding: 12px 0;
+                margin-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                flex-direction: column;
+                line-height: 1.4;
+            }
+            
+            .app-description {
+                font-size: 0.85rem;
+                padding: 0 5px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                margin-bottom: 10px;
+            }
+            
+            .tab-button {
+                padding: 15px 10px;
+                text-align: left;
+                justify-content: flex-start;
+                min-height: 50px;
+            }
+            
+            .tab-content {
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .form-group {
+                margin-bottom: 10px;
+            }
+            
+            .search-sort-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .sort-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .utility-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .utility-buttons button {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .action-buttons button {
+                width: 100%;
+            }
+            
+            .actions-cell {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-icon {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .print-options select, .print-options input {
+                max-width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+                display: block;
+            }
+            
+            .graph-canvas-container {
+                height: 200px;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .pagination button {
+                flex: 1;
+                min-width: 100px;
+            }
+            
+            th, td {
+                padding: 8px 5px;
+                font-size: 0.75rem;
+            }
+            
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .tab-button {
+                font-size: 0.85rem;
+                padding: 12px 8px;
+            }
+            
+            .graph-canvas-container {
+                height: 180px;
+            }
+            
+            .pagination {
+                flex-direction: column;
+            }
+            
+            .pagination button {
+                width: 100%;
+            }
+            
+            .stat-value {
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -559,18 +704,23 @@
         <header>
             <h1>
                 <span class="highlight">O</span>utgoing 
-                <span class="highlight">&nbsp;M</span>ail 
-                <span class="highlight">&nbsp;M</span>anagement 
-                <span class="highlight">&nbsp;S</span>ystem
+                <span class="highlight">M</span>ail 
+                <span class="highlight">M</span>anagement 
+                <span class="highlight">S</span>ystem
             </h1>
             <p class="app-description">Manage outgoing mail with this comprehensive tool. Add, view, track replies, and generate reports with ease.</p>
-            
         </header>
         
         <div class="tabs">
-            <button class="tab-button active" data-tab="data-entry">Data Entry</button>
-            <button class="tab-button" data-tab="mail-view">View Mails</button>
-            <button class="tab-button" data-tab="print-report">Generate Report</button>
+            <button class="tab-button active" data-tab="data-entry">
+                <i class="fas fa-plus-circle"></i> Data Entry
+            </button>
+            <button class="tab-button" data-tab="mail-view">
+                <i class="fas fa-list"></i> View Mails
+            </button>
+            <button class="tab-button" data-tab="print-report">
+                <i class="fas fa-chart-bar"></i> Reports
+            </button>
         </div>
         
         <div id="data-entry" class="tab-content active">
@@ -616,8 +766,12 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <button type="submit" class="btn-success">Save Mail</button>
-                    <button type="reset" class="btn-warning" id="reset-form">Clear Form</button>
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-save"></i> Save Mail
+                    </button>
+                    <button type="reset" class="btn-warning" id="reset-form">
+                        <i class="fas fa-eraser"></i> Clear Form
+                    </button>
                 </div>
             </form>
         </div>
@@ -645,16 +799,16 @@
             
             <div class="utility-buttons">
                 <button id="show-pending" class="btn-warning">
-                    <i class="fas fa-clock"></i> Show Mails Awaiting Reply
+                    <i class="fas fa-clock"></i> Pending Replies
                 </button>
                 <button id="show-all" class="btn-success">
-                    <i class="fas fa-list"></i> Show All Mails
+                    <i class="fas fa-list"></i> All Mails
                 </button>
                 <button id="export-data" class="btn-success">
-                    <i class="fas fa-download"></i> Export Data
+                    <i class="fas fa-download"></i> Export
                 </button>
                 <button id="import-data" class="btn-warning">
-                    <i class="fas fa-upload"></i> Import Data
+                    <i class="fas fa-upload"></i> Import
                 </button>
                 <input type="file" id="import-file" accept=".json" style="display: none;">
             </div>
