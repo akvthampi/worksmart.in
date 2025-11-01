@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,13 +30,19 @@
             box-sizing: border-box;
         }
         
+        html {
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
         body {
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
+            -webkit-overflow-scrolling: touch;
         }
         
         .container {
@@ -45,8 +52,8 @@
         
         .main-header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
+            margin-bottom: 25px;
+            padding: 25px 20px;
             background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
             border-radius: var(--border-radius);
             color: white;
@@ -68,12 +75,13 @@
         
         .main-header h1 {
             margin-bottom: 10px;
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             z-index: 1;
+            flex-wrap: wrap;
         }
         
         .highlight {
@@ -83,27 +91,29 @@
         }
         
         .main-header h1 svg {
-            width: 36px;
-            height: 36px;
-            margin-right: 12px;
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
         
         .main-header .subtitle {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.95;
             font-weight: 400;
             position: relative;
             z-index: 1;
+            line-height: 1.4;
         }
         
         .section {
             background: white;
             border-radius: var(--border-radius);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             box-shadow: var(--box-shadow);
             border: 1px solid #ddd;
             transition: var(--transition);
+            overflow: hidden;
         }
         
         .section:hover {
@@ -111,25 +121,27 @@
         }
         
         .section-header {
-            padding: 25px;
+            padding: 20px;
             margin-bottom: 0;
             border-bottom: 2px solid var(--light-color);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            min-height: 60px;
+            touch-action: manipulation;
         }
         
         .section-header h2 {
             color: var(--primary-color);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             margin-bottom: 5px;
             font-weight: 600;
         }
         
         .section-header p {
             color: #7f8c8d;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         
         .toggle-icon {
@@ -137,29 +149,40 @@
             transition: transform 0.3s ease;
             width: 24px;
             height: 24px;
+            min-width: 24px;
         }
         
         .section-content {
-            padding: 0 25px 25px 25px;
+            padding: 0 20px 20px 20px;
         }
         
+        /* JUSTIFIED BALANCE GRID - EQUAL SPACING ACROSS ALL SCREENS */
         .balance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
             margin-bottom: 20px;
         }
         
         .balance-card {
             background: white;
             border-radius: var(--border-radius);
-            padding: 25px 20px;
+            padding: 20px 15px;
             text-align: center;
             transition: var(--transition);
             border: 1px solid #ddd;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
             position: relative;
             overflow: hidden;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            touch-action: manipulation;
+            flex: 1 1 calc(33.333% - 15px);
+            min-width: 150px;
+            max-width: 100%;
         }
         
         .balance-card::before {
@@ -196,18 +219,18 @@
         }
         
         .balance-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
         
         .balance-icon {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
+            font-size: 2.2rem;
+            margin-bottom: 12px;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
         
         .balance-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 5px;
             background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
@@ -217,21 +240,22 @@
         }
         
         .balance-label {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--dark-color);
             margin-bottom: 5px;
             font-weight: 600;
         }
         
         .balance-description {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #7f8c8d;
             font-weight: 500;
+            line-height: 1.3;
         }
         
         .form-container {
             background: var(--light-color);
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--border-radius);
             margin-bottom: 20px;
             border: 1px solid #ddd;
@@ -246,6 +270,7 @@
             padding: 10px 15px;
             border-radius: var(--border-radius);
             transition: var(--transition);
+            min-height: 44px;
         }
         
         .form-header:hover {
@@ -254,14 +279,14 @@
         
         .form-header h2 {
             color: var(--primary-color);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             margin: 0;
         }
         
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 15px;
         }
         
         .input-group {
@@ -281,11 +306,12 @@
             padding: 14px 16px;
             background-color: white;
             border: 2px solid #ddd;
-            font-size: 1rem;
+            font-size: 16px; /* Prevents zoom on iOS */
             color: #333;
             transition: var(--transition);
             border-radius: 4px;
             font-weight: 400;
+            min-height: 44px;
         }
         
         .input-group input:focus, .input-group select:focus {
@@ -315,11 +341,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 44px;
+            touch-action: manipulation;
         }
         
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(44, 62, 80, 0.4);
+        }
+        
+        .submit-btn:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
         }
         
         .submit-btn svg {
@@ -358,13 +391,14 @@
         .info-box {
             background: rgba(52, 152, 219, 0.08);
             border-left: 4px solid var(--secondary-color);
-            padding: 18px;
+            padding: 16px;
             margin: 20px 0;
             border-radius: 0 8px 8px 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--dark-color);
             border-top-right-radius: 8px;
             border-bottom-right-radius: 8px;
+            line-height: 1.4;
         }
         
         .info-box strong {
@@ -373,7 +407,7 @@
         
         .transactions-container {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--border-radius);
             margin-bottom: 20px;
             border: 1px solid #ddd;
@@ -386,16 +420,18 @@
             max-height: 450px;
             overflow-y: auto;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            -webkit-overflow-scrolling: touch;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            min-width: 600px;
         }
         
         th, td {
-            padding: 14px 16px;
+            padding: 12px 14px;
             text-align: left;
             border-bottom: 1px solid #ddd;
             color: #333;
@@ -407,9 +443,14 @@
             color: var(--primary-color);
             position: sticky;
             top: 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        tr {
+            min-height: 44px;
         }
         
         tr:hover {
@@ -418,9 +459,9 @@
         
         .action-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-top: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
         }
         
         .action-btn {
@@ -437,11 +478,18 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            min-height: 44px;
+            touch-action: manipulation;
         }
         
         .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
         }
         
         .action-btn svg {
@@ -455,6 +503,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            width: 100%;
         }
         
         .file-input {
@@ -462,30 +511,30 @@
         }
         
         .footer {
-            margin-top: 40px;
+            margin-top: 30px;
             text-align: center;
-            padding-top: 25px;
+            padding-top: 20px;
             border-top: 1px solid #ddd;
             color: #7f8c8d;
         }
         
         .disclaimer {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             margin-bottom: 8px;
             font-weight: 500;
         }
         
         .creator {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-style: italic;
             color: #95a5a6;
         }
         
         #toast-message {
             position: fixed;
-            top: 25px;
-            right: 25px;
+            top: 20px;
+            right: 20px;
             z-index: 1000;
             transition: opacity 0.3s ease;
             opacity: 0;
@@ -493,7 +542,7 @@
         }
         
         .toast {
-            padding: 18px 22px;
+            padding: 16px 20px;
             border-radius: var(--border-radius);
             color: white;
             font-weight: 500;
@@ -532,15 +581,16 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            padding: 15px;
         }
         
         .modal-content {
             background: white;
-            padding: 35px;
+            padding: 25px;
             border-radius: var(--border-radius);
             border: none;
             max-width: 450px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
             position: relative;
@@ -555,25 +605,25 @@
         .modal-title {
             color: var(--accent-color);
             margin-bottom: 15px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
         }
         
         .modal-message {
             color: var(--dark-color);
-            margin-bottom: 30px;
-            font-size: 1.05rem;
+            margin-bottom: 25px;
+            font-size: 1rem;
             line-height: 1.5;
         }
         
         .modal-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
         }
         
         .modal-btn {
-            padding: 14px 25px;
+            padding: 14px 20px;
             border: none;
             border-radius: 6px;
             font-weight: 600;
@@ -581,6 +631,13 @@
             transition: var(--transition);
             flex: 1;
             font-size: 1rem;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        
+        .modal-btn:focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
         }
         
         .modal-cancel {
@@ -615,52 +672,57 @@
             transition: max-height 0.5s ease-in;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .section {
-                padding: 20px;
-            }
-            
-            .main-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .main-header .subtitle {
-                font-size: 1rem;
-            }
-            
-            .balance-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 15px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .hidden-mobile {
-                display: none;
-            }
-            
-            .modal-content {
-                padding: 25px;
-            }
+        /* Delete button styling */
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            min-height: 36px;
+            min-width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
         }
         
-        @media (max-width: 480px) {
-            .container {
+        .delete-btn:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 1px;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        /* Loading state */
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
                 padding: 10px;
             }
             
+            .container {
+                padding: 0;
+            }
+            
             .section {
-                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .main-header {
+                padding: 20px 15px;
+                margin-bottom: 20px;
             }
             
             .main-header h1 {
@@ -668,16 +730,172 @@
             }
             
             .main-header .subtitle {
+                font-size: 0.95rem;
+            }
+            
+            /* Adjusted for 2 columns on tablet */
+            .balance-card {
+                flex: 1 1 calc(50% - 15px);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .input-group[style*="grid-column: 1 / -1"] {
+                grid-column: 1 / -1 !important;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hidden-mobile {
+                display: none;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .table-container {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+            
+            th {
+                font-size: 0.8rem;
+            }
+            
+            /* Hide purpose column on mobile */
+            th:nth-child(4), td:nth-child(4) {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .section {
+                padding: 15px;
+                margin-bottom: 12px;
+            }
+            
+            .section-header {
+                padding: 15px;
+            }
+            
+            .section-content {
+                padding: 0 15px 15px 15px;
+            }
+            
+            .main-header {
+                padding: 18px 12px;
+            }
+            
+            .main-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .main-header .subtitle {
                 font-size: 0.9rem;
             }
             
-            .balance-grid {
-                grid-template-columns: 1fr 1fr;
+            /* Single column on very small screens */
+            .balance-card {
+                flex: 1 1 100%;
+            }
+            
+            .balance-card {
+                padding: 18px 12px;
+                min-height: 150px;
+            }
+            
+            .balance-value {
+                font-size: 1.6rem;
+            }
+            
+            .balance-label {
+                font-size: 0.95rem;
+            }
+            
+            .balance-description {
+                font-size: 0.75rem;
             }
             
             .action-btn {
                 padding: 14px;
                 font-size: 0.95rem;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .modal-content {
+                padding: 18px;
+                width: 95%;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            /* Toast positioning for mobile */
+            #toast-message {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+            
+            .toast {
+                padding: 14px;
+                font-size: 0.9rem;
+            }
+            
+            .table-container {
+                font-size: 0.8rem;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .main-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .balance-card {
+                min-height: 140px;
+                padding: 15px 10px;
+            }
+            
+            .balance-value {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -705,7 +923,9 @@
                 </div>
             </div>
             <div class="section-content">
-                <div id="balance-display" class="balance-grid"></div>
+                <div id="balance-display" class="balance-grid">
+                    <!-- Balance cards will be dynamically inserted here -->
+                </div>
                 <div class="info-box">
                     <p><strong>Note:</strong> EL, HPL, CCL, ML debit <strong>calendar days</strong>. CL (including half-day), RH, and Commuted Leave debit <strong>working days</strong> or <strong>x2 HPL</strong>, respectively, as per typical CGE rules.</p>
                 </div>
@@ -1394,7 +1614,7 @@
                         <td style="text-align: right;">${displayDays}</td>
                         <td class="hidden-mobile">${transaction.purpose || transaction.remark || '-'}</td>
                         <td style="text-align: right;">
-                            <button onclick="deleteTransaction(${originalIndex})" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease;">
+                            <button onclick="deleteTransaction(${originalIndex})" class="delete-btn">
                                 Delete
                             </button>
                         </td>
@@ -1644,6 +1864,26 @@
             showToast(`${displayType} of ${days} days recorded successfully!`, 'success');
         }
 
+        // --- Mobile Enhancements ---
+
+        /**
+         * Sets up mobile-specific enhancements for better touch experience
+         */
+        function setupMobileEnhancements() {
+            // Better touch handling for interactive elements
+            document.querySelectorAll('.section-header, .action-btn, .submit-btn, .balance-card').forEach(element => {
+                element.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    this.click();
+                });
+            });
+            
+            // Prevent double-tap zoom on interactive elements
+            document.querySelectorAll('button, .balance-card, .section-header').forEach(element => {
+                element.style.touchAction = 'manipulation';
+            });
+        }
+
         // --- Initialization ---
 
         /**
@@ -1673,6 +1913,9 @@
             document.getElementById('credit-date').value = today;
             document.getElementById('start-date').value = today;
             document.getElementById('end-date').value = today;
+            
+            // Set up mobile enhancements
+            setupMobileEnhancements();
             
             // Initialize the UI
             updateUI();
