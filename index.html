@@ -180,6 +180,7 @@
         .header-right {
             display: flex;
             align-items: center;
+            gap: 20px;
         }
 
         .menu-trigger {
@@ -221,6 +222,47 @@
         .header-logo {
             height: 40px;
             width: auto;
+        }
+
+        /* Navigation Links in Header */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid #e9ecef;
+        }
+
+        .nav-link:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-link.investing {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+        }
+
+        .nav-link.tools {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border: none;
         }
 
         .tool-frame {
@@ -381,6 +423,24 @@
                 font-size: 1.1rem;
             }
 
+            .nav-links {
+                gap: 8px;
+            }
+
+            .nav-link {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .nav-link i {
+                margin: 0;
+                font-size: 1rem;
+            }
+
             .welcome-overlay {
                 padding: 2rem;
                 margin: 1rem;
@@ -416,6 +476,14 @@
             .content-icon {
                 width: 35px;
                 height: 35px;
+            }
+
+            .nav-links {
+                gap: 5px;
+            }
+
+            .nav-link {
+                padding: 5px 8px;
             }
         }
     </style>
@@ -459,7 +527,7 @@
                         <div class="tool-icon" style="background: #9b59b6;">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="tool-name">Infographic Genertor</div>
+                        <div class="tool-name">Infographic Generator</div>
                     </div>
                     <div class="tool-item" data-file="fmru.html" data-name="File Flow Management">
                         <div class="tool-icon" style="background: #1abc9c;">
@@ -636,6 +704,17 @@
                     <div class="content-title">Welcome to WorkSmart™ Dashboard</div>
                 </div>
                 <div class="header-right">
+                    <!-- Navigation Links -->
+                    <div class="nav-links">
+                        <a href="https://invest.worksmartinfinite.org/" class="nav-link investing" target="_blank">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Financial Hub</span>
+                        </a>
+                        <a href="https://tools.worksmartinfinite.org/" class="nav-link tools" target="_blank">
+                            <i class="fas fa-tools"></i>
+                            <span>Tools Suite</span>
+                        </a>
+                    </div>
                     <img src="cover.png" alt="WorkSmartInfinite Logo" class="header-logo">
                 </div>
             </div>
